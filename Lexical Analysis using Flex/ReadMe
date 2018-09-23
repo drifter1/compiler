@@ -1,0 +1,11 @@
+To run the lexer you need to have the following installed in cygwin (https://www.cygwin.com/):  
+-Flex package (https://cygwin.com/cgi-bin2/package-grep.cgi?grep=flex&arch=x86_64)  
+-Bison package (https://cygwin.com/cgi-bin2/package-grep.cgi?grep=bison&arch=x86_64)  
+-gcc pacakge (https://cygwin.com/cgi-bin2/package-grep.cgi?grep=gcc&arch=x86_64)
+
+After that you compile and run the lexer as following:  
+flex lexer.l     // lexer.l is the lexer file  
+gcc lex.yy.c  -o lexer -lfl    // where lex.yy.c is the result of "flex lexer.l"  
+./lexer input_file             // lexer is the executable and we will set up main() to take in an input file  
+
+As an input file you can use any of the examples in "Simple C Language"
