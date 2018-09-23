@@ -1,0 +1,11 @@
+Considering that you have Cygwin and the Bison package already installed, you run it as following:  
+bison -d calc.y  
+gcc -o simple-calc calc.tab.c  
+./simple-calc  
+After doing this you can then "enter" any expression you want.  
+After pressing the "ENTER" key you will get the result.  
+For example you could do:  
+1 + 2 <ENTER>  
+This would give you the result:  
+3  
+Note that only vaild expressions will give you a result, else you will just get an parse error!
