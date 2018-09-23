@@ -1,0 +1,12 @@
+Having cygwin and the needed packages installed you can run it as following:  
+flex lexer.l  
+gcc -o steemit lex.yy.c  
+rm lex.yy.c  
+./steemit input_file
+which do the following:  
+-Compile the Flex code into C-code (lex.yy.c)  
+-Compile the C-code the final executable (steemit)  
+-Remove the file lex.yy.c  
+-Run the lexer for the file "input_file"  
+
+You can use any example from "Simple C Language"
