@@ -1,0 +1,6 @@
+Compiling goes as follows:  
+./Makefile // this will do everything for you   
+./steemit input_file // running for "input_file"  
+The example used in the article is inside of the current folder with name "example.c"  
+To run this example you do:  
+./steemit example.c
