@@ -1,0 +1,7 @@
+Compiling goes as follows:  
+bison -d parser.y  // compiling parser  
+flex lexer.l  // compiling lexer  
+gcc -o steemit parser.tab.c lex.yy.c  // combining them into one file  
+rm lex.yy.c parser.tab.c  // removing "garbage"  
+./steemit input_file // running for "input_file"  
+Actual "valid" examples can be found in "Simple C Language"
