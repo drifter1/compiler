@@ -1,0 +1,10 @@
+The only thing that changed from the previous part (Passing Information from Lexer to Parser)  
+is the parser which is in the file "parser.y"  
+Compiling goes as follows:  
+./Makefile // this will do everything for you   
+./steemit input_file // running for "input_file"  
+The example used in the article is inside of the current folder with name "example2.c"  
+To run this example you do:  
+./steemit example2.c  
+I would suggest running this example, as it contains functions and other things  
+that the previous parser/grammar couldn't recognize
