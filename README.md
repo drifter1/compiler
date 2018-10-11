@@ -17,10 +17,10 @@ Until now we covered:
 -Creating a Grammar for the Language by also implementing a first Parser -> https://steemit.com/programming/@drifter1/writing-a-simple-compiler-on-my-own-creating-a-grammar-for-our-language  
 -Combining Flex and Bison -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-combine-flex-and-bison  
 -Passing information from the Lexer to the Parser -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-passing-information-from-lexer-to-parser  
--Finishing Off the Grammar/Parser (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-finishing-off-the-grammer-parser-part-1
+-Finishing Off the Grammar/Parser (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-finishing-off-the-grammer-parser-part-1  
+-Finishing Off the Grammar/Parser (part 2) -> Code ready, article to be done
 
 What remains now is:  
--Continue on with "Finishing off the grammar/parser (part 2)"
 -Semantic analysis which includes predicates and more things about the Symbol Table  
 -Intermediate code generation in form of a Abstract syntax tree  
 -Final machine code generation in MIPS Assembly
