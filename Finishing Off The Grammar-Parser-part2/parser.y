@@ -114,9 +114,9 @@ expression:
     expression EQUOP expression |
     expression RELOP expression |
     LPAREN expression RPAREN |
-	var_ref |
+    var_ref |
     sign constant |
-	function_call
+    function_call
 ;
 
 sign: ADDOP | /* empty */ ; 
