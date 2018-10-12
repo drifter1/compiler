@@ -21,10 +21,10 @@ for(i = 0; i < 10; i++){ // for
 	}
 	else{
 		*p = add(val, i);
-    	val = res[i];
+    	        val = res[i];
    	 	print(res[i]);
-    	print("\n");
-    	p = p + 1;
+    	        print("\n");
+    	        p = p + 1;
 	}
 	
 	if(i == 2 && val == 4.5){ // if
