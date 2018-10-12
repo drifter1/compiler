@@ -47,8 +47,8 @@ int func1(){ 		/* without parameters */
 void func2(char c){ /* with one parameter */
 	// declarations
 	char *s;
-	*s = c;
 	// statements
+	*s = c;
 	print(*s);
 }
 double add (double a, int b){  /* with two parameters */
