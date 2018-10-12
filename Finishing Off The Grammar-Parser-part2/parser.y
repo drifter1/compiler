@@ -85,8 +85,8 @@ statement:
 ;
 
 if_statement:
-		IF LPAREN expression RPAREN tail else_if optional_else |
-		IF LPAREN expression RPAREN tail optional_else
+	IF LPAREN expression RPAREN tail else_if optional_else |
+	IF LPAREN expression RPAREN tail optional_else
 ;
 
 else_if: 
