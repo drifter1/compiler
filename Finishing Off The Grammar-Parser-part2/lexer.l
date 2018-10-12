@@ -52,7 +52,7 @@ STRING		\"{print}*\"
 "return"|"RETURN"		{ return RETURN; }
 
 
-"+"|"-"				{ return ADDOP; }
+"+"|"-"                       { return ADDOP; }
 "*"				{ return MULOP; }
 "/"				{ return DIVOP; }
 "++"|"--"			{ return INCR; }
