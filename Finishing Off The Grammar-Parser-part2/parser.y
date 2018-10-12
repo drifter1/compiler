@@ -29,7 +29,7 @@
 %token <char_val>      CCONST
 %token <str_val>       STRING
 
-/* precedences and associativities */
+/* precedencies and associativities */
 %left LPAREN RPAREN LBRACK RBRACK
 %right NOTOP INCR REFER
 %left MULOP DIVOP
