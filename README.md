@@ -18,7 +18,7 @@ Until now we covered:
 -Combining Flex and Bison -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-combine-flex-and-bison  
 -Passing information from the Lexer to the Parser -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-passing-information-from-lexer-to-parser  
 -Finishing Off the Grammar/Parser (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-finishing-off-the-grammer-parser-part-1  
--Finishing Off the Grammar/Parser (part 2) -> Code ready, article to be done
+-Finishing Off the Grammar/Parser (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-finishing-off-the-grammar-parser-part-2-c-flex-bison
 
 What remains now is:  
 -Semantic analysis which includes predicates and more things about the Symbol Table  
