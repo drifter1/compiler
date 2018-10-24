@@ -22,7 +22,7 @@ Until now we covered:
 -Semantic Analysis Theory -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-semantic-analysis-theory-c-flex-bison
 
 What remains now is:  
--Semantic analysis which includes predicates and more things about the Symbol Table  
+-Semantic analysis which includes extending the Symbol Table and defining the semantic rules  
 -Intermediate code generation in form of a Abstract syntax tree  
 -Final machine code generation in MIPS Assembly
 
