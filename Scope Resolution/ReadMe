@@ -4,4 +4,5 @@ Compiling goes as follows:
 The example used in the article is inside of the current folder with name "full_example.c"  
 To run this example you do:  
 ./steemit full_example.c  
-This example contains most statements that our grammar supports!
+This example contains most statements that our grammar supports!  
+I also include the dump file for that example
