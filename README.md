@@ -25,7 +25,7 @@ Until now we covered:
 -Type Declaration and Checking -> ...
 
 What remains now is:  
--Semantic analysis which includes extending the Symbol Table and defining the semantic rules  
+-Semantic analysis which includes creating and using even more semantic rules and making the attribute grammar
 -Intermediate code generation in form of a Abstract syntax tree  
 -Final machine code generation in MIPS Assembly
 
