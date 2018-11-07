@@ -4,7 +4,8 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
-	#include "symtab.h"
+       #include "symtab.h"
+       #include "semantics.h"
 	#include "parser.tab.h"
 	extern FILE *yyin;
 	extern FILE *yyout;
