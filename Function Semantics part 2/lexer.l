@@ -30,13 +30,13 @@ STRING		\"{print}*\"
 
 %%
 
-"//".*                    { printf("Eat up comment at line %d\n", lineno); } 
+"//".*                   { printf("Eat up comment at line %d\n", lineno); } 
 
-"/*"                      { printf("Eat up comment from line %d ", lineno); BEGIN(ML_COMMENT); }
-<ML_COMMENT>"*/"          { printf("to line %d\n", lineno); BEGIN(INITIAL); }
+"/*"                     { printf("Eat up comment from line %d ", lineno); BEGIN(ML_COMMENT); }
+<ML_COMMENT>"*/"         { printf("to line %d\n", lineno); BEGIN(INITIAL); }
 <ML_COMMENT>[^*\n]+		
 <ML_COMMENT>"*"			
-<ML_COMMENT>"\n"          { lineno += 1; }
+<ML_COMMENT>"\n"         { lineno += 1; }
 
 
 "char"|"CHAR"       	{ return CHAR; }
@@ -78,11 +78,11 @@ STRING		\"{print}*\"
 
 
 {ID} 			{
-					// insert identifier into symbol table
-					insert(yytext, strlen(yytext), UNDEF, lineno);
-					yylval.symtab_item = lookup(yytext);
-					return ID;
-				}
+				// insert identifier into symbol table
+				insert(yytext, strlen(yytext), UNDEF, lineno);
+				yylval.symtab_item = lookup(yytext);
+				return ID;
+			}
 {ICONST} 		{ yylval.int_val   = atoi(yytext); return ICONST; }
 {FCONST} 		{ yylval.double_val = atof(yytext); return FCONST; }
 {CCONST} 		{ yylval.char_val  = yytext[0];    return CCONST; }
