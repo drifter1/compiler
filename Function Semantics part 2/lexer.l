@@ -30,13 +30,13 @@ STRING		\"{print}*\"
 
 %%
 
-"//".*                   { printf("Eat up comment at line %d\n", lineno); } 
+"//".*                  { printf("Eat up comment at line %d\n", lineno); } 
 
-"/*"                     { printf("Eat up comment from line %d ", lineno); BEGIN(ML_COMMENT); }
-<ML_COMMENT>"*/"         { printf("to line %d\n", lineno); BEGIN(INITIAL); }
+"/*"                    { printf("Eat up comment from line %d ", lineno); BEGIN(ML_COMMENT); }
+<ML_COMMENT>"*/"        { printf("to line %d\n", lineno); BEGIN(INITIAL); }
 <ML_COMMENT>[^*\n]+		
 <ML_COMMENT>"*"			
-<ML_COMMENT>"\n"         { lineno += 1; }
+<ML_COMMENT>"\n"        { lineno += 1; }
 
 
 "char"|"CHAR"       	{ return CHAR; }
@@ -64,17 +64,17 @@ STRING		\"{print}*\"
 ">"|"<"|">="|"<="	{ return RELOP; }
 
 
-"("				{ return LPAREN; }
-")"				{ return RPAREN; }
-"]"				{ return RBRACK; }
-"["				{ return LBRACK; }
-"{"				{ return LBRACE; }
-"}"				{ return RBRACE; }
-";"				{ return SEMI; }
-"."				{ return DOT; }
-","				{ return COMMA; }
-"="				{ return ASSIGN; }
-"&"				{ return REFER; }
+"("			{ return LPAREN; }
+")"			{ return RPAREN; }
+"]"			{ return RBRACK; }
+"["			{ return LBRACK; }
+"{"			{ return LBRACE; }
+"}"			{ return RBRACE; }
+";"			{ return SEMI; }
+"."			{ return DOT; }
+","			{ return COMMA; }
+"="			{ return ASSIGN; }
+"&"			{ return REFER; }
 
 
 {ID} 			{
