@@ -30,38 +30,38 @@ STRING		\"{print}*\"
 
 %%
 
-"//".*					{ printf("Eat up comment at line %d\n", lineno); } 
+"//".*                    { printf("Eat up comment at line %d\n", lineno); } 
 
-"/*"					{ printf("Eat up comment from line %d ", lineno); BEGIN(ML_COMMENT); }
-<ML_COMMENT>"*/" 		{ printf("to line %d\n", lineno); BEGIN(INITIAL); }
+"/*"                      { printf("Eat up comment from line %d ", lineno); BEGIN(ML_COMMENT); }
+<ML_COMMENT>"*/"          { printf("to line %d\n", lineno); BEGIN(INITIAL); }
 <ML_COMMENT>[^*\n]+		
 <ML_COMMENT>"*"			
-<ML_COMMENT>"\n"		{ lineno += 1; }
+<ML_COMMENT>"\n"          { lineno += 1; }
 
 
 "char"|"CHAR"       	{ return CHAR; }
-"int"|"INT"				{ return INT; }
-"float"|"FLOAT"			{ return FLOAT; }
-"double"|"DOUBLE"		{ return DOUBLE; }
-"if"|"IF"				{ return IF; }
-"else"|"ELSE"			{ return ELSE; }
-"while"|"WHILE"			{ return WHILE; }
-"for"|"FOR"				{ return FOR; }
+"int"|"INT"		{ return INT; }
+"float"|"FLOAT"	{ return FLOAT; }
+"double"|"DOUBLE"	{ return DOUBLE; }
+"if"|"IF"		{ return IF; }
+"else"|"ELSE"		{ return ELSE; }
+"while"|"WHILE"	{ return WHILE; }
+"for"|"FOR"		{ return FOR; }
 "continue"|"CONTINUE"	{ return CONTINUE; }
-"break"|"BREAK"			{ return BREAK; }
-"void"|"VOID"			{ return VOID; }
-"return"|"RETURN"		{ return RETURN; }
+"break"|"BREAK"	{ return BREAK; }
+"void"|"VOID"		{ return VOID; }
+"return"|"RETURN"	{ return RETURN; }
 
 
-"+"|"-"					{ return ADDOP; }
-"*"						{ return MULOP; }
-"/"						{ return DIVOP; }
-"++"|"--"				{ return INCR; }
-"||"					{ return OROP; }
-"&&"					{ return ANDOP; }
-"!"						{ return NOTOP; }
-"=="|"!="				{ return EQUOP; }
-">"|"<"|">="|"<="		{ return RELOP; }
+"+"|"-"		{ return ADDOP; }
+"*"			{ return MULOP; }
+"/"			{ return DIVOP; }
+"++"|"--"		{ return INCR; }
+"||"			{ return OROP; }
+"&&"			{ return ANDOP; }
+"!"			{ return NOTOP; }
+"=="|"!="		{ return EQUOP; }
+">"|"<"|">="|"<="	{ return RELOP; }
 
 
 "("				{ return LPAREN; }
