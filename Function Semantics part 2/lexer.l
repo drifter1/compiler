@@ -22,7 +22,7 @@ digit 		[0-9]
 alnum 		{alpha}|{digit}
 print		[ -~]
 
-ID 			{alpha}+{alnum}*
+ID 		{alpha}+{alnum}*
 ICONST		"0"|[0-9]{digit}*
 FCONST		"0"|{digit}*"."{digit}+
 CCONST		(\'{print}\')|(\'\\[nftrbv]\')
