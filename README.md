@@ -24,7 +24,7 @@ Until now we covered:
 -Scope Resolution using Symbol Table -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own---scope-resolution-using-the-symbol-table-cflexbison  
 -Type Declaration and Checking -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-type-declaration-and-checking-c-flex-bison  
 -Function Semantics (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-function-semantics-part-1-c-flex-bison  
--Function Semantics (part 2) -> ...
+-Function Semantics (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-function-semantics-part-2-c-flex-bison
 
 What remains now is:  
 -Semantic analysis which includes creating and using even more semantic rules and making the attribute grammar
