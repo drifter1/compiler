@@ -27,7 +27,7 @@ Until now we covered:
 -Function Semantics (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-function-semantics-part-2-c-flex-bison
 
 What remains now is:  
--Semantic analysis which includes creating and using even more semantic rules and making the attribute grammar
+-Semantic analysis which includes creating and using even more semantic rules and making the attribute grammar  
 -Intermediate code generation in form of a Abstract syntax tree  
 -Final machine code generation in MIPS Assembly
 
