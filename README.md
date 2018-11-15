@@ -26,7 +26,7 @@ Until now we covered:
 -Function Semantics (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-function-semantics-part-1-c-flex-bison  
 -Function Semantics (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-function-semantics-part-2-c-flex-bison  
 -Abstract Syntax Tree Principle -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-principle-c-flex-bison  
--Abstract Syntax Tree Structure ->
+-Abstract Syntax Tree Structure -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-structure-c-flex-bison
 
 What remains now is:  
 -Semantic analysis which includes creating and using semantic and so action rules in Bison  
