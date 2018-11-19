@@ -27,11 +27,12 @@ Until now we covered:
 -Function Semantics (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-function-semantics-part-2-c-flex-bison  
 -Abstract Syntax Tree Principle -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-principle-c-flex-bison  
 -Abstract Syntax Tree Structure -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-structure-c-flex-bison  
--Abstract Syntax Tree Management -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-management-c-flex-bison
+-Abstract Syntax Tree Management -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-management-c-flex-bison  
+-Action Rules for Declarations and Initializations -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-declarations-and-initializations-c-flex-bison
 
 What remains now is:  
 -Semantic analysis which includes creating and using semantic and so action rules in Bison  
--Intermediate code generation in form of a Abstract syntax tree (continue with the implementation)  
+-Intermediate code generation in form of a Abstract syntax tree (continue using the AST)  
 -Final machine code generation in MIPS Assembly
 
 After doing all that we could also get into Optimizations, Extensions and even more if you like :)
