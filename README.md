@@ -28,7 +28,9 @@ Until now we covered:
 -Abstract Syntax Tree Principle -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-principle-c-flex-bison  
 -Abstract Syntax Tree Structure -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-structure-c-flex-bison  
 -Abstract Syntax Tree Management -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-abstract-syntax-tree-management-c-flex-bison  
--Action Rules for Declarations and Initializations -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-declarations-and-initializations-c-flex-bison
+-Action Rules for Declarations and Initializations -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-declarations-and-initializations-c-flex-bison  
+-Action Rules for Expressions -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-expressions-c-flex-bison  
+-Action Rules for Assignments and Simple Statements -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-assignments-and-simple-statements-c-flex-bison
 
 What remains now is:  
 -Semantic analysis which includes creating and using semantic and so action rules in Bison  
