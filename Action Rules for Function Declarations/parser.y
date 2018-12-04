@@ -523,7 +523,6 @@ functions:
 	}
 ;
 
-/* kati gkamiete poly edw pera */
 function: { incr_scope(); } function_head function_tail
 { 
 	hide_scope();
