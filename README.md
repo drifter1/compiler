@@ -34,7 +34,7 @@ Until now we covered:
 -Action Rules for If-Else Statemenets -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-if-else-statements-c-flex-bison  
 -Action Rules for Loop Statements and some Fixes -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-loop-statements-and-some-fixes-c-flex-bison  
 -Action Rules for Function Declarations (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-function-declarations-part-1-c-flex-bison  
--Action Rules for Function Declarations (part 2) ->
+-Action Rules for Function Declarations (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-action-rules-for-function-declarations-part-2-c-flex-bison
 
 What remains now is:  
 -Semantic analysis which includes creating and using semantic and so action rules in Bison  
