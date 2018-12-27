@@ -40,7 +40,8 @@ Until now we covered:
 -Type Checking for Assignments -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-type-checking-for-assignments-c-flex-bison  
 -Revisit Queue and Parameter Checking (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-parameter-checking-part-1-c-flex-bison  
 -Revisit Queue and Parameter Checking (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-parameter-checking-part-2-c-flex-bison  
--Revisit Queue and Parameter Checking (part 3) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-parameter-checking-part-3-c-flex-bison
+-Revisit Queue and Parameter Checking (part 3) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-parameter-checking-part-3-c-flex-bison  
+-Revisit Queue and Parameter Checking (part 4) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-parameter-checking-part-4-c-flex-bison
 
 What remains now is:  
 -Semantic analysis which includes creating and using even more semantic and so action rules in Bison  
