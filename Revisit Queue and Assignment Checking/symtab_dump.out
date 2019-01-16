@@ -1,0 +1,12 @@
+------------ -------------- ------ ------------
+Name         Type           Scope  Line Numbers
+------------ -------------- ------ ------------
+func1        func ret int     0    16   44 
+func2        func ret void    0    38   48 
+add          func ret real    0    17   23   55 
+c            char             0     5   38 
+i            int              0     4   10   10   10   11   14   15   15   17   18   23   24   25   30   35   36   39 
+p            pointer to real  0     7    9   17   23   27   27 
+val          real             0     6   16   17   23   24   30 
+res          array of real    0     6    9   18   24   25 
+print        func ret void    0    18   19   25   26   31   36   37   41   53 
