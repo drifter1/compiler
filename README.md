@@ -50,9 +50,10 @@ Until now we covered the following...
 -Revisit Queue and Assignment Checking (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-assignment-checking-part-1-c-flex-bison  
 -Revisit Queue and Assignment Checking (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-assignment-checking-part-2-c-flex-bison  
 -Revisit Queue and Assignment Checking (part 3) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-assignment-checking-part-3-c-flex-bison
+**Machine Code Generation**  
 
 What remains now is:  
--Semantic analysis which includes creating and using even more semantic and so action rules in Bison  
--Final machine code generation in MIPS Assembly
+-Machine code generation in MIPS Assembly  
+-Various optimizations in our compiler code
 
 After doing all that we could also get into Optimizations, Extensions and even more if you like :)
