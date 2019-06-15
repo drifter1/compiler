@@ -58,7 +58,7 @@ Until now we covered the following...
 **Machine Code Generation**  
 
 What remains now is:  
--Machine code generation in MIPS Assembly  
--Various optimizations in our compiler code
+-Machine Code generation in MIPS Assembly  
+-Various Optimizations in the Compiler's Code
 
 After doing all that we could also get into Optimizations, Extensions and even more if you like :)
