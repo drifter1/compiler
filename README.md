@@ -1,6 +1,6 @@
 # compiler
 A short Description of this repository:  
-It contains all the Code from my "Writing a simple Compiler on my own" series on Steemit (step by step / article by article), where we are implementing a complete Compiler for a simple C-like Language using the C-tools Flex and Bison.
+It contains all the Code from my "Writing a simple Compiler on my own" series on Steemit (step by step / article by article), where we are implementing a complete Compiler for a simple C-like Language using the C-tools Flex and Bison and our own Custom Structures and Code.
 
 It's worth noting that not all articles contain actual Code.  
 Compiler design in general is mostly about understanding how everything needs to work.  
