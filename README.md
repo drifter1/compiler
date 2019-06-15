@@ -56,6 +56,7 @@ Until now we covered the following...
 -Revisit Queue and Assignment Checking (part 3) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-revisit-queue-and-assignment-checking-part-3-c-flex-bison
 
 **Machine Code Generation**  
+-Machine Code Generation Principles -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-machine-code-generation-principles
 
 What remains now is:  
 -Machine Code generation in MIPS Assembly  
