@@ -57,7 +57,8 @@ Until now we covered the following...
 
 **Machine Code Generation**  
 -Machine Code Generation Principles -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-machine-code-generation-principles  
--MIPS Instruction Set -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-mips-instruction-set
+-MIPS Instruction Set -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-mips-instruction-set  
+-Simple Examples in MIPS Assembly -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-simple-examples-in-mips-assembly
 
 What remains now is:  
 -Machine Code generation in MIPS Assembly  
