@@ -60,7 +60,8 @@ Until now we covered the following...
 -MIPS Instruction Set -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-mips-instruction-set  
 -Simple Examples in MIPS Assembly -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-simple-examples-in-mips-assembly  
 -full_example.c in MIPS Assembly (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-fullexample-c-in-mips-assembly  
--full_example.c in MIPS Assembly (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-fullexample-c-in-mips-assembly-part-2
+-full_example.c in MIPS Assembly (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-fullexample-c-in-mips-assembly-part-2  
+-Generating Code for Declarations and Initializations -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-declarations-and-initializations
 
 What remains now is:  
 -Machine Code generation in MIPS Assembly  
