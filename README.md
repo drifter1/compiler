@@ -63,7 +63,8 @@ Until now we covered the following...
 -full_example.c in MIPS Assembly (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-fullexample-c-in-mips-assembly-part-2  
 -Generating Code for Declarations and Initializations -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-declarations-and-initializations  
 -Generating Code for Array Initializations and String Messages -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-array-initializations-and-string-messages  
--Register Allocation & Assignment Theory -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-register-allocation-and-assignment-theory
+-Register Allocation & Assignment Theory -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-register-allocation-and-assignment-theory  
+-Implementing Register Allocation (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-1
 
 What remains now is:  
 -Machine Code generation in MIPS Assembly  
