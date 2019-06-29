@@ -159,8 +159,6 @@ void insertEdge(int i, int j){
 		return;
 	}
 	
-	int k;
-	
 	/* find max */
 	int max;
 	if(i > j){
@@ -197,6 +195,7 @@ void insertEdge(int i, int j){
 	
 	/* insert edge j-i */
 	l = g->adj[j];
+	
 	while ((l != NULL) && (l->index != i)) l = l->next;
 	
 	if (l == NULL){
@@ -297,7 +296,6 @@ void insertVar(char *name){
 		var_count++;
 	}
 	else{
-		
 		/* check if variable already exists */
 		int flag = 0;
 		int i;
