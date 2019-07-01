@@ -349,7 +349,6 @@ void main_reg_allocation(AST_Node *node){
 	AST_Node_Bool *temp_bool;
 	AST_Node_Rel *temp_rel;
 	AST_Node_Equ *temp_equ;
-	AST_Node_Ref *temp_ref;
 	AST_Node_Statements *temp_statements;
 	AST_Node_If *temp_if;
 	AST_Node_Elsif *temp_elsif;
@@ -383,6 +382,9 @@ void main_reg_allocation(AST_Node *node){
 			temp_decl = (struct AST_Node_Decl *) node;
 			for(i = 0; i < temp_decl->names_count; i++){
 				insertVar(temp_decl->names[i]->st_name);
+				
+				/* graph index */
+				temp_decl->names[i]->g_index = getVarIndex(temp_decl->names[i]->st_name);
 			}
 			break;
 		/* left and right child cases */
@@ -414,6 +416,9 @@ void main_reg_allocation(AST_Node *node){
 				insertEdge(temp_arithm->g_index, getGraphIndex(temp_arithm->right));
 				insertEdge(getGraphIndex(temp_arithm->left), getGraphIndex(temp_arithm->right));
 			}
+			else{
+				insertEdge(temp_arithm->g_index, getGraphIndex(temp_arithm->left));
+			}
 			
 			inst_num++;
 			break;
@@ -440,6 +445,9 @@ void main_reg_allocation(AST_Node *node){
 				insertEdge(temp_bool->g_index, getGraphIndex(temp_bool->left));
 				insertEdge(temp_bool->g_index, getGraphIndex(temp_bool->right));	
 				insertEdge(getGraphIndex(temp_bool->left), getGraphIndex(temp_bool->right));
+			}
+			else{
+				insertEdge(temp_bool->g_index, getGraphIndex(temp_bool->left));
 			}
 			
 			inst_num++;
@@ -496,15 +504,11 @@ void main_reg_allocation(AST_Node *node){
 			break;
 		/* reference case */
 		case REF_NODE:
-			temp_ref = (AST_Node_Ref*) node;
-			insertVar(temp_ref->entry->st_name);
-			
-			/* graph index */
-			temp_ref->entry->g_index = getVarIndex(temp_ref->entry->st_name);
+			/* all the entries are already being managed by the Decl case */
 			break;
 		/* constant case */
 		case CONST_NODE:
-			/* action */
+			/* already managed in getGraphIndex */
 			break;
 		/* statements case */
 		case STATEMENTS:
@@ -568,13 +572,10 @@ void main_reg_allocation(AST_Node *node){
 		case ASSIGN_NODE:
 			temp_assign = (struct AST_Node_Assign *) node;
 			
-			insertVar(temp_assign->entry->st_name);
-			
-			/* graph index */
-			temp_assign->entry->g_index = getVarIndex(temp_assign->entry->st_name);
+			/* manage graph */
+			insertEdge(temp_assign->entry->g_index, getGraphIndex(temp_assign->assign_val));
 			
 			main_reg_allocation(temp_assign->assign_val);
-			
 			break;
 		/* simple case */
 		case SIMPLE_NODE:
@@ -583,11 +584,6 @@ void main_reg_allocation(AST_Node *node){
 		/* increment statement */
 		case INCR_NODE:
 			temp_incr = (AST_Node_Incr*) node;
-			
-			insertVar(temp_incr->entry->st_name);
-			
-			/* graph index */
-			temp_incr->entry->g_index = getVarIndex(temp_incr->entry->st_name);
 			
 			inst_num++;
 			break;
