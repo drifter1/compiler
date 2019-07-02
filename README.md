@@ -66,7 +66,8 @@ Until now we covered the following...
 -Register Allocation & Assignment Theory -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-register-allocation-and-assignment-theory  
 -Implementing Register Allocation (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-1  
 -Implementing Register Allocation (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-2  
--Implementing Register Allocation (part 3) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-3
+-Implementing Register Allocation (part 3) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-3  
+-Implementing Register Allocation (part 4) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-4
 
 What remains now is:  
 -Machine Code generation in MIPS Assembly  
