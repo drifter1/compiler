@@ -119,14 +119,6 @@ void generate_statements(FILE *fp){
 	int i;
 	int *colors = greedyColoring();
 	
-	if(var_count > g->vertexCount){
-		/* assign colors to the non-adjacenct variables */
-		colors = (int*) realloc(colors, var_count * sizeof(int));
-		for(i = g->vertexCount; i < var_count; i++){
-			colors[i] = 0;
-		}
-	}
-	
 	printf("Colors:\n");
 	for(i = 0; i < var_count; i++){
 		printf("%s: %d\n", var_name[i], colors[i]);
@@ -403,6 +395,10 @@ void main_reg_allocation(AST_Node *node){
 			insertVar(name);
 			temp_count++;
 			
+			printf("Inserting %s for node:\n", name);
+			ast_print_node(node);
+			printf("\n");
+			
 			declare = 1;
 			insert(name, strlen(name), temp_arithm->data_type, -1);
 			declare = 0;
@@ -432,6 +428,10 @@ void main_reg_allocation(AST_Node *node){
 			sprintf(name, "_temp%d", temp_count);
 			insertVar(name);
 			temp_count++;
+			
+			printf("Inserting %s for node:\n", name);
+			ast_print_node(node);
+			printf("\n");
 			
 			declare = 1;
 			insert(name, strlen(name), temp_bool->data_type, -1);
@@ -463,6 +463,10 @@ void main_reg_allocation(AST_Node *node){
 			insertVar(name);
 			temp_count++;
 			
+			printf("Inserting %s for node:\n", name);
+			ast_print_node(node);
+			printf("\n");
+			
 			declare = 1;
 			insert(name, strlen(name), temp_rel->data_type, -1);
 			declare = 0;
@@ -487,6 +491,10 @@ void main_reg_allocation(AST_Node *node){
 			sprintf(name, "_temp%d", temp_count);
 			insertVar(name);
 			temp_count++;
+			
+			printf("Inserting %s for node:\n", name);
+			ast_print_node(node);
+			printf("\n");
 			
 			declare = 1;
 			insert(name, strlen(name), temp_equ->data_type, -1);
@@ -549,15 +557,15 @@ void main_reg_allocation(AST_Node *node){
 		case FOR_NODE:
 			temp_for = (struct AST_Node_For *) node;
 			
-			main_reg_allocation(temp_for->initialize);
+			//main_reg_allocation(temp_for->initialize);
 			inst_num++;
 			
-			main_reg_allocation(temp_for->condition);
+			//main_reg_allocation(temp_for->condition);
 			inst_num++;
 			
 			main_reg_allocation(temp_for->for_branch);
 			
-			main_reg_allocation(temp_for->increment);
+			//main_reg_allocation(temp_for->increment);
 			inst_num++;
 			break;
 		/* while case */
@@ -601,6 +609,10 @@ void main_reg_allocation(AST_Node *node){
 				sprintf(name, "_temp%d", temp_count);
 				insertVar(name);
 				temp_count++;
+				
+				printf("Inserting %s for node:\n", name);
+				ast_print_node(node);
+				printf("\n");
 				
 				declare = 1;
 				insert(name, strlen(name), temp_func_call->entry->inf_type, -1);
