@@ -68,7 +68,8 @@ Until now we covered the following...
 -Implementing Register Allocation (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-2  
 -Implementing Register Allocation (part 3) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-3  
 -Implementing Register Allocation (part 4) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-implementing-register-allocation-part-4  
--Generating Code for Expressions (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-expressions-part-1
+-Generating Code for Expressions (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-expressions-part-1  
+-Generating Code for Expressions (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-expressions-part-2
 
 What remains now is:  
 -Machine Code generation in MIPS Assembly  
