@@ -16,31 +16,33 @@ msg5: .asciiz "\n"
 main:
 LA $s3, res($0)
 LW $s0, i($0)
-Relational Expression
+BGE $s0, 10, Temp_Label
 LW $s0, i($0)
-Relational Expression
+BGT $s0, 5, Temp_Label
 LW $s0, i($0)
-Equality Expression
+BNE $s0, 5, Temp_Label
 LW $s0, i($0)
 MULI $s5, $s0, 2
-Function Call result
+LI $s6, 0
 L.D $f4, val
 LW $s0, i($0)
-Function Call result
+LI.D $f14, 0.0
 LW $s3, res($0)
 L.D $f4, val
 LW $s0, i($0)
-Function Call result
+LI.D $f16, 0.0
 LW $s3, res($0)
 LW $s3, res($0)
 LW $s4, p($0)
 ADDI $t1, $s4, 1
 LW $s0, i($0)
-Equality Expression
+BNE $s0, 2, Temp_Label
 L.D $f4, val
-Equality Expression
-Boolean Expression
+LI.D $f28, 4.50
+C.EQ.D $f4 $f28 
+BC1F Temp_Label
+AND $s0, $s0, $s0
 LW $s0, i($0)
-Relational Expression
+BGE $s0, 12, Temp_Label
 LW $s0, i($0)
 LW $s1, c($0)
