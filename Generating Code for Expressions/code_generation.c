@@ -781,14 +781,653 @@ void generate_arithm(FILE *fp, AST_Node_Arithm *node){
 			exit(1);
 	}	
 }
+
 void generate_bool(FILE *fp, AST_Node_Bool *node){
-	fprintf(fp, "Boolean Expression\n");	
+	
+	int const_op = 0;
+	
+	/* GP: 0, Constant: 1 */
+	int Operand1 = 0; 
+	int Operand2 = 0;
+	
+	AST_Node_Const *temp_const;
+	
+	if(node->op != NOT){
+		if(node->left->type == CONST_NODE){
+			const_op = 1;
+			Operand1 = 1;
+		}
+		else if(node->right->type == CONST_NODE){
+			const_op = 1;
+			Operand2 = 1;
+		}
+	}
+	
+	/* operation */
+	switch(node->op){
+		case OR:
+			if (const_op == 1){
+				if(Operand1 == 1){
+					temp_const = (AST_Node_Const*) node->left;
+					fprintf(fp,"ORI %s, %s, %d\n", GetRegisterName(node->g_index, 0), GetRegisterName(getGraphIndex(node->right), 0), temp_const->val);
+				}
+				else{
+					temp_const = (AST_Node_Const*) node->right;
+					fprintf(fp,"ORI %s, %s, %d\n", GetRegisterName(node->g_index ,0), GetRegisterName(getGraphIndex(node->left),0), temp_const->val);
+				}
+			}
+			else{
+				fprintf(fp,"OR %s, %s, %s\n", GetRegisterName(node->g_index ,0), GetRegisterName(getGraphIndex(node->left),0), GetRegisterName(getGraphIndex(node->right),0));
+			}
+			break;
+		case AND:
+			if (const_op == 1){
+				if(Operand1 == 1){
+					temp_const = (AST_Node_Const*) node->left;
+					fprintf(fp,"ANDI %s, %s, %d\n", GetRegisterName(node->g_index ,0), GetRegisterName(getGraphIndex(node->right),0), temp_const->val);
+				}
+				else{
+					temp_const = (AST_Node_Const*) node->right;
+					fprintf(fp,"ANDI %s, %s, %d\n", GetRegisterName(node->g_index ,0), GetRegisterName(getGraphIndex(node->left),0), temp_const->val);
+				}
+			}
+			else{
+				fprintf(fp,"AND %s, %s, %s\n", GetRegisterName(node->g_index ,0), GetRegisterName(getGraphIndex(node->left),0), GetRegisterName(getGraphIndex(node->right),0));
+			}
+			break;
+		case NOT:
+			fprintf(fp, "NOT %s, %s", GetRegisterName(node->g_index ,0), GetRegisterName(getGraphIndex(node->left),0));
+			break;
+		default:
+			fprintf(stderr, "Error in OP selection!\n");
+			exit(1);
+	}
 }
-void generate_rel(FILE *fp, AST_Node_Rel *node){
-	fprintf(fp, "Relational Expression\n");	
+
+void generate_rel(FILE *fp, AST_Node_Rel *node, int invLogic, char* Label){
+	
+	int const_op = 0;
+	int float_op = 0;
+	
+	/* GP: 0, FP: 1, Constant: 2, FP Constant: 3 */
+	int Operand1 = 0; 
+	int Operand2 = 0;
+	
+	AST_Node_Const *temp_const;
+
+	/* check left operand */
+	if (expression_data_type(node->left) == REAL_TYPE){
+		float_op = 1;
+		if(node->left->type == CONST_NODE){
+			const_op = 1;
+			Operand1 = 3;
+		}
+		else{
+			Operand1 = 1;
+		}
+	}
+	else{
+		if(node->left->type == CONST_NODE){
+			const_op = 1;
+			Operand1 = 2;
+		}
+		else{
+			Operand1 = 0;
+		}
+	}
+
+	/* check right operand */
+	if(expression_data_type(node->right) == REAL_TYPE){
+		float_op = 1;
+		if(node->right->type == CONST_NODE){
+			const_op = 1;
+			Operand2 = 3;
+		}
+		else{
+			Operand2 = 1;
+		}
+	}
+	else{
+		if(node->right->type == CONST_NODE){
+			const_op = 1;
+			Operand2 = 2;
+		}
+		else{
+			Operand2 = 0;
+		}
+	}
+	
+	
+	/* inverted logic */
+	int op;
+	if(invLogic == 1){
+		switch(node->op){
+			case GREATER:
+				op = LESS_EQUAL;
+				break;
+			case LESS:
+				op = GREATER_EQUAL;
+				break;
+			case GREATER_EQUAL:
+				op = LESS;
+				break;
+			case LESS_EQUAL:
+				op = GREATER;
+				break;
+			default:
+				fprintf(stderr, "Error in OP selection!\n");
+				exit(1);
+		}
+	}
+	else{
+		op = node->op;
+	}
+	
+	/* operation */
+	switch(op){
+		case GREATER:
+			if(float_op == 1){
+				if(const_op == 1){
+					if(Operand1 == 2 || Operand1 == 3){
+						temp_const = (AST_Node_Const *) node->left;
+					}
+					else{
+						temp_const = (AST_Node_Const *) node->right;
+					}
+					if(temp_const->const_type == REAL_TYPE){
+						fprintf(fp, "LI.D $f28, %.2f\n", temp_const->val);
+					}
+					else{
+						fprintf(fp, "LI.D $f28, %d.0\n", temp_const->val);
+					}
+				}
+				
+				if(Operand1 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->left) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				else if(Operand2 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->right) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				
+				fprintf(fp, "C.LE.D ");
+				
+				switch(Operand1){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->left) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				
+				switch(Operand2){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->right) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				fprintf(fp, "\n");
+				
+				fprintf(fp, "BC1F %s\n", Label);
+				
+			}
+			else if(const_op == 1){
+				if(Operand1 != 0){
+					temp_const = (AST_Node_Const *) node->left;
+					fprintf(fp, "BLE %s, %d, %s\n", GetRegisterName(getGraphIndex(node->right), 0), temp_const->val, Label);
+				}
+				else if(Operand2 != 0){
+					temp_const = (AST_Node_Const *) node->right;
+					fprintf(fp, "BGT %s, %d, %s\n", GetRegisterName(getGraphIndex(node->left), 0), temp_const->val, Label);
+				}
+			}
+			else{
+				fprintf(fp, "BGT %s, %s, %s\n", GetRegisterName(getGraphIndex(node->left), 0), GetRegisterName(getGraphIndex(node->right), 0), Label);
+			}
+			break;
+		case LESS:
+			if(float_op == 1){
+				if(const_op == 1){
+					if(Operand1 == 2 || Operand1 == 3){
+						temp_const = (AST_Node_Const *) node->left;
+					}
+					else{
+						temp_const = (AST_Node_Const *) node->right;
+					}
+					if(temp_const->const_type == REAL_TYPE){
+						fprintf(fp, "LI.D $f28, %.2f\n", temp_const->val);
+					}
+					else{
+						fprintf(fp, "LI.D $f28, %d.0\n", temp_const->val);
+					}
+					
+				}
+				
+				if(Operand1 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->left) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				else if(Operand2 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->right) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				
+				fprintf(fp, "C.LT.D ");
+				
+				switch(Operand1){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->left) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				
+				switch(Operand2){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->right) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				fprintf(fp, "\n");
+				
+				fprintf(fp, "BC1T %s\n", Label);
+				
+			}
+			else if(const_op == 1){
+				if(Operand1 != 0){
+					temp_const = (AST_Node_Const *) node->left;
+					fprintf(fp, "BGE %s, %d, %s\n", GetRegisterName(getGraphIndex(node->right), 0), temp_const->val, Label);
+				}
+				else if(Operand2 != 0){
+					temp_const = (AST_Node_Const *) node->right;
+					fprintf(fp, "BLT %s, %d, %s\n", GetRegisterName(getGraphIndex(node->left), 0), temp_const->val, Label);
+				}
+			}
+			else{
+				fprintf(fp, "BLT %s, %s, %s\n", GetRegisterName(getGraphIndex(node->left), 0), GetRegisterName(getGraphIndex(node->right), 0), Label);
+			}
+			break;
+		case GREATER_EQUAL:
+			if(float_op == 1){
+				if(const_op == 1){
+					if(Operand1 == 2 || Operand1 == 3){
+						temp_const = (AST_Node_Const *) node->left;
+					}
+					else{
+						temp_const = (AST_Node_Const *) node->right;
+					}
+					if(temp_const->const_type == REAL_TYPE){
+						fprintf(fp, "LI.D $f28, %.2f\n", temp_const->val);
+					}
+					else{
+						fprintf(fp, "LI.D $f28, %d.0\n", temp_const->val);
+					}
+					
+				}
+				
+				if(Operand1 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->left) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				else if(Operand2 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->right) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				
+				fprintf(fp, "C.LT.D ");
+				
+				switch(Operand1){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->left) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				
+				switch(Operand2){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->right) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				fprintf(fp, "\n");
+				
+				fprintf(fp, "BC1F %s\n", Label);
+				
+			}
+			else if(const_op == 1){
+				if(Operand1 != 0){
+					temp_const = (AST_Node_Const *) node->left;
+					fprintf(fp, "BLT %s, %d, %s\n", GetRegisterName(getGraphIndex(node->right), 0), temp_const->val, Label);
+				}
+				else if(Operand2 != 0){
+					temp_const = (AST_Node_Const *) node->right;
+					fprintf(fp, "BGE %s, %d, %s\n", GetRegisterName(getGraphIndex(node->left), 0), temp_const->val, Label);
+				}
+			}
+			else{
+				fprintf(fp, "BGE %s, %s, %s\n", GetRegisterName(getGraphIndex(node->left), 0), GetRegisterName(getGraphIndex(node->right), 0), Label);
+			}
+			break;
+		case LESS_EQUAL:
+			if(float_op == 1){
+				if(const_op == 1){
+					if(Operand1 == 2 || Operand1 == 3){
+						temp_const = (AST_Node_Const *) node->left;
+					}
+					else{
+						temp_const = (AST_Node_Const *) node->right;
+					}
+					if(temp_const->const_type == REAL_TYPE){
+						fprintf(fp, "LI.D $f28, %.2f\n", temp_const->val);
+					}
+					else{
+						fprintf(fp, "LI.D $f28, %d.0\n", temp_const->val);
+					}
+					
+				}
+				
+				if(Operand1 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->left) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				else if(Operand2 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->right) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				
+				fprintf(fp, "C.LE.D ");
+				
+				switch(Operand1){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->left) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				
+				switch(Operand2){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->right) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				fprintf(fp, "\n");
+				
+				fprintf(fp, "BC1T %s\n", Label);
+				
+			}
+			else if(const_op == 1){
+				if(Operand1 != 0){
+					temp_const = (AST_Node_Const *) node->left;
+					fprintf(fp, "BLE %s, %d, %s\n", GetRegisterName(getGraphIndex(node->right), 0), temp_const->val, Label);
+				}
+				else if(Operand2 != 0){
+					temp_const = (AST_Node_Const *) node->right;
+					fprintf(fp, "BGT %s, %d, %s\n", GetRegisterName(getGraphIndex(node->left), 0), temp_const->val, Label);
+				}
+			}
+			else{
+				fprintf(fp, "BLE %s, %s, %s\n", GetRegisterName(getGraphIndex(node->left), 0), GetRegisterName(getGraphIndex(node->right), 0), Label);
+			}
+			break;			
+		default:
+			fprintf(stderr, "Error in OP selection!\n");
+			exit(1);
+	}
 }
-void generate_equ(FILE *fp, AST_Node_Equ *node){
-	fprintf(fp, "Equality Expression\n");	
+void generate_equ(FILE *fp, AST_Node_Equ *node, int invLogic, char* Label){
+	int const_op = 0;
+	int float_op = 0;
+	
+	/* GP: 0, FP: 1, Constant: 2, FP Constant: 3 */
+	int Operand1 = 0; 
+	int Operand2 = 0;
+	
+	AST_Node_Const *temp_const;
+
+	/* check left operand */
+	if (expression_data_type(node->left) == REAL_TYPE){
+		float_op = 1;
+		if(node->left->type == CONST_NODE){
+			const_op = 1;
+			Operand1 = 3;
+		}
+		else{
+			Operand1 = 1;
+		}
+	}
+	else{
+		if(node->left->type == CONST_NODE){
+			const_op = 1;
+			Operand1 = 2;
+		}
+		else{
+			Operand1 = 0;
+		}
+	}
+
+	/* check right operand */
+	if(expression_data_type(node->right) == REAL_TYPE){
+		float_op = 1;
+		if(node->right->type == CONST_NODE){
+			const_op = 1;
+			Operand2 = 3;
+		}
+		else{
+			Operand2 = 1;
+		}
+	}
+	else{
+		if(node->right->type == CONST_NODE){
+			const_op = 1;
+			Operand2 = 2;
+		}
+		else{
+			Operand2 = 0;
+		}
+	}
+	
+	/* inverted logic */
+	int op;
+	if(invLogic == 1){
+		/* EQUAL <-> NOT_EQUAL */
+		if(node->op == EQUAL){
+			op = NOT_EQUAL;
+		}
+		else{
+			op = EQUAL;
+		}
+	}
+	else{
+		op = node->op;
+	}
+	
+	/* operation */
+	switch(op){
+		case EQUAL:
+			if(float_op == 1){
+				if(const_op == 1){
+					if(Operand1 == 2 || Operand1 == 3){
+						temp_const = (AST_Node_Const *) node->left;
+					}
+					else{
+						temp_const = (AST_Node_Const *) node->right;
+					}
+					if(temp_const->const_type == REAL_TYPE){
+						fprintf(fp, "LI.D $f28, %.2f\n", temp_const->val);
+					}
+					else{
+						fprintf(fp, "LI.D $f28, %d.0\n", temp_const->val);
+					}
+					
+				}
+				
+				if(Operand1 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->left) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				else if(Operand2 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->right) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				
+				fprintf(fp, "C.EQ.D ");
+				
+				switch(Operand1){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->left) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				
+				switch(Operand2){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->right) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				fprintf(fp, "\n");
+				
+				fprintf(fp, "BC1T %s\n", Label);
+				
+			}
+			else if(const_op == 1){
+				if(Operand1 != 0){
+					temp_const = (AST_Node_Const *) node->left;
+					fprintf(fp, "BEQ %s, %d, %s\n", GetRegisterName(getGraphIndex(node->right), 0), temp_const->val, Label);
+				}
+				else if(Operand2 != 0){
+					temp_const = (AST_Node_Const *) node->right;
+					fprintf(fp, "BEQ %s, %d, %s\n", GetRegisterName(getGraphIndex(node->left), 0), temp_const->val, Label);
+				}
+			}
+			else{
+				fprintf(fp, "BEQ %s, %s, %s\n", GetRegisterName(getGraphIndex(node->left), 0), GetRegisterName(getGraphIndex(node->right), 0), Label);
+			}
+			break;
+		case NOT_EQUAL:
+			if(float_op == 1){
+				if(const_op == 1){
+					if(Operand1 == 2 || Operand1 == 3){
+						temp_const = (AST_Node_Const *) node->left;
+					}
+					else{
+						temp_const = (AST_Node_Const *) node->right;
+					}
+					if(temp_const->const_type == REAL_TYPE){
+						fprintf(fp, "LI.D $f28, %.2f\n", temp_const->val);
+					}
+					else{
+						fprintf(fp, "LI.D $f28, %d.0\n", temp_const->val);
+					}
+					
+				}
+				
+				if(Operand1 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->left) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				else if(Operand2 == 0){
+					fprintf(fp, "MTC1.D %s, $f30\n", GetRegisterName(getGraphIndex(node->right) , 0));
+					fprintf(fp, "CVT.D.W $f30, $f30\n");
+				}
+				
+				fprintf(fp, "C.EQ.D ");
+				
+				switch(Operand1){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->left) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				
+				switch(Operand2){
+					case 0:
+						fprintf(fp, "$f30 ");
+						break;
+					case 1:
+						fprintf(fp, "%s ", GetRegisterName(getGraphIndex(node->right) , 1));
+						break;
+					case 2:
+					case 3:
+						fprintf(fp, "$f28 ");
+				}
+				fprintf(fp, "\n");
+				
+				fprintf(fp, "BC1F %s\n", Label);
+				
+			}
+			else if(const_op == 1){
+				if(Operand1 != 0){
+					temp_const = (AST_Node_Const *) node->left;
+					fprintf(fp, "BNE %s, %d, %s\n", GetRegisterName(getGraphIndex(node->right), 0), temp_const->val, Label);
+				}
+				else if(Operand2 != 0){
+					temp_const = (AST_Node_Const *) node->right;
+					fprintf(fp, "BNE %s, %d, %s\n", GetRegisterName(getGraphIndex(node->left), 0), temp_const->val, Label);
+				}
+			}
+			else{
+				fprintf(fp, "BNE %s, %s, %s\n", GetRegisterName(getGraphIndex(node->left), 0), GetRegisterName(getGraphIndex(node->right), 0), Label);
+			}
+			break;			
+		default:
+			fprintf(stderr, "Error in OP selection!\n");
+			exit(1);
+	}
 }
 void generate_load(FILE *fp, AST_Node_Ref *node){
 	if(node->entry->st_type == REAL_TYPE){
@@ -804,7 +1443,12 @@ void generate_load(FILE *fp, AST_Node_Ref *node){
 	}
 }
 void generate_func_call_res(FILE *fp, AST_Node_Func_Call *node){
-	fprintf(fp, "Function Call result\n");
+	if(node->entry->inf_type == REAL_TYPE){
+		fprintf(fp, "LI.D %s, 0.0\n", GetRegisterName(node->g_index, 1));
+	}
+	else{
+		fprintf(fp, "LI %s, 0\n", GetRegisterName(node->g_index, 0));
+	}	
 }
 
 /* Graph Functions */
@@ -1321,7 +1965,7 @@ void main_func_traversal(FILE *fp, AST_Node *node){
 			main_func_traversal(fp, node->left);
 			main_func_traversal(fp, node->right);
 		
-			generate_rel(fp, temp_rel);
+			generate_rel(fp, temp_rel, 1, "Temp_Label");
 			
 			break;
 		case EQU_NODE:
@@ -1330,7 +1974,7 @@ void main_func_traversal(FILE *fp, AST_Node *node){
 			main_func_traversal(fp, node->left);
 			main_func_traversal(fp, node->right);
 		
-			generate_equ(fp, temp_equ);
+			generate_equ(fp, temp_equ, 1, "Temp_Label");
 			
 			break;
 		/* reference case */
