@@ -14,8 +14,8 @@ char * GetRegisterName(int color, int isFloat);
 /* various generation functions */
 void generate_arithm(FILE *fp, AST_Node_Arithm *node);
 void generate_bool(FILE *fp, AST_Node_Bool *node);
-void generate_rel(FILE *fp, AST_Node_Rel *node);
-void generate_equ(FILE *fp, AST_Node_Equ *node);
+void generate_rel(FILE *fp, AST_Node_Rel *node, int invLogic, char* Label);
+void generate_equ(FILE *fp, AST_Node_Equ *node, int invLogic, char* Label);
 void generate_load(FILE *fp, AST_Node_Ref *node);
 void generate_func_call_res(FILE *fp, AST_Node_Func_Call *node);
 
