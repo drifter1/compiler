@@ -1475,7 +1475,8 @@ void generate_incr_decr(FILE *fp, AST_Node_Incr *node){
 				fprintf(fp, "SUBI %s, %s, 1\n", GetRegisterName(node->entry->g_index, 0), GetRegisterName(node->entry->g_index, 0));
 			}
 			break;
-		fprintf(stderr, "Error in Incr_Type selection!\n");
+		default:
+			fprintf(stderr, "Error in Incr_Type selection!\n");
 			exit(1);
 	}
 }
