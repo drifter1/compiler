@@ -71,7 +71,7 @@ Until now we covered the following...
 -Generating Code for Expressions (part 1) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-expressions-part-1  
 -Generating Code for Expressions (part 2) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-expressions-part-2  
 -Generating Code for Expressions (part 3) -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-expressions-part-3  
--Generating Code for Simple Statements ->
+-Generating Code for Simple Statements -> https://steemit.com/utopian-io/@drifter1/writing-a-simple-compiler-on-my-own-generating-code-for-simple-statements
 
 What remains now is:  
 -Machine Code generation in MIPS Assembly  
