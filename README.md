@@ -6,6 +6,8 @@ It's worth noting that not all articles contain actual Code.
 Compiler design in general is mostly about understanding how everything needs to work.  
 After understanding the basic principle, the implementation is much easier, which is why some articles are 90% theory!
 
+![Compiler Design Steps](https://i.ibb.co/Y7rChXr/compiler-series.png)
+
 Until now we covered the following...  
 **General Knowledge and Lexical Analysis**  
 -Compiler design in general (introduction) -> https://steemit.com/programming/@drifter1/writing-a-simple-compiler-on-my-own-introduction 
