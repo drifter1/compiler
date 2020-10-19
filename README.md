@@ -1,12 +1,13 @@
 # compiler
+
+![Compiler Design Steps](https://i.ibb.co/Y7rChXr/compiler-series.png)
+
 A short Description of this repository:  
 It contains all the Code from my "Writing a simple Compiler on my own" series on Steemit (step by step / article by article), where we are implementing a complete Compiler for a simple C-like Language using the C-tools Flex and Bison and self-written Custom Structures and Code.
 
-It's worth noting that not all articles contain actual Code.  
+It's worth noting that not all articles contain actual Code.
 Compiler design in general is mostly about understanding how everything needs to work.  
 After understanding the basic principle, the implementation is much easier, which is why some articles are 90% theory!
-
-![Compiler Design Steps](https://i.ibb.co/Y7rChXr/compiler-series.png)
 
 Until now we covered the following...  
 **General Knowledge and Lexical Analysis**  
