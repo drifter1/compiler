@@ -24,7 +24,7 @@
 %token<int_val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
 %token<int_val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI DOT COMMA ASSIGN REFER
 %token <symtab_item>   ID
-%token <int_val>       CONST
+%token <int_val>       ICONST
 %token <double_val>    FCONST
 %token <char_val>      CCONST
 %token <str_val>       STRING
