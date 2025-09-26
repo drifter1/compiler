@@ -71,6 +71,51 @@ xcode-select --install
 brew install flex bison
 ```
 
+# Getting Started
+
+Clone the repository and change into the directory:
+
+```
+git clone https://github.com/drifter1/compiler.git
+cd compiler
+```
+
+To build the compiler simply type `make` in this directory.
+
+By default, the executable will be located in the subdirectory *bin* and called *compiler*.
+
+Examples are included in the *examples* subdirectory. You can compile *example1.c* in the Simple-C language via:
+
+```
+./bin/compiler examples/simple_c_examples/example1.c
+```
+
+This will print out parsing debugging information in the terminal console and also create a *symtab_dump_out* file.
+
+**terminal output:**
+```
+Inserted i for the first time with linenumber 1!
+Inserted val for the first time with linenumber 2!
+Found i again at line 3!
+Found i again at line 3!
+Found i again at line 3!
+Found val again at line 4!
+Found val again at line 4!
+Found i again at line 4!
+Found i again at line 4!
+Inserted print for the first time with linenumber 6!
+Found val again at line 6!
+```
+
+**symtab_dump.out**
+```
+------------ ------ ------------
+Name         Type   Line Numbers
+------------ ------ -------------
+i            undef     1    3    3    3    4    4 
+val          undef     2    4    4    6 
+print        undef     6 
+```
 
 # Articles
 
