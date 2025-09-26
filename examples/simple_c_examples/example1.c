@@ -4,3 +4,4 @@ for(i = 0; i < 10; i++){
 	val = val*i + i;
 }
 print(val);
+return;
