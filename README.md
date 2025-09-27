@@ -32,6 +32,7 @@ sudo pacman -S --needed base-devel
 
 **Note**: `base-devel` includes `gcc`, `make`, `flex`, `bison`, and other core development tools. Alternatively, you can install each separately.
 
+
 For Debian-based distributions
 ```
 sudo apt update
@@ -49,7 +50,8 @@ sudo dnf install flex flex-devel bison bison-devel
 
 **Note**: `development-tools` group includes `gcc`, `make`, and other core build tools. Alternatively, you can install each separately.
 
-## Windows
+
+## Microsoft Windows
 
 It is highly recommended that you use a Linux distribution instead, through any method you prefer.
 
@@ -59,7 +61,7 @@ Options include:
 - Docker or Podman containers
 - Virtual Machines
 
-## MacOS
+## macOS
 
 I am not very familiar with Macintosh systems.
 However, it seems that you first need to install Apple's command-line developer tools, which will provide you with `make`, `clang` and `gcc` (via clang), as well as other development tools.
@@ -71,7 +73,16 @@ xcode-select --install
 brew install flex bison
 ```
 
+## MIPS32 Emulation (QtSpim)
+
+Regarding MIPS32 simulation, note that there is a Flatpak package for *QtSpim* that appears to work just fine on Arch Linux.
+
+If you are on Microsoft Windows, macOS, or a Debian-based Linux distribution, you should be good to go with one of the [recent releases of QtSpim on SourceForge](https://sourceforge.net/projects/spimsimulator/files/).
+
+
 # Getting Started
+
+## Building the compiler from source
 
 Clone the repository and change into the directory:
 
@@ -83,6 +94,8 @@ cd compiler
 To build the compiler simply type `make` in this directory.
 
 By default, the executable will be located in the subdirectory *bin* and called *compiler*.
+
+## Running the included examples
 
 Examples are included in the *examples* subdirectory. You can compile *example1.c* in the Simple-C language via:
 
@@ -116,6 +129,11 @@ i            undef     1    3    3    3    4    4
 val          undef     2    4    4    6 
 print        undef     6 
 ```
+
+## Cleaning up the build files and binaries
+
+To clean the build files and binary executable, you just have to type `make clean`. Note that this does not remove debugging files such as *symtab_dump_out*, which are created when you use the compiler itself. These files need to be removed manually.
+
 
 # Articles
 
