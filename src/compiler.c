@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "../include/symtab.h"
+#include <stdio.h>
 
 extern FILE *yyin;
 extern FILE *yyout;
@@ -8,7 +8,7 @@ extern int lineno;
 int yylex();
 int yyparse();
 
-int main (int argc, char *argv[]){
+int main(int argc, char *argv[]) {
 
     // initialize symbol table
     init_hash_table();
