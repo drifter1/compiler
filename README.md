@@ -11,6 +11,9 @@ The project was unfortunately abandoned for over five years due to the maintaine
 
 Due to the 2020 Steemit dispute, when the project was revitalized the tutorial series resumed on Hive instead.
 
+> [!IMPORTANT]
+> A major overhaul of the repository is currently underway (see open issue #5). Although the project had reached the code generation stage, improvements to the code base have necessitated a temporary return to the post-syntax analysis stage.
+
 # Prerequisites
 
 - GCC (GNU Compiler Collection)
