@@ -14,14 +14,12 @@ C_SRC := $(wildcard $(SRC_DIR)/*.c)
 LEX_OUT := $(OBJ_DIR)/lex.yy.c
 YACC_OUT := $(OBJ_DIR)/parser.tab.c
 
-LDFLAGS := -lfl
-
 TARGET := $(BIN_DIR)/compiler
 
 all: $(TARGET)
 
 $(TARGET): $(YACC_OUT) $(LEX_OUT) | $(BIN_DIR)
-	@$(CC) -o $@ $(YACC_OUT) $(LEX_OUT) $(C_SRC) $(LDFLAGS)
+	@$(CC) -o $@ $(YACC_OUT) $(LEX_OUT) $(C_SRC)
 
 $(LEX_OUT): $(LEX_SRC) | $(OBJ_DIR)
 	@$(LEX) -o $@ $<
