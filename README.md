@@ -33,7 +33,8 @@ sudo pacman -Syu
 sudo pacman -S --needed base-devel
 ```
 
-**Note**: `base-devel` includes `gcc`, `make`, `flex`, `bison`, and other core development tools. Alternatively, you can install each separately.
+> [!NOTE]
+> `base-devel` includes `gcc`, `make`, `flex`, `bison`, and other core development tools. Alternatively, you can install each separately.
 
 
 For Debian-based distributions
@@ -42,7 +43,8 @@ sudo apt update
 sudo apt install build-essential flex bison
 ```
 
-**Note**: `build-essential` includes `gcc`, `make`, and other core build tools. Alternatively, you can install each separately.
+> [!NOTE]
+> `build-essential` includes `gcc`, `make`, and other core build tools. Alternatively, you can install each separately.
 
 For Fedora-based distributions
 ```
@@ -51,7 +53,8 @@ sudo dnf group install development-tools
 sudo dnf install flex flex-devel bison bison-devel
 ```
 
-**Note**: `development-tools` group includes `gcc`, `make`, and other core build tools. Alternatively, you can install each separately.
+> [!NOTE]
+> `development-tools` group includes `gcc`, `make`, and other core build tools. Alternatively, you can install each separately.
 
 
 ## Microsoft Windows
@@ -135,7 +138,10 @@ print        undef     6
 
 ## Cleaning up the build files and binaries
 
-To clean the build files and binary executable, you just have to type `make clean`. Note that this does not remove debugging files such as *symtab_dump_out*, which are created when you use the compiler itself. These files need to be removed manually.
+To clean the build files and binary executable, you just have to type `make clean`.
+
+> [!NOTE]
+> The above command does not remove debugging files such as *symtab_dump_out*, which are created when you use the compiler itself. These files need to be removed manually.
 
 
 # Articles
