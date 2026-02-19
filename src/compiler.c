@@ -24,5 +24,10 @@ int main(int argc, char *argv[]) {
     symtab_dump(yyout);
     fclose(yyout);
 
+    // revisit queue dump
+	yyout = fopen("revisit_dump.out", "w");
+	revisit_dump(yyout);
+	fclose(yyout);
+
     return flag;
 }

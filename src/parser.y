@@ -138,7 +138,7 @@ functions: functions function | function ;
 
 function: { incr_scope(); } function_head function_tail { hide_scope(); } ;
 
-function_head: return_type ID LPAREN parameters_optional RPAREN ;
+function_head: { declare = 1; } return_type ID LPAREN { declare = 0; } parameters_optional RPAREN ;
 
 return_type: type | type pointer ;
 

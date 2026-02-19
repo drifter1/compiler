@@ -31,7 +31,6 @@ typedef struct Param {
 typedef struct RefList {
     int lineno;
     struct RefList *next;
-    int type;
 } RefList;
 
 // struct that represents a list node
@@ -68,8 +67,25 @@ typedef struct list_t {
     struct list_t *next;
 } list_t;
 
-/* the hash table */
+/* Queue of identifiers to revisit */
+typedef struct revisit_queue{
+	// name of identifier
+	char *st_name;
+	
+	// type of revisit
+	int revisit_type;
+	
+	// maybe additional information to simplify the process ...
+		
+	struct revisit_queue *next;
+}revisit_queue;
+
+/* revisit types */
+#define PARAM_CHECK 1 /* Check parameters of function call when functions gets declared */
+
+/* static structures */
 static list_t **hash_table;
+static revisit_queue *queue;
 
 // Symbol Table Functions
 void init_hash_table();                                 // initialize hash table
@@ -90,3 +106,8 @@ void incr_scope();      // go to next scope
 Param def_param(int par_type, char *param_name, int passing); // define parameter
 int func_declare(char *name, int ret_type, int num_of_pars, Param *parameters); // declare function
 int func_param_check(char *name, int num_of_pars, Param *parameters); // check parameters
+
+// Revisit Queue Functions
+void add_to_queue(char *name, int type); // add to queue
+int revisit(char *name); // revisit entry by also removing it from queue
+void revisit_dump(FILE *of); // dump file
