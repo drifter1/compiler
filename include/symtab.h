@@ -13,7 +13,8 @@
 #define STR_TYPE 3
 #define LOGIC_TYPE 4
 #define ARRAY_TYPE 5
-#define FUNCTION_TYPE 6
+#define POINTER_TYPE 6
+#define FUNCTION_TYPE 7
 
 /* how parameter is passed */
 #define BY_VALUE 1
@@ -21,6 +22,9 @@
 
 /* current scope */
 extern int cur_scope;
+
+/* flag variable for declaring variables */
+extern int declare; // 1: declaring variable, 0: not
 
 /* parameter struct */
 typedef struct Param {
@@ -73,7 +77,6 @@ void init_hash_table();                                 // initialize hash table
 unsigned int hash(char *key);                           // hash function
 void insert(char *name, int len, int type, int lineno); // insert entry
 list_t *lookup(char *name);                             // search for entry
-list_t *lookup_scope(char *name, int scope); // search for entry in scope
-void hide_scope();                           // hide the current scope
-void incr_scope();                           // go to next scope
-void symtab_dump(FILE *of);                  // dump file
+void hide_scope();                                      // hide the current scope
+void incr_scope();                                      // go to next scope
+void symtab_dump(FILE *of);                             // dump file

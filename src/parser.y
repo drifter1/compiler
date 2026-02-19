@@ -51,7 +51,7 @@ program: declarations statements RETURN SEMI functions_optional ;
 /* declarations */
 declarations: declarations declaration | declaration;
 
-declaration: type names SEMI ;
+declaration: { declare = 1; } type names { declare = 0; } SEMI ;
 
 type: INT | CHAR | FLOAT | DOUBLE | VOID ;
 
@@ -136,7 +136,7 @@ functions_optional: functions | /* empty */ ;
 
 functions: functions function | function ;
 
-function: function_head function_tail ;
+function: { incr_scope(); } function_head function_tail { hide_scope(); } ;
 
 function_head: return_type ID LPAREN parameters_optional RPAREN ;
 
@@ -146,7 +146,7 @@ parameters_optional: parameters | /* empty */ ;
 
 parameters: parameters COMMA parameter | parameter ;
 
-parameter : type variable ;
+parameter : { declare = 1; } type variable { declare = 0; } ;
 
 function_tail: LBRACE declarations_optional statements_optional return_optional RBRACE ;
 
@@ -163,26 +163,3 @@ void yyerror (char *message)
   fprintf(stderr, "Syntax error at line %d\n", lineno);
   exit(1);
 }
-
-/*
-int main (int argc, char *argv[]){
-
-	// initialize symbol table
-	init_hash_table();
-
-	// parsing
-	int flag;
-	yyin = fopen(argv[1], "r");
-	flag = yyparse();
-	fclose(yyin);
-
-	printf("Parsing finished!");
-
-	// symbol table dump
-	yyout = fopen("symtab_dump.out", "w");
-	symtab_dump(yyout);
-	fclose(yyout);
-
-	return flag;
-}
-*/
