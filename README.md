@@ -12,7 +12,7 @@ The project was unfortunately abandoned for over five years due to the maintaine
 Due to the 2020 Steemit dispute, when the project was revitalized the tutorial series resumed on Hive instead.
 
 > [!IMPORTANT]
-> A major overhaul of the repository is currently underway (see open issue #5). Although the project had reached the code generation stage, improvements to the code base have necessitated a temporary return to the post-syntax analysis stage.
+> A major overhaul of the repository is currently underway (see open issue #5). Although the project had reached the machine code generation stage, improvements to the code base have necessitated a temporary return to the semantical analysis stage.
 
 # Prerequisites
 
@@ -109,7 +109,7 @@ Examples are included in the *examples* subdirectory. You can compile *example1.
 ./bin/compiler examples/simple_c_examples/example1.c
 ```
 
-This will print out parsing debugging information in the terminal console and also create the *symtab_dump_out* and *revisit_dump.out* files.
+This will print out parsing debugging information in the terminal console and also create the *symtab_dump.out* and *revisit_dump.out* files.
 
 **terminal output:**
 ```
@@ -155,8 +155,9 @@ To clean the build files and binary executable, you just have to type `make clea
 
 The complete list of articles can be found [here](/docs/articles.md).
 
+# Status
 
-# Next Up
-
+- Abstract Syntax Trees and Semantical Analsyis (related to #5)
+- Machine Code generation in MIPS Assembly (covered up to #5)
 - Machine Code generation in MIPS Assembly (remaining cases)
 - Optimizations in the compiler's source code
