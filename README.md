@@ -109,7 +109,7 @@ Examples are included in the *examples* subdirectory. You can compile *example1.
 ./bin/compiler examples/simple_c_examples/example1.c
 ```
 
-This will print out parsing debugging information in the terminal console and also create a *symtab_dump_out* file.
+This will print out parsing debugging information in the terminal console and also create the *symtab_dump_out* and *revisit_dump.out* files.
 
 **terminal output:**
 ```
@@ -122,18 +122,26 @@ Found val again at line 4!
 Found val again at line 4!
 Found i again at line 4!
 Found i again at line 4!
-Inserted print for the first time with linenumber 6!
+Inserted print at line 6 to check it again later!
 Found val again at line 6!
 ```
 
 **symtab_dump.out**
 ```
------------- ------ ------------
-Name         Type   Line Numbers
------------- ------ -------------
-i            undef     1    3    3    3    4    4 
-val          undef     2    4    4    6 
-print        undef     6 
+------------ ------ ------ ------------
+Name         Type   Scope  Line Numbers
+------------ ------ ------ ------------
+i            undef    0     1    3    3    3    4    4 
+val          undef    0     2    4    4    6 
+print        undef    0     6 
+```
+
+**revisit_dump.out**
+```
+------------ -------------
+Identifier   Revisit Type
+------------ -------------
+print        Parameter Check
 ```
 
 ## Cleaning up the build files and binaries
@@ -141,8 +149,7 @@ print        undef     6
 To clean the build files and binary executable, you just have to type `make clean`.
 
 > [!NOTE]
-> The above command does not remove debugging files such as *symtab_dump_out*, which are created when you use the compiler itself. These files need to be removed manually.
-
+> The above command does not remove debugging files such as *symtab_dump.out* and *revisit_dump.out*, which are created when you use the compiler itself. These files need to be removed manually.
 
 # Articles
 
