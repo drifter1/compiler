@@ -1,4 +1,5 @@
 #include "../include/symtab.h"
+#include "../include/semantics.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,8 @@ int cur_scope = 0;
 
 /* flag variable for declaring variables */
 int declare = 0;
+
+// Symbol Table Functions
 
 void init_hash_table() {
     int i;
@@ -102,8 +105,102 @@ list_t *lookup(char *name) {
     return l; // NULL is not found
 }
 
-/* hide the current scope */
-void hide_scope() {
+/* print to stdout by default */
+void symtab_dump(FILE *of) {
+    int i;
+    fprintf(of, "------------ ------ ------ ------------\n");
+    fprintf(of, "Name         Type   Scope  Line Numbers\n");
+    fprintf(of, "------------ ------ ------ ------------\n");
+    for (i = 0; i < SIZE; ++i) {
+        if (hash_table[i] != NULL) {
+            list_t *l = hash_table[i];
+            while (l != NULL) {
+                RefList *t = l->lines;
+                fprintf(of, "%-12s ", l->st_name);
+                if (l->st_type == INT_TYPE)
+                    fprintf(of, "%-7s", "int");
+                else if (l->st_type == REAL_TYPE)
+                    fprintf(of, "%-7s", "real");
+                else if (l->st_type == CHAR_TYPE)
+                    fprintf(of, "%-7s", "string");
+                else if (l->st_type == ARRAY_TYPE) {
+                    fprintf(of, "array of ");
+                    if (l->inf_type == INT_TYPE)
+                        fprintf(of, "%-7s", "int");
+                    else if (l->inf_type == REAL_TYPE)
+                        fprintf(of, "%-7s", "real");
+                    else if (l->inf_type == CHAR_TYPE)
+                        fprintf(of, "%-7s", "string");
+                    else
+                        fprintf(of, "%-7s", "undef");
+                } else if (l->st_type == POINTER_TYPE) {
+                    fprintf(of, "%-7s", "pointer to ");
+                    if (l->inf_type == INT_TYPE)
+                        fprintf(of, "%-7s", "int");
+                    else if (l->inf_type == REAL_TYPE)
+                        fprintf(of, "%-7s", "real");
+                    else if (l->inf_type == CHAR_TYPE)
+                        fprintf(of, "%-7s", "string");
+                    else
+                        fprintf(of, "%-7s", "undef");
+                } else if (l->st_type == FUNCTION_TYPE) {
+                    fprintf(of, "%-7s", "function returns ");
+                    if (l->inf_type == INT_TYPE)
+                        fprintf(of, "%-7s", "int");
+                    else if (l->inf_type == REAL_TYPE)
+                        fprintf(of, "%-7s", "real");
+                    else if (l->inf_type == CHAR_TYPE)
+                        fprintf(of, "%-7s", "string");
+                    else
+                        fprintf(of, "%-7s", "undef");
+                } else
+                    fprintf(of, "%-7s", "undef"); // if UNDEF or 0
+                fprintf(of, "  %d  ", l->scope);
+                while (t != NULL) {
+                    fprintf(of, "%4d ", t->lineno);
+                    t = t->next;
+                }
+                fprintf(of, "\n");
+                l = l->next;
+            }
+        }
+    }
+}
+
+// Type Functions
+
+void set_type(char *name, int st_type,
+              int inf_type) { // set the type of an entry (declaration)
+    /* lookup entry */
+    list_t *l = lookup(name);
+
+    /* set "main" type */
+    l->st_type = st_type;
+
+    /* if array, pointer or function */
+    if (inf_type != UNDEF) {
+        l->inf_type = inf_type;
+    }
+}
+
+int get_type(char *name) { // get the type of an entry
+    /* lookup entry */
+    list_t *l = lookup(name);
+
+    /* if "simple" type */
+    if (l->st_type == INT_TYPE || l->st_type == REAL_TYPE ||
+        l->st_type == CHAR_TYPE) {
+        return l->st_type;
+    }
+    /* if array, pointer or function */
+    else {
+        return l->inf_type;
+    }
+}
+
+// Scope Management Functions
+
+void hide_scope() { /* hide the current scope */
     list_t *l;
     int i;
     printf("Hiding scope \'%d\':\n", cur_scope);
@@ -123,67 +220,4 @@ void hide_scope() {
     cur_scope--;
 }
 
-/* go to next scope */
-void incr_scope() { cur_scope++; }
-
-/* print to stdout by default */
-void symtab_dump(FILE *of) {
-    int i;
-    fprintf(of, "------------ ------ ------ ------------\n");
-    fprintf(of, "Name         Type   Scope  Line Numbers\n");
-    fprintf(of, "------------ ------ ------ ------------\n");
-    for (i = 0; i < SIZE; ++i) {
-        if (hash_table[i] != NULL) {
-            list_t *l = hash_table[i];
-            while (l != NULL) {
-                RefList *t = l->lines;
-                fprintf(of, "%-12s ", l->st_name);
-                if (l->st_type == INT_TYPE)
-                    fprintf(of, "%-7s", "int");
-                else if (l->st_type == REAL_TYPE)
-                    fprintf(of, "%-7s", "real");
-                else if (l->st_type == STR_TYPE)
-                    fprintf(of, "%-7s", "string");
-                else if (l->st_type == ARRAY_TYPE) {
-                    fprintf(of, "array of ");
-                    if (l->inf_type == INT_TYPE)
-                        fprintf(of, "%-7s", "int");
-                    else if (l->inf_type == REAL_TYPE)
-                        fprintf(of, "%-7s", "real");
-                    else if (l->inf_type == STR_TYPE)
-                        fprintf(of, "%-7s", "string");
-                    else
-                        fprintf(of, "%-7s", "undef");
-                } else if (l->st_type == POINTER_TYPE) {
-                    fprintf(of, "%-7s %s", "pointer to ");
-                    if (l->inf_type == INT_TYPE)
-                        fprintf(of, "%-7s", "int");
-                    else if (l->inf_type == REAL_TYPE)
-                        fprintf(of, "%-7s", "real");
-                    else if (l->inf_type == STR_TYPE)
-                        fprintf(of, "%-7s", "string");
-                    else
-                        fprintf(of, "%-7s", "undef");
-                } else if (l->st_type == FUNCTION_TYPE) {
-                    fprintf(of, "%-7s %s", "function returns ");
-                    if (l->inf_type == INT_TYPE)
-                        fprintf(of, "%-7s", "int");
-                    else if (l->inf_type == REAL_TYPE)
-                        fprintf(of, "%-7s", "real");
-                    else if (l->inf_type == STR_TYPE)
-                        fprintf(of, "%-7s", "string");
-                    else
-                        fprintf(of, "%-7s", "undef");
-                } else
-                    fprintf(of, "%-7s", "undef"); // if UNDEF or 0
-                fprintf(of, "  %d  ", l->scope);
-                while (t != NULL) {
-                    fprintf(of, "%4d ", t->lineno);
-                    t = t->next;
-                }
-                fprintf(of, "\n");
-                l = l->next;
-            }
-        }
-    }
-}
+void incr_scope() { /* go to next scope */ cur_scope++; }

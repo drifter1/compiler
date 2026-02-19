@@ -2,6 +2,7 @@
 
 %{
 	#include "../include/symtab.h"
+	#include "../include/semantics.h"
 	#include "../build/parser.tab.h"
 
 	int lineno = 1; // initialize to 1
