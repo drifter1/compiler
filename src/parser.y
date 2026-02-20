@@ -53,16 +53,16 @@
 %token <val>     STRING
 
 /* precedencies and associativities */
-%left LPAREN RPAREN LBRACK RBRACK
-%right NOTOP INCR REFER
-%left MULOP DIVOP
-%left ADDOP
-%left RELOP
-%left EQUOP
+%left COMMA
+%right ASSIGN
 %left OROP
 %left ANDOP
-%right ASSIGN
-%left COMMA
+%left EQUOP
+%left RELOP
+%left ADDOP
+%left MULOP DIVOP
+%right NOTOP INCR REFER MINUS
+%left LPAREN RPAREN LBRACK RBRACK
 
 /* rule (non-terminal) definitions */
 %type <node> program
