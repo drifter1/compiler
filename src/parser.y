@@ -73,7 +73,6 @@
 %type <symtab_item> init var_init array_init
 %type <node> constant
 %type <node> expression var_ref
-%type <val> sign
 %type <node> statement assigment
 %type <node> statements tail
 %type <node> if_statement else_if optional_else
@@ -394,10 +393,18 @@ expression:
 	{ 
 		$$ = $1; /* just pass information */
 	}
-	| sign constant
+    | constant
 	{
-		/* sign */
-		if($1.ival == 1){
+		$$ = $1; /* no sign */
+	}
+	| ADDOP constant %prec MINUS
+	{
+		/* plus sign error */
+		if($1.ival == ADD){
+			fprintf(stderr, "Error having plus as a sign!\n");
+			exit(1);
+		}
+		else{
 			AST_Node_Const *temp = (AST_Node_Const*) $2;
 		
 			/* inverse value depending on the constant type */
@@ -417,33 +424,11 @@ expression:
 			
 			$$ = (AST_Node*) temp;
 		}
-		/* no sign */
-		else{
-			$$ = $2;
-		}
-	    ast_traversal($$); /* just for testing */
 	}
 	| function_call
 	{
 		$$ = NULL; /* will do it later ! */
 	}
-;
-
-sign: ADDOP
-	{ 
-		/* plus sign error */
-		if($1.ival == ADD){
-			fprintf(stderr, "Error having plus as a sign!\n");
-			exit(1);
-		}
-		else{
-			$$.ival = 1; /* sign */
-		}
-	}
-	| /* empty */
-	{ 
-		$$.ival = 0; /* no sign */
-	} 
 ;
 
 constant:
