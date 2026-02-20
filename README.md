@@ -115,25 +115,19 @@ This will print out parsing debugging information in the terminal console and al
 ```
 Declaration Node of data-type 1 for 1 names
 Declaration Node of data-type 2 for 1 names
+Statements Node with 2 statements
+For Node with loop counter i
+Initialize:
+Assign Node of entry i
+Assigning:
+Constant Node of const-type 1 with value 0
+Condition:
 Reference Node of entry i
 Constant Node of const-type 1 with value 10
 Relational Node of operator 1
+Increment:
 Increment Node of entry i being 0 0
-Reference Node of entry val
-Reference Node of entry i
-Arithmetic Node of operator 2
-Reference Node of entry val
-Reference Node of entry i
-Arithmetic Node of operator 2
-Reference Node of entry i
-Arithmetic Node of operator 0
-Assign Node of entry val
-Assigning:
-Reference Node of entry val
-Reference Node of entry i
-Arithmetic Node of operator 2
-Reference Node of entry i
-Arithmetic Node of operator 0
+For branch:
 Statements Node with 1 statements
 Assign Node of entry val
 Assigning:

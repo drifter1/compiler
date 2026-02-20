@@ -76,6 +76,7 @@
 %type <node> statement assigment
 %type <node> statements tail
 %type <node> if_statement else_if optional_else
+%type <node> for_statement while_statement
 
 %start program
 
@@ -83,7 +84,7 @@
 
 %%
 
-program: declarations statements RETURN SEMI functions_optional ;
+program: declarations statements { ast_traversal($2); } RETURN SEMI functions_optional ;
 
 /* declarations */
 declarations: declarations declaration | declaration;
@@ -229,22 +230,25 @@ statement:
 	{ 
 		$$ = $1; /* just pass information */
 	}
-	| for_statement { $$ = NULL; /* will do it later ! */ }
-	| while_statement { $$ = NULL; /* will do it later ! */ }
+	| for_statement
+	{ 
+		$$ = $1; /* just pass information */
+	}
+	| while_statement
+	{
+		$$ = $1; /* just pass information */
+	}
 	| assigment SEMI
 	{
 		$$ = $1; /* just pass information */
-		ast_traversal($$); /* just for testing */
 	}
 	| CONTINUE SEMI
 	{ 
 		$$ = new_ast_simple_node(0);
-		ast_traversal($$); /* just for testing */
 	}
 	| BREAK SEMI
 	{ 
 		$$ = new_ast_simple_node(1);
-		ast_traversal($$); /* just for testing */
 	}
 	| function_call SEMI { $$ = NULL; /* will do it later ! */ }
 	| ID INCR SEMI
@@ -256,7 +260,6 @@ statement:
 		else{
 			$$ = new_ast_incr_node($1, 1, 0);
 		}
-		ast_traversal($$); /* just for testing */
 	}
 	| INCR ID SEMI
 	{
@@ -267,7 +270,6 @@ statement:
 		else{
 			$$ = new_ast_incr_node($2, 1, 1);
 		}
-		ast_traversal($$); /* just for testing */
 	}
 ;
 
@@ -311,14 +313,31 @@ optional_else:
 	}
 ;
 
-for_statement: FOR LPAREN assigment SEMI expression SEMI expression RPAREN tail ;
+for_statement: FOR LPAREN assigment SEMI expression SEMI ID INCR RPAREN tail
+    {
+        /* create increment node*/
+        AST_Node *incr_node;
+        if($8.ival == INC){ /* increment */
+            incr_node = new_ast_incr_node($7, 0, 0);
+        }
+        else{
+            incr_node = new_ast_incr_node($7, 1, 0);
+        }
 
-while_statement: WHILE LPAREN expression RPAREN tail ;
+        $$ = new_ast_for_node($3, $5, incr_node, $10);
+        set_loop_counter($$);
+    }
+;
+
+while_statement: WHILE LPAREN expression RPAREN tail
+    {
+        $$ = new_ast_while_node($3, $5);
+    }
+;
 
 tail: LBRACE statements RBRACE
     { 
         $$ = $2; /* just pass information */
-        ast_traversal($2);
     }
 ;
 
@@ -326,17 +345,14 @@ expression:
     expression ADDOP expression
 	{ 
 	    $$ = new_ast_arithm_node($2.ival, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression MULOP expression
 	{
 	    $$ = new_ast_arithm_node(MUL, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression DIVOP expression
 	{
 		$$ = new_ast_arithm_node(DIV, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| ID INCR
 	{
@@ -347,7 +363,6 @@ expression:
 		else{
 			$$ = new_ast_incr_node($1, 1, 0);
 		}
-		ast_traversal($$); /* just for testing */		
 	}
 	| INCR ID
 	{ 
@@ -358,32 +373,26 @@ expression:
 		else{
 			$$ = new_ast_incr_node($2, 1, 1);
 		}
-		ast_traversal($$); /* just for testing */
 	}
 	| expression OROP expression
 	{
 		$$ = new_ast_bool_node(OR, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression ANDOP expression
 	{
 		$$ = new_ast_bool_node(AND, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| NOTOP expression
 	{
 	    $$ = new_ast_bool_node(NOT, $2, NULL);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression EQUOP expression
 	{
 		$$ = new_ast_equ_node($2.ival, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| expression RELOP expression
 	{
 		$$ = new_ast_rel_node($2.ival, $1, $3);
-		ast_traversal($$); /* just for testing */
 	}
 	| LPAREN expression RPAREN
 	{
