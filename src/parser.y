@@ -628,6 +628,19 @@ parameters:
 parameter : { declare = 1; } type variable
     { 
         declare = 0;
+        
+        // set type of symbol table entry	
+        if($3->st_type == UNDEF){ /* "simple" type */
+            set_type($3->st_name, $2, UNDEF); 
+        }
+        else if($3->st_type == POINTER_TYPE){ /* pointer */
+            set_type($3->st_name, POINTER_TYPE, $2);
+        }
+        else if($3->st_type == ARRAY_TYPE){ /* array  */
+            set_type($3->st_name, ARRAY_TYPE, $2);
+        }
+        
+        /* define parameter */
         $$ = def_param($2, $3->st_name, 0);
     }
 ;

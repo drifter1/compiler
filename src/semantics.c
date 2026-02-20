@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern int lineno;
+
 // actual types are: INT_TYPE, REAL_TYPE, CHAR_TYPE
 
 int get_result_type(int type_1, int type_2,
@@ -12,7 +14,7 @@ int get_result_type(int type_1, int type_2,
         if (type_1 == INT_TYPE) {
             // second type INT or CHAR
             if (type_2 == INT_TYPE || type_2 == CHAR_TYPE) {
-                return INT_TYPE;
+                return 1;
             } else {
                 type_error(type_1, type_2, op_type);
             }
@@ -22,7 +24,7 @@ int get_result_type(int type_1, int type_2,
             // second type INT, REAL or CHAR
             if (type_2 == INT_TYPE || type_2 == REAL_TYPE ||
                 type_2 == CHAR_TYPE) {
-                return INT_TYPE;
+                return 1;
             } else {
                 type_error(type_1, type_2, op_type);
             }
@@ -31,7 +33,7 @@ int get_result_type(int type_1, int type_2,
         else if (type_1 == CHAR_TYPE) {
             // second type INT or CHAR
             if (type_2 == INT_TYPE || type_2 == CHAR_TYPE) {
-                return INT_TYPE;
+                return 1;
             } else {
                 type_error(type_1, type_2, op_type);
             }
@@ -202,7 +204,8 @@ int get_result_type(int type_1, int type_2,
 }
 
 void type_error(int type_1, int type_2, int op_type) { /* print type error */
-    fprintf(stderr, "Type conflict between %d and %d using op type %d\n",
-            type_1, type_2, op_type);
+    fprintf(stderr,
+            "Type conflict between %d and %d using op type %d in line %d\n",
+            type_1, type_2, op_type, lineno);
     exit(1);
 }

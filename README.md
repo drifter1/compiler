@@ -123,8 +123,6 @@ Assign Node of entry i
 Assigning:
 Constant Node of const-type 1 with value 0
 Condition:
-Reference Node of entry i
-Constant Node of const-type 1 with value 10
 Relational Node of operator 1
 Increment:
 Increment Node of entry i being 0 0
@@ -144,7 +142,7 @@ Call parameters:
 Reference Node of entry res
 Function Call Node of print with 1 parameters
 Call parameters:
-Constant Node of const-type 3 with value '
+Constant Node of const-type 4 with value "\n"
 Function Declarations Node with 1 function declarations
 Function Declaration Node of operation with ret_type 2 and 2 parameters
 Parameters:
@@ -157,11 +155,7 @@ Function statements:
 Statements Node with 1 statements
 Assign Node of entry res
 Assigning:
-Reference Node of entry value
-Reference Node of entry i
-Arithmetic Node of operator 2
-Reference Node of entry i
-Arithmetic Node of operator 0
+Arithmetic Node of operator 0 with result type 2
 Return node:
 Return Node of ret_type 2
 Returning:
