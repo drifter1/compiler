@@ -203,7 +203,7 @@ The complete list of articles can be found [here](/docs/articles.md).
 
 # Status
 
-- Abstract Syntax Trees and Semantical Analsyis (related to #5)
+- Semantical Analysis pt.2 (related to #5)
 - Machine Code generation in MIPS Assembly (covered up to #5)
 - Machine Code generation in MIPS Assembly (remaining cases)
 - Optimizations in the compiler's source code
