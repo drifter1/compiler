@@ -499,10 +499,23 @@ var_ref: variable
 ; 
 
 function_call: ID LPAREN call_params RPAREN
-    {	
-        AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $3;
-        $$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);
-    }
+{
+	AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $3;
+	$$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);	
+	
+	/* add information to revisit queue entry (if one exists) */
+	revisit_queue *q = search_queue($1->st_name);
+	if(q != NULL){
+		q->num_of_pars = temp->num_of_pars;
+		q->par_types = (int*) malloc(temp->num_of_pars * sizeof(int));
+		/* get the types of the parameters */
+		int i;
+		for(i = 0; i < temp->num_of_pars; i++){
+			/* get datatype of parameter-expression */
+			q->par_types[i] = expression_data_type(temp->params[i]);
+		}
+	}	
+}
 ;
 
 call_params: 
