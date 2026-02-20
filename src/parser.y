@@ -2,6 +2,7 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include "../include/symtab.h"
+    #include "../include/ast.h"
 
 	extern int lineno;
 	extern int yylex();
@@ -10,11 +11,15 @@
 
 /* YYSTYPE union */
 %union{
+    // simple values (should be removed later on)
     char char_val;
 	int int_val;
 	double double_val;
 	char* str_val;
+
+    // structures
 	list_t* symtab_item;
+    AST_Node* node;
 }
 
 /* token definition */
