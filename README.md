@@ -103,19 +103,20 @@ By default, the executable will be located in the subdirectory *bin* and called 
 
 ## Running the included examples
 
-Examples are included in the *examples* subdirectory. You can compile *example1.c* in the Simple-C language via:
+Examples are included in the *examples* subdirectory. You can compile *example2.c* in the Simple-C language via:
 
 ```
-./bin/compiler examples/simple_c_examples/example1.c
+./bin/compiler examples/simple_c_examples/example2.c
 ```
 
 This will print out parsing debugging information in the terminal console and also create the *symtab_dump.out* and *revisit_dump.out* files.
 
 **terminal output:**
 ```
+Declarations Node with 2 declarations
 Declaration Node of data-type 1 for 1 names
-Declaration Node of data-type 2 for 1 names
-Statements Node with 2 statements
+Declaration Node of data-type 2 for 2 names
+Statements Node with 1 statements
 For Node with loop counter i
 Initialize:
 Assign Node of entry i
@@ -128,14 +129,33 @@ Relational Node of operator 1
 Increment:
 Increment Node of entry i being 0 0
 For branch:
-Statements Node with 1 statements
+Statements Node with 4 statements
+Assign Node of entry res
+Assigning:
 Assign Node of entry val
 Assigning:
-Reference Node of entry val
+Reference Node of entry res
+Function Declarations Node with 1 function declarations
+Function Declaration Node of operation with ret_type 2 and 2 parameters
+Parameters:
+Parameter value of type 2
+Parameter i of type 1
+Function declarations:
+Declarations Node with 1 declarations
+Declaration Node of data-type 2 for 1 names
+Function statements:
+Statements Node with 1 statements
+Assign Node of entry res
+Assigning:
+Reference Node of entry value
 Reference Node of entry i
 Arithmetic Node of operator 2
 Reference Node of entry i
 Arithmetic Node of operator 0
+Return node:
+Return Node of ret_type 2
+Returning:
+Reference Node of entry res
 Parsing finished!
 ```
 
@@ -144,9 +164,11 @@ Parsing finished!
 ------------ -------------- ------ ------------
 Name         Type           Scope  Line Numbers
 ------------ -------------- ------ ------------
-i            int              0     1    3    3    3    4    4 
-val          real             0     2    4    4    6 
-print        undef            0     6 
+i            int              0     3    6    6    6    7    7    8    9 
+val          real             0     4    7    8 
+res          array of real    0     4    7    8    9 
+operation    undef            0     7 
+print        undef            0     9   10 
 ```
 
 **revisit_dump.out**
@@ -154,6 +176,7 @@ print        undef            0     6
 ------------ -------------
 Identifier   Revisit Type
 ------------ -------------
+operation    Parameter Check
 print        Parameter Check
 ```
 

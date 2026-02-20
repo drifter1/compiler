@@ -23,6 +23,9 @@
 	void add_elseif(AST_Node *elsif);
 	AST_Node **elsifs;
 	int elseif_count = 0;
+
+    // for functions
+	AST_Node_Func_Decl *temp_function;
 %}
 
 /* YYSTYPE union */
@@ -40,6 +43,9 @@
 	
 	// for arrays
 	int array_size;
+
+    // for parameters
+	Param par;
 }
 
 /* token definition */
@@ -77,6 +83,10 @@
 %type <node> statements tail
 %type <node> if_statement else_if optional_else
 %type <node> for_statement while_statement
+%type <node> functions_optional functions function
+%type <node> parameters_optional parameters
+%type <par>  parameter
+%type <node> return_type
 
 %start program
 
@@ -84,14 +94,29 @@
 
 %%
 
-program: declarations statements { ast_traversal($2); } RETURN SEMI functions_optional ;
+program: 
+	declarations { ast_traversal($1); }
+	statements   { ast_traversal($3); }
+	RETURN SEMI functions_optional { ast_traversal($7); }
+;
+
 
 /* declarations */
-declarations: declarations declaration | declaration;
+declarations: 
+	declarations declaration
+	{
+		AST_Node_Declarations *temp = (AST_Node_Declarations*) $1;
+		$$ = new_declarations_node(temp->declarations, temp->declaration_count, $2);
+	}
+	| declaration
+	{
+		$$ = new_declarations_node(NULL, 0, $1);
+	}
+;
 
-declaration: type { declare = 1; } names { declare = 0; } SEMI 
-    {
-        int i;
+declaration: type { declare = 1; } names { declare = 0; } SEMI
+	{
+		int i;
 		$$ = new_ast_decl_node($1, names, nc);
 		nc = 0;
 		
@@ -112,8 +137,7 @@ declaration: type { declare = 1; } names { declare = 0; } SEMI
 				set_type(temp->names[i]->st_name, ARRAY_TYPE, temp->data_type);
 			}
 		}
-		ast_traversal($$); /* just for testing */
-    }
+	}
 ;
 
 type: INT  		{ $$ = INT_TYPE;   }
@@ -170,6 +194,11 @@ array: array LBRACK expression RBRACK
 		if(declare == 1){
 			fprintf(stderr, "Array declaration at %d contains expression!\n", lineno);
 		}
+	}
+    | LBRACK ICONST RBRACK
+	{
+		// set array_size for declaration purposes
+		$$ = $2.ival;
 	}
 ;
 
@@ -470,29 +499,137 @@ call_params: call_param | STRING | /* empty */
 call_param: call_param COMMA expression | expression ;
 
 /* functions */
-functions_optional: functions | /* empty */ ;
+functions_optional: 
+	functions
+	{
+		$$ = $1;
+	}
+	| /* empty */
+	{
+		$$ = NULL;
+	}
+;
 
-functions: functions function | function ;
+functions: 
+	functions function
+	{
+		AST_Node_Func_Declarations *temp = (AST_Node_Func_Declarations*) $1;
+		$$ = new_func_declarations_node(temp->func_declarations, temp->func_declaration_count, $2);
+	}
+	| function
+	{
+		$$ = new_func_declarations_node(NULL, 0, $1);
+	}
+;
 
-function: { incr_scope(); } function_head function_tail { hide_scope(); } ;
 
-function_head: { declare = 1; } return_type ID LPAREN { declare = 0; } parameters_optional RPAREN ;
+function: { incr_scope(); } function_head function_tail
+    { 
+        hide_scope();
+        $$ = (AST_Node *) temp_function;
+    } 
+;
 
-return_type: type | type pointer ;
+function_head: { declare = 1; } return_type ID LPAREN
+	{ 
+		declare = 0;
+		
+		AST_Node_Ret_Type *temp = (AST_Node_Ret_Type *) $2;
+		temp_function = (AST_Node_Func_Decl *) new_ast_func_decl_node(temp->ret_type, temp->pointer, $3);
+		temp_function->entry->st_type = FUNCTION_TYPE;
+		temp_function->entry->inf_type = temp->ret_type;
+	}
+	parameters_optional RPAREN
+	{
+		if($6 != NULL){
+			AST_Node_Decl_Params *temp = (AST_Node_Decl_Params *) $6;
+			
+			temp_function->entry->parameters = temp->parameters;
+			temp_function->entry->num_of_pars = temp->num_of_pars;
+		}
+		else{
+			temp_function->entry->parameters = NULL;
+			temp_function->entry->num_of_pars = 0;
+		}		
+	}
+;
 
-parameters_optional: parameters | /* empty */ ;
+return_type:
+	type
+	{
+		$$ = new_ast_ret_type_node($1, 0);
+	}
+	| type pointer
+	{
+		$$ = new_ast_ret_type_node($1, 1);
+	}
+;
 
-parameters: parameters COMMA parameter | parameter ;
+parameters_optional: 
+	parameters
+	{
+		$$ = $1;
+	}
+	| /* empty */
+	{
+		$$ = NULL;
+	}
+;
 
-parameter : { declare = 1; } type variable { declare = 0; } ;
+parameters: 
+	parameters COMMA parameter
+	{
+		AST_Node_Decl_Params *temp = (AST_Node_Decl_Params *) $1;
+		$$ = new_ast_decl_params_node(temp->parameters, temp->num_of_pars, $3);
+	}
+	| parameter
+	{
+		$$ = new_ast_decl_params_node(NULL, 0, $1);
+	}
+;
+
+parameter : { declare = 1; } type variable
+    { 
+        declare = 0;
+        $$ = def_param($2, $3->st_name, 0);
+    }
+;
 
 function_tail: LBRACE declarations_optional statements_optional return_optional RBRACE ;
 
-declarations_optional: declarations | /* empty */ ;
+declarations_optional: 
+	declarations 
+	{
+		temp_function->declarations = $1;
+	}
+	| /* empty */
+	{
+		temp_function->declarations = NULL;
+	}
+;
 
-statements_optional: statements { ast_traversal($1); } | /* empty */ ;
+statements_optional: 
+	statements
+	{
+		temp_function->statements = $1;
+	} 
+	| /* empty */
+	{
+		temp_function->statements = NULL;
+	}
+;
 
-return_optional: RETURN expression SEMI | /* empty */ ;
+
+return_optional:
+	RETURN expression SEMI
+	{
+		temp_function->return_node = new_ast_return_node(temp_function->ret_type, $2);
+	}
+	| /* empty */
+	{
+		temp_function->return_node = NULL;
+	}
+;
 
 %%
 

@@ -19,6 +19,35 @@ AST_Node *new_ast_node(Node_Type type, AST_Node *left, AST_Node *right) {
 }
 
 /* Declarations */
+AST_Node *new_declarations_node(AST_Node **declarations, int declaration_count,
+                                AST_Node *declaration) {
+    // allocate memory
+    AST_Node_Declarations *v = malloc(sizeof(AST_Node_Declarations));
+
+    // set node type
+    v->type = DECLARATIONS;
+
+    // first declaration
+    if (declarations == NULL) {
+        declarations = (AST_Node **)malloc(sizeof(AST_Node *));
+        declarations[0] = declaration;
+        declaration_count = 1;
+    }
+    // add new declaration
+    else {
+        declarations = (AST_Node **)realloc(
+            declarations, (declaration_count + 1) * sizeof(AST_Node *));
+        declarations[declaration_count] = declaration;
+        declaration_count++;
+    }
+
+    // set entries
+    v->declarations = declarations;
+    v->declaration_count = declaration_count;
+
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
 
 AST_Node *new_ast_decl_node(int data_type, list_t **names, int names_count) {
     // allocate memory
@@ -287,15 +316,90 @@ AST_Node *new_ast_ref_node(list_t *entry, int ref) {
 }
 
 /* Functions */
+AST_Node *new_func_declarations_node(AST_Node **func_declarations,
+                                     int func_declaration_count,
+                                     AST_Node *func_declaration) {
+    // allocate memory
+    AST_Node_Func_Declarations *v = malloc(sizeof(AST_Node_Func_Declarations));
 
-AST_Node *new_ast_func_decl_node(int ret_type, list_t *entry) {
+    // set node type
+    v->type = FUNC_DECLS;
+
+    // first declaration
+    if (func_declarations == NULL) {
+        func_declarations = (AST_Node **)malloc(sizeof(AST_Node *));
+        func_declarations[0] = func_declaration;
+        func_declaration_count = 1;
+    }
+    // add new declaration
+    else {
+        func_declarations = (AST_Node **)realloc(func_declarations,
+                                                 (func_declaration_count + 1) *
+                                                     sizeof(AST_Node *));
+        func_declarations[func_declaration_count] = func_declaration;
+        func_declaration_count++;
+    }
+
+    // set entries
+    v->func_declarations = func_declarations;
+    v->func_declaration_count = func_declaration_count;
+
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
+
+AST_Node *new_ast_func_decl_node(int ret_type, int pointer, list_t *entry) {
     // allocate memory
     AST_Node_Func_Decl *v = malloc(sizeof(AST_Node_Func_Decl));
 
     // set entries
     v->type = FUNC_DECL;
     v->ret_type = ret_type;
+    v->pointer = pointer;
     v->entry = entry;
+
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
+
+AST_Node *new_ast_ret_type_node(int ret_type, int pointer) {
+    // allocate memory
+    AST_Node_Ret_Type *v = malloc(sizeof(AST_Node_Ret_Type));
+
+    // set entries
+    v->type = RET_TYPE;
+    v->ret_type = ret_type;
+    v->pointer = pointer;
+
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
+
+AST_Node *new_ast_decl_params_node(Param *parameters, int num_of_pars,
+                                   Param param) {
+    // allocate memory
+    AST_Node_Decl_Params *v = malloc(sizeof(AST_Node_Decl_Params));
+
+    // set node type
+    v->type = DECL_PARAMS;
+
+    // first declaration
+    if (parameters == NULL) {
+        parameters = (Param *)malloc(sizeof(Param));
+        parameters[0] = param;
+        num_of_pars = 1;
+    }
+    // add new declaration
+    else {
+        parameters =
+            (Param *)realloc(parameters, (num_of_pars + 1) * sizeof(Param));
+        parameters[num_of_pars] = param;
+        num_of_pars++;
+    }
+
+    // set entries
+    v->parameters = parameters;
+    v->num_of_pars = num_of_pars;
 
     // return type-casted result
     return (struct AST_Node *)v;
@@ -306,7 +410,7 @@ AST_Node *new_ast_return_node(int ret_type, AST_Node *ret_val) {
     AST_Node_Return *v = malloc(sizeof(AST_Node_Return));
 
     // set entries
-    v->type = FUNC_DECL;
+    v->type = RETURN_NODE;
     v->ret_type = ret_type;
     v->ret_val = ret_val;
 
@@ -318,6 +422,7 @@ AST_Node *new_ast_return_node(int ret_type, AST_Node *ret_val) {
 
 void ast_print_node(AST_Node *node) {
     /* temp nodes */
+    AST_Node_Declarations *temp_declarations;
     AST_Node_Decl *temp_decl;
     AST_Node_Const *temp_const;
     AST_Node_Statements *temp_statements;
@@ -332,12 +437,20 @@ void ast_print_node(AST_Node *node) {
     AST_Node_Rel *temp_rel;
     AST_Node_Equ *temp_equ;
     AST_Node_Ref *temp_ref;
+    AST_Node_Func_Declarations *temp_func_declarations;
     AST_Node_Func_Decl *temp_func_decl;
+    AST_Node_Ret_Type *temp_ret_type;
+    AST_Node_Decl_Params *temp_decl_params;
     AST_Node_Return *temp_return;
 
     switch (node->type) {
     case BASIC_NODE:
         printf("Basic Node\n");
+        break;
+    case DECLARATIONS:
+        temp_declarations = (struct AST_Node_Declarations *)node;
+        printf("Declarations Node with %d declarations\n",
+               temp_declarations->declaration_count);
         break;
     case DECL_NODE:
         temp_decl = (struct AST_Node_Decl *)node;
@@ -423,10 +536,31 @@ void ast_print_node(AST_Node *node) {
         temp_ref = (struct AST_Node_Ref *)node;
         printf("Reference Node of entry %s\n", temp_ref->entry->st_name);
         break;
+    case FUNC_DECLS:
+        temp_func_declarations = (struct AST_Node_Func_Declarations *)node;
+        printf("Function Declarations Node with %d function declarations\n",
+               temp_func_declarations->func_declaration_count);
+        break;
     case FUNC_DECL:
         temp_func_decl = (struct AST_Node_Func_Decl *)node;
-        printf("Function Declaration Node of %s with ret_type %d\n",
-               temp_func_decl->entry->st_name, temp_func_decl->ret_type);
+        printf("Function Declaration Node of %s with ret_type %d and %d "
+               "parameters\n",
+               temp_func_decl->entry->st_name, temp_func_decl->ret_type,
+               temp_func_decl->entry->num_of_pars);
+        break;
+    case RET_TYPE:
+        temp_ret_type = (struct AST_Node_Ret_Type *)node;
+        printf("Return type %d which is ", temp_ret_type->ret_type);
+        if (temp_ret_type->pointer) {
+            printf("a pointer\n");
+        } else {
+            printf("not a pointer\n");
+        }
+        break;
+    case DECL_PARAMS:
+        temp_decl_params = (struct AST_Node_Decl_Params *)node;
+        printf("Function declaration parameters node of %d parameters\n",
+               temp_decl_params->num_of_pars);
         break;
     case RETURN_NODE:
         temp_return = (struct AST_Node_Return *)node;
@@ -453,6 +587,15 @@ void ast_traversal(AST_Node *node) {
         ast_traversal(node->left);
         ast_traversal(node->right);
         ast_print_node(node); // postfix
+    }
+    /* declarations case */
+    else if (node->type == DECLARATIONS) {
+        AST_Node_Declarations *temp_declarations =
+            (struct AST_Node_Declarations *)node;
+        ast_print_node(node);
+        for (i = 0; i < temp_declarations->declaration_count; i++) {
+            ast_traversal(temp_declarations->declarations[i]);
+        }
     }
     /* statements case */
     else if (node->type == STATEMENTS) {
@@ -527,6 +670,52 @@ void ast_traversal(AST_Node *node) {
         printf("Call parameters:\n");
         for (i = 0; i < temp_func_call->num_of_pars; i++) {
             ast_traversal(temp_func_call->params[i]);
+        }
+    }
+    /* function declarations case */
+    else if (node->type == FUNC_DECLS) {
+        AST_Node_Func_Declarations *temp_func_declarations =
+            (struct AST_Node_Func_Declarations *)node;
+        ast_print_node(node);
+        for (i = 0; i < temp_func_declarations->func_declaration_count; i++) {
+            ast_traversal(temp_func_declarations->func_declarations[i]);
+        }
+    }
+    /* function declaration case */
+    else if (node->type == FUNC_DECL) {
+        AST_Node_Func_Decl *temp_func_decl = (struct AST_Node_Func_Decl *)node;
+        ast_print_node(node);
+        if (temp_func_decl->entry->num_of_pars != 0) {
+            printf("Parameters:\n");
+            for (i = 0; i < temp_func_decl->entry->num_of_pars; i++) {
+                printf("Parameter %s of type %d\n",
+                       temp_func_decl->entry->parameters[i].param_name,
+                       temp_func_decl->entry->parameters[i].par_type);
+            }
+        }
+        if (temp_func_decl->declarations != NULL) {
+            printf("Function declarations:\n");
+            ast_traversal(temp_func_decl->declarations);
+        }
+        if (temp_func_decl->statements != NULL) {
+            printf("Function statements:\n");
+            ast_traversal(temp_func_decl->statements);
+        }
+        if (temp_func_decl->return_node != NULL) {
+            printf("Return node:\n");
+            ast_traversal(temp_func_decl->return_node);
+        }
+    }
+    /* parameter declarations case */
+    else if (node->type == DECL_PARAMS) {
+        AST_Node_Decl_Params *temp_decl_params =
+            (struct AST_Node_Decl_Params *)node;
+        ast_print_node(node);
+        printf("Call parameters:\n");
+        for (i = 0; i < temp_decl_params->num_of_pars; i++) {
+            printf("Parameter %s of type %d\n",
+                   temp_decl_params->parameters[i].param_name,
+                   temp_decl_params->parameters[i].par_type);
         }
     }
     /* return case */
