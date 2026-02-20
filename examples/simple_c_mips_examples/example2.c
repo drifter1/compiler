@@ -7,7 +7,7 @@ for(i = 0; i < 10; i++){
     res[i] = operation(val, i);
     val = res[i];
     print(res[i]);
-    print('\n');
+    print("\n");
 }
 return;
 // functions
