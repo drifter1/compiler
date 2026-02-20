@@ -103,13 +103,15 @@ By default, the executable will be located in the subdirectory *bin* and called 
 
 ## Running the included examples
 
-Examples are included in the *examples* subdirectory. You can compile *example2.c* in the Simple-C language via:
+Examples are included in the *examples* subdirectory.
+
+You can compile *example2.c* in the Simple-C language via:
 
 ```
 ./bin/compiler examples/simple_c_examples/example2.c
 ```
 
-This will print out parsing debugging information in the terminal console and also create the *symtab_dump.out* and *revisit_dump.out* files.
+This will print out parsing debugging information in the terminal console and also create the *symtab_dump.out* and *revisit_dump.out* debugging files.
 
 **terminal output:**
 ```
@@ -189,7 +191,7 @@ print        Parameter Check
 To clean the build files and binary executable, you just have to type `make clean`.
 
 > [!NOTE]
-> The above command does not remove debugging files such as *symtab_dump.out* and *revisit_dump.out*, which are created when you use the compiler itself. These files need to be removed manually.
+> The above command does not remove debugging files such as *symtab_dump.out* and *revisit_dump.out*, as well as the assembly outputs (*.s* files), which are created when you use the compiler itself. These files need to be removed manually.
 
 # Articles
 
@@ -197,7 +199,8 @@ The complete list of articles can be found [here](/docs/articles.md).
 
 # Status
 
-- Semantical Analysis pt.2 (related to #5)
-- Machine Code generation in MIPS Assembly (covered up to #5)
+- Semantical Analysis pt.2 - Revisit Queue Usage (related to #5)
+- Machine Code generation in MIPS Assembly (covered up to issue #5)
 - Machine Code generation in MIPS Assembly (remaining cases)
 - Optimizations in the compiler's source code
+- Fixing errors, bugs, issues, ...
