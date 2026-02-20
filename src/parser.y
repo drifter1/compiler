@@ -180,23 +180,18 @@ variable: ID { $$ = $1; }
 	}
 ;
 
-pointer: pointer MULOP | MULOP ; /* for now we suppose everything is a simple pointer! */
+pointer: MULOP ; /* for now only single pointers! */
 
-array: array LBRACK expression RBRACK
-	{ 
-	    // if declaration then error!
-		if(declare == 1){
-			fprintf(stderr, "Array declaration at %d contains expression!\n", lineno);
-		}
-	}
-	| LBRACK expression RBRACK
+array: /* for now only one-dimensional arrays */
+	LBRACK expression RBRACK /* can only be used in expressions */
 	{
 		// if declaration then error!
 		if(declare == 1){
 			fprintf(stderr, "Array declaration at %d contains expression!\n", lineno);
+			exit(1);
 		}
 	}
-    | LBRACK ICONST RBRACK
+	| LBRACK ICONST RBRACK
 	{
 		// set array_size for declaration purposes
 		$$ = $2.ival;
