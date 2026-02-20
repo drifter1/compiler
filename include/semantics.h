@@ -6,6 +6,7 @@
 #define ARRAY_TYPE 4
 #define POINTER_TYPE 5
 #define FUNCTION_TYPE 6
+#define VOID_TYPE 7
 
 /* operator types */
 #define NONE 0		// to check types only - assignment, parameter

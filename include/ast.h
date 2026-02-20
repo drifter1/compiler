@@ -55,16 +55,6 @@ typedef enum Equ_op {
     NOT_EQUAL // != operator
 } Equ_op;
 
-/* -------------------HELP STRUCTURES----------------------- */
-
-/* Types of values that we can have in constants */
-typedef union Value {
-    int ival;
-    double fval;
-    char cval;
-    char *sval;
-} Value;
-
 /* -----------------------AST NODES------------------------- */
 
 /* The basic node */

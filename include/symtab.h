@@ -16,14 +16,22 @@ extern int cur_scope;
 /* flag variable for declaring variables */
 extern int declare; // 1: declaring variable, 0: not
 
+/* Types of values that we can have */
+typedef union Value {
+    int ival;
+    double fval;
+    char cval;
+    char *sval;
+} Value;
+
 /* parameter struct */
 typedef struct Param {
     int par_type;
     char param_name[MAXTOKENLEN];
+
     // to store value
-    int ival;
-    double fval;
-    char *st_sval;
+    Value val;
+
     int passing; // value or reference
 } Param;
 
@@ -41,10 +49,8 @@ typedef struct list_t {
     int scope;
     RefList *lines;
 
-    // to store value and sometimes more information
-    int st_ival;
-    double st_fval;
-    char st_sval;
+    // to store value
+    Value val;
 
     // type
     int st_type;
@@ -54,9 +60,7 @@ typedef struct list_t {
     int inf_type;
 
     // array stuff
-    int *i_vals;
-    double *f_vals;
-    char *s_vals;
+    Value *vals;
     int array_size;
 
     // function parameters

@@ -114,7 +114,9 @@ This will print out parsing debugging information in the terminal console and al
 **terminal output:**
 ```
 Inserted i for the first time with linenumber 1!
+Declaration Node of data-type 1 for 1 names
 Inserted val for the first time with linenumber 2!
+Declaration Node of data-type 2 for 1 names
 Found i again at line 3!
 Found i again at line 3!
 Found i again at line 3!
@@ -124,16 +126,17 @@ Found i again at line 4!
 Found i again at line 4!
 Inserted print at line 6 to check it again later!
 Found val again at line 6!
+Parsing finished!
 ```
 
 **symtab_dump.out**
 ```
------------- ------ ------ ------------
-Name         Type   Scope  Line Numbers
------------- ------ ------ ------------
-i            undef    0     1    3    3    3    4    4 
-val          undef    0     2    4    4    6 
-print        undef    0     6 
+------------ -------------- ------ ------------
+Name         Type           Scope  Line Numbers
+------------ -------------- ------ ------------
+i            int              0     1    3    3    3    4    4 
+val          real             0     2    4    4    6 
+print        undef            0     6 
 ```
 
 **revisit_dump.out**
