@@ -127,19 +127,21 @@ Reference Node of entry i
 Arithmetic Node of operator 2
 Reference Node of entry i
 Arithmetic Node of operator 0
+Assign Node of entry val
+Assigning:
 Reference Node of entry val
 Reference Node of entry i
 Arithmetic Node of operator 2
 Reference Node of entry i
 Arithmetic Node of operator 0
-Assign Node of entry val
-Reference Node of entry val
-Reference Node of entry i
-Arithmetic Node of operator 2
-Reference Node of entry i
-Arithmetic Node of operator 0
-Assign Node of entry val
 Statements Node with 1 statements
+Assign Node of entry val
+Assigning:
+Reference Node of entry val
+Reference Node of entry i
+Arithmetic Node of operator 2
+Reference Node of entry i
+Arithmetic Node of operator 0
 Parsing finished!
 ```
 
