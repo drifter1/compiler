@@ -21,6 +21,7 @@ typedef enum Node_Type {
     BOOL_NODE,   // boolean expression
     REL_NODE,    // relational expression
     EQU_NODE,    // equality expression
+    REF_NODE,    // identifier in expression
     // functions
     FUNC_DECL,   // function declaration
     RETURN_NODE, // return statement of functions
@@ -222,6 +223,16 @@ typedef struct AST_Node_Equ {
     struct AST_Node *right; // right child
 } AST_Node_Equ;
 
+typedef struct AST_Node_Ref {
+    enum Node_Type type; // node type
+
+    // symbol table entry
+    list_t *entry;
+
+    // reference or not1
+    int ref; // 0: not reference, 1: reference
+} AST_Node_Ref;
+
 /* Functions */
 typedef struct AST_Node_Func_Decl {
     enum Node_Type type; // node type
@@ -276,6 +287,7 @@ AST_Node *new_ast_arithm_node(enum Arithm_op op, AST_Node *left,
 AST_Node *new_ast_bool_node(enum Bool_op op, AST_Node *left, AST_Node *right);
 AST_Node *new_ast_rel_node(enum Rel_op op, AST_Node *left, AST_Node *right);
 AST_Node *new_ast_equ_node(enum Equ_op op, AST_Node *left, AST_Node *right);
+AST_Node *new_ast_ref_node(list_t *entry, int ref);
 
 /* Functions */
 AST_Node *new_ast_func_decl_node(int ret_type,

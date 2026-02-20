@@ -50,15 +50,21 @@ STRING		\"{print}*\"
 "return"|"RETURN"		{ return RETURN; }
 
 
-"+"|"-"				{ return ADDOP; }
-"*"					{ return MULOP; }
-"/"					{ return DIVOP; }
-"++"|"--"			{ return INCR; }
-"||"				{ return OROP; }
-"&&"				{ return ANDOP; }
-"!"					{ return NOTOP; }
-"=="|"!="			{ return EQUOP; }
-">"|"<"|">="|"<="	{ return RELOP; }
+"+"					    { yylval.val.ival = ADD; return ADDOP; }
+"-"					    { yylval.val.ival = SUB; return ADDOP; }
+"*"						{ return MULOP; }
+"/"						{ return DIVOP; }
+"++"				    { yylval.val.ival = INC; return INCR; }
+"--"				    { yylval.val.ival = DEC; return INCR; }
+"||"					{ return OROP; }
+"&&"					{ return ANDOP; }
+"!"						{ return NOTOP; }
+"=="				    { yylval.val.ival = EQUAL; return EQUOP; }
+"!="				    { yylval.val.ival = NOT_EQUAL; return EQUOP; }
+">"						{ yylval.val.ival = GREATER; return RELOP; }
+"<"						{ yylval.val.ival = LESS; return RELOP; }
+">="					{ yylval.val.ival = GREATER_EQUAL; return RELOP; }
+"<="					{ yylval.val.ival = LESS_EQUAL; return RELOP; }
 
 
 "("			{ return LPAREN; }

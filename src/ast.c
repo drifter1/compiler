@@ -1,4 +1,5 @@
 #include "../include/ast.h"
+#include "../include/semantics.h"
 #include <stdlib.h>
 
 /* ------------------AST NODE MANAGEMENT-------------------- */
@@ -220,6 +221,19 @@ AST_Node *new_ast_equ_node(enum Equ_op op, AST_Node *left, AST_Node *right) {
     return (struct AST_Node *)v;
 }
 
+AST_Node *new_ast_ref_node(list_t *entry, int ref) {
+    // allocate memory
+    AST_Node_Ref *v = malloc(sizeof(AST_Node_Ref));
+
+    // set entries
+    v->type = REF_NODE;
+    v->entry = entry;
+    v->ref = ref;
+
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
+
 /* Functions */
 
 AST_Node *new_ast_func_decl_node(int ret_type, list_t *entry) {
@@ -263,6 +277,7 @@ void ast_print_node(AST_Node *node) {
     AST_Node_Bool *temp_bool;
     AST_Node_Rel *temp_rel;
     AST_Node_Equ *temp_equ;
+    AST_Node_Ref *temp_ref;
     AST_Node_Func_Decl *temp_func_decl;
     AST_Node_Return *temp_return;
 
@@ -277,7 +292,19 @@ void ast_print_node(AST_Node *node) {
         break;
     case CONST_NODE:
         temp_const = (struct AST_Node_Const *)node;
-        printf("Constant Node of const-type %d\n", temp_const->const_type);
+        printf("Constant Node of const-type %d with value ",
+               temp_const->const_type);
+        switch (temp_const->const_type) {
+        case INT_TYPE:
+            printf("%d\n", temp_const->val.ival);
+            break;
+        case REAL_TYPE:
+            printf("%.2f\n", temp_const->val.fval);
+            break;
+        case CHAR_TYPE:
+            printf("%c\n", temp_const->val.cval);
+            break;
+        }
         break;
     case IF_NODE:
         temp_if = (struct AST_Node_If *)node;
@@ -326,6 +353,10 @@ void ast_print_node(AST_Node *node) {
     case EQU_NODE:
         temp_equ = (struct AST_Node_Equ *)node;
         printf("Equality Node of operator %d\n", temp_equ->op);
+        break;
+    case REF_NODE:
+        temp_ref = (struct AST_Node_Ref *)node;
+        printf("Reference Node of entry %s\n", temp_ref->entry->st_name);
         break;
     case FUNC_DECL:
         temp_func_decl = (struct AST_Node_Func_Decl *)node;

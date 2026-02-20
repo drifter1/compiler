@@ -67,6 +67,8 @@
 %type <array_size> array
 %type <symtab_item> init var_init array_init
 %type <node> constant
+%type <node> expression var_ref
+%type <val> sign
 
 %start program
 
@@ -229,23 +231,127 @@ while_statement: WHILE LPAREN expression RPAREN tail ;
 tail: LBRACE statements RBRACE ;
 
 expression:
-    expression ADDOP expression |
-    expression MULOP expression |
-    expression DIVOP expression |
-    ID INCR |
-    INCR ID |
-    expression OROP expression |
-    expression ANDOP expression |
-    NOTOP expression |
-    expression EQUOP expression |
-    expression RELOP expression |
-    LPAREN expression RPAREN |
-    var_ref |
-    sign constant |
-    function_call
+    expression ADDOP expression
+	{ 
+	    $$ = new_ast_arithm_node($2.ival, $1, $3);
+		ast_traversal($$); /* just for testing */
+	}
+	| expression MULOP expression
+	{
+	    $$ = new_ast_arithm_node(MUL, $1, $3);
+		ast_traversal($$); /* just for testing */
+	}
+	| expression DIVOP expression
+	{
+		$$ = new_ast_arithm_node(DIV, $1, $3);
+		ast_traversal($$); /* just for testing */
+	}
+	| ID INCR
+	{
+		/* increment */
+		if($2.ival == INC){
+			$$ = new_ast_incr_node($1, 0, 0);
+		}
+		else{
+			$$ = new_ast_incr_node($1, 1, 0);
+		}
+		ast_traversal($$); /* just for testing */		
+	}
+	| INCR ID
+	{ 
+		/* increment */
+		if($1.ival == INC){
+			$$ = new_ast_incr_node($2, 0, 1);
+		}
+		else{
+			$$ = new_ast_incr_node($2, 1, 1);
+		}
+		ast_traversal($$); /* just for testing */
+	}
+	| expression OROP expression
+	{
+		$$ = new_ast_bool_node(OR, $1, $3);
+		ast_traversal($$); /* just for testing */
+	}
+	| expression ANDOP expression
+	{
+		$$ = new_ast_bool_node(AND, $1, $3);
+		ast_traversal($$); /* just for testing */
+	}
+	| NOTOP expression
+	{
+	    $$ = new_ast_bool_node(NOT, $2, NULL);
+		ast_traversal($$); /* just for testing */
+	}
+	| expression EQUOP expression
+	{
+		$$ = new_ast_equ_node($2.ival, $1, $3);
+		ast_traversal($$); /* just for testing */
+	}
+	| expression RELOP expression
+	{
+		$$ = new_ast_rel_node($2.ival, $1, $3);
+		ast_traversal($$); /* just for testing */
+	}
+	| LPAREN expression RPAREN
+	{
+		$$ = $2; /* just pass information */
+	}
+	| var_ref
+	{ 
+		$$ = $1; /* just pass information */
+	}
+	| sign constant
+	{
+		/* sign */
+		if($1.ival == 1){
+			AST_Node_Const *temp = (AST_Node_Const*) $2;
+		
+			/* inverse value depending on the constant type */
+			switch(temp->const_type){
+				case INT_TYPE:
+					temp->val.ival *= -1;
+					break;
+				case REAL_TYPE:
+					temp->val.fval *= -1;
+					break;
+				case CHAR_TYPE:
+					/* sign before char error */
+					fprintf(stderr, "Error having sign before character constant!\n");
+					exit(1);
+					break;
+			}
+			
+			$$ = (AST_Node*) temp;
+		}
+		/* no sign */
+		else{
+			$$ = $2;
+		}
+	    ast_traversal($$); /* just for testing */
+	}
+	| function_call
+	{
+		$$ = NULL; /* will do it later ! */
+	}
 ;
 
-sign: ADDOP | /* empty */ ;
+sign: ADDOP
+	{ 
+		/* plus sign error */
+		if($1.ival == ADD){
+			fprintf(stderr, "Error having plus as a sign!\n");
+			exit(1);
+		}
+		else{
+			$$.ival = 1; /* sign */
+		}
+	}
+	| /* empty */
+	{ 
+		$$.ival = 0; /* no sign */
+	} 
+;
 
 constant:
 	ICONST   { $$ = new_ast_const_node(INT_TYPE, $1);  }
@@ -255,7 +361,15 @@ constant:
 
 assigment: var_ref ASSIGN expression ;
 
-var_ref  : variable | REFER variable ;
+var_ref: variable
+	{
+		$$ = new_ast_ref_node($1, 0); /* no reference */
+	}
+	| REFER variable
+	{
+		$$ = new_ast_ref_node($2, 1); /* reference */
+	}
+; 
 
 function_call: ID LPAREN call_params RPAREN;
 
