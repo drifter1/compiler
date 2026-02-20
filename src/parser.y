@@ -69,6 +69,7 @@
 %type <node> constant
 %type <node> expression var_ref
 %type <val> sign
+%type <node> statement assigment
 
 %start program
 
@@ -208,8 +209,47 @@ values: values COMMA constant
 statements: statements statement | statement ;
 
 statement:
-	if_statement | for_statement | while_statement | assigment SEMI |
-	CONTINUE SEMI | BREAK SEMI | function_call SEMI | ID INCR SEMI | INCR ID SEMI
+	if_statement { $$ = NULL; /* will do it later ! */ }
+	| for_statement { $$ = NULL; /* will do it later ! */ }
+	| while_statement { $$ = NULL; /* will do it later ! */ }
+	| assigment SEMI
+	{
+		$$ = $1; /* just pass information */
+		ast_traversal($$); /* just for testing */
+	}
+	| CONTINUE SEMI
+	{ 
+		$$ = new_ast_simple_node(0);
+		ast_traversal($$); /* just for testing */
+	}
+	| BREAK SEMI
+	{ 
+		$$ = new_ast_simple_node(1);
+		ast_traversal($$); /* just for testing */
+	}
+	| function_call SEMI { $$ = NULL; /* will do it later ! */ }
+	| ID INCR SEMI
+	{
+		/* increment */
+		if($2.ival == INC){
+			$$ = new_ast_incr_node($1, 0, 0);
+		}
+		else{
+			$$ = new_ast_incr_node($1, 1, 0);
+		}
+		ast_traversal($$); /* just for testing */
+	}
+	| INCR ID SEMI
+	{
+		/* increment */
+		if($1.ival == INC){
+			$$ = new_ast_incr_node($2, 0, 1);
+		}
+		else{
+			$$ = new_ast_incr_node($2, 1, 1);
+		}
+		ast_traversal($$); /* just for testing */
+	}
 ;
 
 if_statement:
@@ -359,7 +399,12 @@ constant:
 	| CCONST { $$ = new_ast_const_node(CHAR_TYPE, $1); }
 ;
 
-assigment: var_ref ASSIGN expression ;
+assigment: var_ref ASSIGN expression
+    {
+        AST_Node_Ref *temp = (AST_Node_Ref*) $1;
+        $$ = new_ast_assign_node(temp->entry, temp->ref, $3);
+    }
+;
 
 var_ref: variable
 	{

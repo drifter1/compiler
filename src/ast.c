@@ -108,13 +108,14 @@ AST_Node *new_ast_while_node(AST_Node *condition, AST_Node *while_branch) {
     return (struct AST_Node *)v;
 }
 
-AST_Node *new_ast_assign_node(list_t *entry, AST_Node *assign_val) {
+AST_Node *new_ast_assign_node(list_t *entry, int ref, AST_Node *assign_val) {
     // allocate memory
     AST_Node_Assign *v = malloc(sizeof(AST_Node_Assign));
 
     // set entries
     v->type = ASSIGN_NODE;
     v->entry = entry;
+    v->ref = ref;
     v->assign_val = assign_val;
 
     // return type-casted result

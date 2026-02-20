@@ -1,7 +1,6 @@
 #include "../include/symtab.h"
 
 /* ---------------------NODE TYPES-------------------------- */
-
 typedef enum Node_Type {
     BASIC_NODE, // no special usage (for roots only)
     // declarations
@@ -147,6 +146,9 @@ typedef struct AST_Node_Assign {
     // symbol table entry
     list_t *entry;
 
+    // reference or not
+    int ref; // 0: not reference, 1: reference
+
     // assignment value
     struct AST_Node *assign_val;
 } AST_Node_Assign;
@@ -154,7 +156,7 @@ typedef struct AST_Node_Assign {
 typedef struct AST_Node_Simple {
     enum Node_Type type; // node type
 
-    // continue, break or "main" return
+    // continue: '0', break: '1'
     int statement_type;
 } AST_Node_Simple;
 
@@ -229,7 +231,7 @@ typedef struct AST_Node_Ref {
     // symbol table entry
     list_t *entry;
 
-    // reference or not1
+    // reference or not
     int ref; // 0: not reference, 1: reference
 } AST_Node_Ref;
 
@@ -273,9 +275,8 @@ AST_Node *new_ast_elsif_node(AST_Node *condition, AST_Node *elsif_branch);
 AST_Node *new_ast_for_node(AST_Node *initialize, AST_Node *condition,
                            AST_Node *increment, AST_Node *for_branch);
 AST_Node *new_ast_while_node(AST_Node *condition, AST_Node *while_branch);
-AST_Node *new_ast_assign_node(list_t *entry, AST_Node *assign_val);
-AST_Node *
-new_ast_simple_node(int statement_type); // continue, break or "main" return
+AST_Node *new_ast_assign_node(list_t *entry, int ref, AST_Node *assign_val);
+AST_Node *new_ast_simple_node(int statement_type); // continue or break
 AST_Node *new_ast_incr_node(list_t *entry, int incr_type,
                             int pf_type); // increment decrement
 AST_Node *new_ast_func_call_node(list_t *entry, AST_Node **params,
