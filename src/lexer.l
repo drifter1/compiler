@@ -27,10 +27,10 @@ STRING		\"{print}*\"
 
 %%
 
-"//".*				{ printf("Eat up comment at line %d\n", lineno); }
+"//".*				{ /*printf("Eat up comment at line %d\n", lineno); */ }
 
-"/*"				{ printf("Eat up comment from line %d ", lineno); BEGIN(ML_COMMENT); }
-<ML_COMMENT>"*/" 	{ printf("to line %d\n", lineno); BEGIN(INITIAL); }
+"/*"				{ /* printf("Eat up comment from line %d ", lineno); */ BEGIN(ML_COMMENT); }
+<ML_COMMENT>"*/" 	{ /* printf("to line %d\n", lineno); */ BEGIN(INITIAL); }
 <ML_COMMENT>[^*\n]+
 <ML_COMMENT>"*"
 <ML_COMMENT>"\n"	{ lineno += 1; }

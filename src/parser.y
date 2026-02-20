@@ -481,7 +481,7 @@ function_tail: LBRACE declarations_optional statements_optional return_optional 
 
 declarations_optional: declarations | /* empty */ ;
 
-statements_optional: statements | /* empty */ ;
+statements_optional: statements { ast_traversal($1); } | /* empty */ ;
 
 return_optional: RETURN expression SEMI | /* empty */ ;
 

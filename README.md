@@ -113,46 +113,33 @@ This will print out parsing debugging information in the terminal console and al
 
 **terminal output:**
 ```
-Inserted i for the first time with linenumber 1!
 Declaration Node of data-type 1 for 1 names
-Inserted val for the first time with linenumber 2!
 Declaration Node of data-type 2 for 1 names
-Found i again at line 3!
-Constant Node of const-type 1 with value 0
-Found i again at line 3!
-Constant Node of const-type 1 with value 10
 Reference Node of entry i
 Constant Node of const-type 1 with value 10
 Relational Node of operator 1
-Found i again at line 3!
 Increment Node of entry i being 0 0
-Found val again at line 4!
-Found val again at line 4!
-Found i again at line 4!
-Found i again at line 4!
+Reference Node of entry val
 Reference Node of entry i
+Arithmetic Node of operator 2
+Reference Node of entry val
+Reference Node of entry i
+Arithmetic Node of operator 2
 Reference Node of entry i
 Arithmetic Node of operator 0
 Reference Node of entry val
 Reference Node of entry i
+Arithmetic Node of operator 2
 Reference Node of entry i
 Arithmetic Node of operator 0
-Arithmetic Node of operator 2
-Reference Node of entry val
-Reference Node of entry i
-Reference Node of entry i
-Arithmetic Node of operator 0
-Arithmetic Node of operator 2
 Assign Node of entry val
 Reference Node of entry val
 Reference Node of entry i
+Arithmetic Node of operator 2
 Reference Node of entry i
 Arithmetic Node of operator 0
-Arithmetic Node of operator 2
 Assign Node of entry val
 Statements Node with 1 statements
-Inserted print at line 6 to check it again later!
-Found val again at line 6!
 Parsing finished!
 ```
 
