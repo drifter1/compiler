@@ -144,6 +144,13 @@ Reference Node of entry i
 Arithmetic Node of operator 0
 Arithmetic Node of operator 2
 Assign Node of entry val
+Reference Node of entry val
+Reference Node of entry i
+Reference Node of entry i
+Arithmetic Node of operator 0
+Arithmetic Node of operator 2
+Assign Node of entry val
+Statements Node with 1 statements
 Inserted print at line 6 to check it again later!
 Found val again at line 6!
 Parsing finished!

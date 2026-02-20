@@ -18,6 +18,11 @@
 	void add_to_vals(Value val);
 	Value *vals;
 	int vc = 0;
+
+    // for else ifs
+	void add_elseif(AST_Node *elsif);
+	AST_Node **elsifs;
+	int elseif_count = 0;
 %}
 
 /* YYSTYPE union */
@@ -70,6 +75,8 @@
 %type <node> expression var_ref
 %type <val> sign
 %type <node> statement assigment
+%type <node> statements tail
+%type <node> if_statement else_if optional_else
 
 %start program
 
@@ -206,10 +213,23 @@ values: values COMMA constant
 
 
 /* statements */
-statements: statements statement | statement ;
+statements:
+	statements statement
+	{
+		AST_Node_Statements *temp = (AST_Node_Statements*) $1;
+		$$ = new_statements_node(temp->statements, temp->statement_count, $2);
+	}
+	| statement
+	{
+		$$ = new_statements_node(NULL, 0, $1);
+	}
+;
 
 statement:
-	if_statement { $$ = NULL; /* will do it later ! */ }
+	if_statement
+	{ 
+		$$ = $1; /* just pass information */
+	}
 	| for_statement { $$ = NULL; /* will do it later ! */ }
 	| while_statement { $$ = NULL; /* will do it later ! */ }
 	| assigment SEMI
@@ -253,22 +273,55 @@ statement:
 ;
 
 if_statement:
-	IF LPAREN expression RPAREN tail else_if optional_else |
-	IF LPAREN expression RPAREN tail optional_else
+	IF LPAREN expression RPAREN tail else_if optional_else
+	{
+		$$ = new_ast_if_node($3, $5, elsifs, elseif_count, $7);
+		elseif_count = 0;
+		elsifs = NULL;
+	}
+	| IF LPAREN expression RPAREN tail optional_else
+	{
+		$$ = new_ast_if_node($3, $5, NULL, 0, $6);
+	}
 ;
+
 
 else_if:
-	else_if ELSE IF LPAREN expression RPAREN tail |
-	ELSE IF LPAREN expression RPAREN tail
+	else_if ELSE IF LPAREN expression RPAREN tail
+	{
+		AST_Node *temp = new_ast_elsif_node($5, $7);
+		add_elseif(temp);
+	}
+	| ELSE IF LPAREN expression RPAREN tail
+	{
+		AST_Node *temp = new_ast_elsif_node($4, $6);
+		add_elseif(temp);
+	}
 ;
 
-optional_else: ELSE tail | /* empty */ ;
+optional_else:
+	ELSE tail
+	{
+		/* else exists */
+		$$ = $2;
+	}
+	| /* empty */
+	{
+		/* no else */
+		$$ = NULL;
+	}
+;
 
 for_statement: FOR LPAREN assigment SEMI expression SEMI expression RPAREN tail ;
 
 while_statement: WHILE LPAREN expression RPAREN tail ;
 
-tail: LBRACE statements RBRACE ;
+tail: LBRACE statements RBRACE
+    { 
+        $$ = $2; /* just pass information */
+        ast_traversal($2);
+    }
+;
 
 expression:
     expression ADDOP expression
@@ -482,5 +535,20 @@ void add_to_vals(Value val){
 		vc++;
 		vals = (Value *) realloc(vals, vc * sizeof(Value));
 		vals[vc - 1] = val;
+	}
+}
+
+void add_elseif(AST_Node *elsif){
+	// first entry
+	if(elseif_count == 0){
+		elseif_count = 1;
+		elsifs = (AST_Node **) malloc(1 * sizeof(AST_Node));
+		elsifs[0] = elsif;
+	}
+	// general case
+	else{
+		elseif_count++;
+		elsifs = (AST_Node **) realloc(elsifs, elseif_count * sizeof(AST_Node));
+		elsifs[elseif_count - 1] = elsif;
 	}
 }

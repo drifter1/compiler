@@ -48,6 +48,36 @@ AST_Node *new_ast_const_node(int const_type, Value val) {
 
 /* Statements */
 
+AST_Node *new_statements_node(AST_Node **statements, int statement_count,
+                              AST_Node *statement) {
+    // allocate memory
+    AST_Node_Statements *v = malloc(sizeof(AST_Node_Statements));
+
+    // set node type
+    v->type = STATEMENTS;
+
+    // first statement
+    if (statements == NULL) {
+        statements = (AST_Node **)malloc(sizeof(AST_Node *));
+        statements[0] = statement;
+        statement_count = 1;
+    }
+    // add new statement
+    else {
+        statements = (AST_Node **)realloc(statements, (statement_count + 1) *
+                                                          sizeof(AST_Node *));
+        statements[statement_count] = statement;
+        statement_count++;
+    }
+
+    // set entries
+    v->statements = statements;
+    v->statement_count = statement_count;
+
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
+
 AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch,
                           AST_Node **elsif_branches, int elseif_count,
                           AST_Node *else_branch) {
@@ -269,6 +299,7 @@ void ast_print_node(AST_Node *node) {
     /* temp nodes */
     AST_Node_Decl *temp_decl;
     AST_Node_Const *temp_const;
+    AST_Node_Statements *temp_statements;
     AST_Node_If *temp_if;
     AST_Node_Assign *temp_assign;
     AST_Node_Simple *temp_simple;
@@ -307,9 +338,19 @@ void ast_print_node(AST_Node *node) {
             break;
         }
         break;
+    case STATEMENTS:
+        temp_statements = (struct AST_Node_Statements *)node;
+        printf("Statements Node with %d statements\n",
+               temp_statements->statement_count);
+        break;
     case IF_NODE:
         temp_if = (struct AST_Node_If *)node;
-        printf("If Node with %d elseifs\n", temp_if->elseif_count);
+        printf("If Node with %d elseifs and ", temp_if->elseif_count);
+        if (temp_if->else_branch == NULL) {
+            printf("no else\n");
+        } else {
+            printf("else\n");
+        }
         break;
     case ELSIF_NODE:
         printf("Elsif Node\n");
@@ -389,6 +430,15 @@ void ast_traversal(AST_Node *node) {
         ast_traversal(node->left);
         ast_traversal(node->right);
         ast_print_node(node); // postfix
+    }
+    /* statements case */
+    else if (node->type == STATEMENTS) {
+        AST_Node_Statements *temp_statements =
+            (struct AST_Node_Statements *)node;
+        for (i = 0; i < temp_statements->statement_count; i++) {
+            ast_traversal(temp_statements->statements[i]);
+        }
+        ast_print_node(node);
     }
     /* the if case */
     else if (node->type == IF_NODE) {
