@@ -132,9 +132,19 @@ For branch:
 Statements Node with 4 statements
 Assign Node of entry res
 Assigning:
+Function Call Node of operation with 2 parameters
+Call parameters:
+Reference Node of entry val
+Reference Node of entry i
 Assign Node of entry val
 Assigning:
 Reference Node of entry res
+Function Call Node of print with 1 parameters
+Call parameters:
+Reference Node of entry res
+Function Call Node of print with 1 parameters
+Call parameters:
+Constant Node of const-type 3 with value '
 Function Declarations Node with 1 function declarations
 Function Declaration Node of operation with ret_type 2 and 2 parameters
 Parameters:

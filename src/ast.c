@@ -2,7 +2,7 @@
 #include "../include/semantics.h"
 #include <stdlib.h>
 #include <string.h>
-
+#
 /* ------------------AST NODE MANAGEMENT-------------------- */
 /* The basic node */
 AST_Node *new_ast_node(Node_Type type, AST_Node *left, AST_Node *right) {
@@ -243,6 +243,36 @@ AST_Node *new_ast_func_call_node(list_t *entry, AST_Node **params,
     return (struct AST_Node *)v;
 }
 
+AST_Node *new_ast_call_params_node(AST_Node **params, int num_of_pars,
+                                   AST_Node *param) {
+    // allocate memory
+    AST_Node_Call_Params *v = malloc(sizeof(AST_Node_Call_Params));
+
+    // set type
+    v->type = CALL_PARAMS;
+
+    // first parameter
+    if (params == NULL) {
+        params = (AST_Node **)malloc(sizeof(AST_Node *));
+        params[0] = param;
+        num_of_pars = 1;
+    }
+    // add new parameter
+    else {
+        params = (AST_Node **)realloc(params,
+                                      (num_of_pars + 1) * sizeof(AST_Node *));
+        params[num_of_pars] = param;
+        num_of_pars++;
+    }
+
+    // set entries
+    v->params = params;
+    v->num_of_pars = num_of_pars;
+
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
+
 /* Expressions */
 
 AST_Node *new_ast_arithm_node(enum Arithm_op op, AST_Node *left,
@@ -432,6 +462,7 @@ void ast_print_node(AST_Node *node) {
     AST_Node_Simple *temp_simple;
     AST_Node_Incr *temp_incr;
     AST_Node_Func_Call *temp_func_call;
+    AST_Node_Call_Params *temp_call_params;
     AST_Node_Arithm *temp_arithm;
     AST_Node_Bool *temp_bool;
     AST_Node_Rel *temp_rel;
@@ -470,6 +501,9 @@ void ast_print_node(AST_Node *node) {
             break;
         case CHAR_TYPE:
             printf("%c\n", temp_const->val.cval);
+            break;
+        case STR_TYPE:
+            printf("%s\n", temp_const->val.sval);
             break;
         }
         break;
@@ -513,9 +547,13 @@ void ast_print_node(AST_Node *node) {
         break;
     case FUNC_CALL:
         temp_func_call = (struct AST_Node_Func_Call *)node;
-        printf("Function Call Node with %d parameters\n",
-               temp_func_call->num_of_pars);
+        printf("Function Call Node of %s with %d parameters\n",
+               temp_func_call->entry->st_name, temp_func_call->num_of_pars);
         break;
+    case CALL_PARAMS:
+        temp_call_params = (struct AST_Node_Call_Params *)node;
+        printf("Function Call Parameters Node with %d parameters\n",
+               temp_call_params->num_of_pars);
     case ARITHM_NODE:
         temp_arithm = (struct AST_Node_Arithm *)node;
         printf("Arithmetic Node of operator %d\n", temp_arithm->op);
@@ -667,9 +705,21 @@ void ast_traversal(AST_Node *node) {
     else if (node->type == FUNC_CALL) {
         AST_Node_Func_Call *temp_func_call = (struct AST_Node_Func_Call *)node;
         ast_print_node(node);
-        printf("Call parameters:\n");
-        for (i = 0; i < temp_func_call->num_of_pars; i++) {
-            ast_traversal(temp_func_call->params[i]);
+        if (temp_func_call->num_of_pars != 0) {
+            printf("Call parameters:\n");
+            for (i = 0; i < temp_func_call->num_of_pars; i++) {
+                ast_traversal(temp_func_call->params[i]);
+            }
+        }
+    } else if (node->type == CALL_PARAMS) {
+        AST_Node_Call_Params *temp_call_params =
+            (struct AST_Node_Call_Params *)node;
+        ast_print_node(node);
+        if (temp_call_params->num_of_pars > 0) {
+            printf("Call Parameters:\n");
+            for (i = 0; i < temp_call_params->num_of_pars; i++) {
+                ast_traversal(temp_call_params->params[i]);
+            }
         }
     }
     /* function declarations case */

@@ -87,6 +87,7 @@
 %type <node> parameters_optional parameters
 %type <par>  parameter
 %type <node> return_type
+%type <node> function_call call_params call_param
 
 %start program
 
@@ -279,7 +280,10 @@ statement:
 	{ 
 		$$ = new_ast_simple_node(1);
 	}
-	| function_call SEMI { $$ = NULL; /* will do it later ! */ }
+	| function_call SEMI
+	{ 
+		$$ = $1; /* just pass information */
+	}
 	| ID INCR SEMI
 	{
 		/* increment */
@@ -465,7 +469,7 @@ expression:
 	}
 	| function_call
 	{
-		$$ = NULL; /* will do it later ! */
+		$$ = $1; /* just pass information */
 	}
 ;
 
@@ -492,11 +496,44 @@ var_ref: variable
 	}
 ; 
 
-function_call: ID LPAREN call_params RPAREN;
+function_call: ID LPAREN call_params RPAREN
+    {	
+        AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $3;
+        $$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);
+    }
+;
 
-call_params: call_param | STRING | /* empty */
+call_params: 
+	call_param
+	{
+		$$ = $1;
+	}
+	| STRING
+	{
+		AST_Node *temp = new_ast_const_node(STR_TYPE, $1);
+		$$ = new_ast_call_params_node(NULL, 0, temp);
+	}
+	| /* empty */
+	{
+		AST_Node_Call_Params *temp = malloc (sizeof (AST_Node_Call_Params));
+		temp->type = CALL_PARAMS;
+		temp->params = NULL;
+		temp->num_of_pars = 0;
+		$$ = (AST_Node*)temp;
+	}
+;
 
-call_param: call_param COMMA expression | expression ;
+call_param: 
+	call_param COMMA expression
+	{
+		AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $1;
+		$$ = new_ast_call_params_node(temp->params, temp->num_of_pars, $3);
+	}
+	| expression
+	{
+		$$ = new_ast_call_params_node(NULL, 0, $1);
+	}	
+;
 
 /* functions */
 functions_optional: 
