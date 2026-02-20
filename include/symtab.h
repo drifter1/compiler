@@ -72,20 +72,28 @@ typedef struct list_t {
 } list_t;
 
 /* Queue of identifiers to revisit */
-typedef struct revisit_queue{
-	// name of identifier
-	char *st_name;
-	
-	// type of revisit
-	int revisit_type;
-	
-	// maybe additional information to simplify the process ...
-		
-	struct revisit_queue *next;
-}revisit_queue;
+typedef struct revisit_queue {
+    // symbol table entry
+    list_t *entry;
+
+    // name of identifier
+    char *st_name;
+
+    // type of revisit
+    int revisit_type;
+
+    // parameters
+    int *par_types;
+    int num_of_pars;
+
+    // maybe additional information to simplify the process ...
+
+    struct revisit_queue *next;
+} revisit_queue;
 
 /* revisit types */
-#define PARAM_CHECK 1 /* Check parameters of function call when functions gets declared */
+#define PARAM_CHECK                                                            \
+    1 /* Check parameters of function call when functions gets declared */
 
 /* static structures */
 static list_t **hash_table;
@@ -99,19 +107,24 @@ list_t *lookup(char *name);                             // search for entry
 void symtab_dump(FILE *of);                             // dump file
 
 // Type Functions
-void set_type(char *name, int st_type, int inf_type);   // set the type of an entry (declaration)
-int get_type(char *name);                               // get the type of an entry
+void set_type(char *name, int st_type,
+              int inf_type); // set the type of an entry (declaration)
+int get_type(char *name);    // get the type of an entry
 
 // Scope Management Functions
-void hide_scope();      // hide the current scope
-void incr_scope();      // go to next scope
+void hide_scope(); // hide the current scope
+void incr_scope(); // go to next scope
 
 // Function Declaration and Parameters
-Param def_param(int par_type, char *param_name, int passing); // define parameter
-int func_declare(char *name, int ret_type, int num_of_pars, Param *parameters); // declare function
-int func_param_check(char *name, int num_of_pars, Param *parameters); // check parameters
+Param def_param(int par_type, char *param_name,
+                int passing); // define parameter
+int func_declare(char *name, int ret_type, int num_of_pars,
+                 Param *parameters); // declare function
+int func_param_check(char *name, int num_of_pars,
+                     Param *parameters); // check parameters
 
 // Revisit Queue Functions
-void add_to_queue(char *name, int type); // add to queue
-int revisit(char *name); // revisit entry by also removing it from queue
+void add_to_queue(list_t *entry, char *name, int type); // add to queue
+revisit_queue *search_queue(char *name);                // search queue
+int revisit(char *name);     // revisit entry by also removing it from queue
 void revisit_dump(FILE *of); // dump file

@@ -57,6 +57,7 @@ void insert(char *name, int len, int type, int lineno) {
             /* add it to check it again later */
             l = (list_t *)malloc(sizeof(list_t));
             strncpy(l->st_name, name, len);
+            l->st_size = len;
             l->st_type = type;
             l->scope = cur_scope;
             l->lines = (RefList *)malloc(sizeof(RefList));
@@ -68,7 +69,7 @@ void insert(char *name, int len, int type, int lineno) {
             // lineno);
 
             /* Adding identifier to the revisit queue! */
-            add_to_queue(l->st_name, PARAM_CHECK);
+            add_to_queue(l, l->st_name, PARAM_CHECK);
         }
     }
     /* found in table */
@@ -100,6 +101,7 @@ void insert(char *name, int len, int type, int lineno) {
                 /* set up entry */
                 l = (list_t *)malloc(sizeof(list_t));
                 strncpy(l->st_name, name, len);
+                l->st_size = len;
                 l->st_type = type;
                 l->scope = cur_scope;
                 l->lines = (RefList *)malloc(sizeof(RefList));
@@ -116,17 +118,15 @@ void insert(char *name, int len, int type, int lineno) {
     }
 }
 
-/* return symbol if found or NULL if not found */
-list_t *lookup(char *name) {
+list_t *lookup(char *name) { /* return symbol if found or NULL if not found */
     unsigned int hashval = hash(name);
     list_t *l = hash_table[hashval];
     while ((l != NULL) && (strcmp(name, l->st_name) != 0))
         l = l->next;
-    return l; // NULL is not found
+    return l;
 }
 
-/* print to stdout by default */
-void symtab_dump(FILE *of) {
+void symtab_dump(FILE *of) { /* dump file */
     int i;
     fprintf(of, "------------ -------------- ------ ------------\n");
     fprintf(of, "Name         Type           Scope  Line Numbers\n");
@@ -200,7 +200,7 @@ void set_type(char *name, int st_type,
     /* lookup entry */
     list_t *l = lookup(name);
 
-    /* set "main" type */
+    /* set as "main" type */
     l->st_type = st_type;
 
     /* if array, pointer or function */
@@ -321,13 +321,14 @@ int func_param_check(char *name, int num_of_pars,
 
 // Revisit Queue Functions
 
-void add_to_queue(char *name, int type) { /* add to queue */
+void add_to_queue(list_t *entry, char *name, int type) { /* add to queue */
     revisit_queue *q;
 
     /* queue is empty */
     if (queue == NULL) {
         /* set up entry */
         q = (revisit_queue *)malloc(sizeof(revisit_queue));
+        q->entry = entry;
         q->st_name = name;
         q->revisit_type = type;
         q->next = NULL;
@@ -344,10 +345,22 @@ void add_to_queue(char *name, int type) { /* add to queue */
 
         /* add element to the end */
         q->next = (revisit_queue *)malloc(sizeof(revisit_queue));
+        q->next->entry = entry;
         q->next->st_name = name;
         q->next->revisit_type = type;
         q->next->next = NULL;
     }
+}
+
+revisit_queue *search_queue(char *name) { /* search queue */
+    revisit_queue *q;
+
+    /* search for the entry */
+    q = queue;
+    while (strcmp(q->st_name, name) != 0)
+        q = q->next;
+
+    return q;
 }
 
 int revisit(char *name) { /* revisit entry by also removing it from queue */

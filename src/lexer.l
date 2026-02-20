@@ -74,7 +74,6 @@ STRING		\"{print}*\"
 "{"			{ return LBRACE; }
 "}"			{ return RBRACE; }
 ";"			{ return SEMI; }
-"."			{ return DOT; }
 ","			{ return COMMA; }
 "="			{ return ASSIGN; }
 "&"			{ return REFER; }

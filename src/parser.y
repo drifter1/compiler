@@ -51,7 +51,7 @@
 /* token definition */
 %token<val> CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
 %token<val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
-%token<val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI DOT COMMA ASSIGN REFER
+%token<val> LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE SEMI COMMA ASSIGN REFER
 %token <symtab_item> ID
 %token <val> 	 ICONST
 %token <val>  	 FCONST
@@ -478,6 +478,13 @@ assigment: var_ref ASSIGN expression
     {
         AST_Node_Ref *temp = (AST_Node_Ref*) $1;
         $$ = new_ast_assign_node(temp->entry, temp->ref, $3);
+        
+        // check assignment semantics
+        get_result_type(
+            get_type(temp->entry->st_name), /* variable datatype */
+            expression_data_type($3),       /* expression datatype */
+            NONE  /* checking compatibility only (no operator) */
+        );
     }
 ;
 
