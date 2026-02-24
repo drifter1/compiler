@@ -16,6 +16,8 @@ YACC_OUT := $(OBJ_DIR)/parser.tab.c
 
 TARGET := $(BIN_DIR)/compiler
 
+.PHONY: all clean
+
 all: $(TARGET)
 
 $(TARGET): $(YACC_OUT) $(LEX_OUT) | $(BIN_DIR)
@@ -35,5 +37,3 @@ $(OBJ_DIR):
 
 clean:
 	@rm -rf $(BIN_DIR) $(OBJ_DIR)
-
-.PHONY: all clean
