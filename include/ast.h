@@ -1,5 +1,8 @@
 #include "../include/symtab.h"
 
+#ifndef AST_H
+#define AST_H
+
 /* flag variable that shows revisit in assignment expression */
 extern int cont_revisit; // 1: contains revisit, 0: not
 
@@ -397,3 +400,5 @@ AST_Node *new_ast_return_node(int ret_type,
 /* Tree Traversal */
 void ast_print_node(AST_Node *node); // print information of node
 void ast_traversal(AST_Node *node);  // tree traversal (for testing right now)
+
+#endif /* AST_H */

@@ -1,3 +1,6 @@
+#ifndef SEMANTICS_H
+#define SEMANTICS_H
+
 /* token types */
 #define UNDEF 0
 #define INT_TYPE 1
@@ -22,3 +25,5 @@
 int get_result_type(int type_1, int type_2,
                     int op_type); /* type check and result type */
 void type_error(int type_1, int type_2, int op_type); /* print type error */
+
+#endif /* SEMANTICS_H */

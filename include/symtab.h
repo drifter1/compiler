@@ -1,3 +1,6 @@
+#ifndef SYMTAB_H
+#define SYMTAB_H
+
 #include <stdio.h>
 
 /* maximum size of hash table */
@@ -139,3 +142,5 @@ revisit_queue *search_queue(char *name);                // search queue
 revisit_queue *search_prev_queue(char *name); // search previous of element
 int revisit(char *name);     // revisit entry by also removing it from queue
 void revisit_dump(FILE *of); // dump file
+
+#endif /* SYMTAB_H */
