@@ -499,23 +499,60 @@ var_ref: variable
 ; 
 
 function_call: ID LPAREN call_params RPAREN
-{
-	AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $3;
-	$$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);	
-	
-	/* add information to revisit queue entry (if one exists) */
-	revisit_queue *q = search_queue($1->st_name);
-	if(q != NULL){
-		q->num_of_pars = temp->num_of_pars;
-		q->par_types = (int*) malloc(temp->num_of_pars * sizeof(int));
-		/* get the types of the parameters */
-		int i;
-		for(i = 0; i < temp->num_of_pars; i++){
-			/* get datatype of parameter-expression */
-			q->par_types[i] = expression_data_type(temp->params[i]);
+	{
+		AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $3;
+		$$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);	
+		
+		/* add information to revisit queue entry (if one exists) */
+		revisit_queue *q = search_queue($1->st_name);
+		if(q != NULL){
+			/* setup structures */
+			if(q->num_of_calls == 0){ /* first call */
+				q->par_types = (int**) malloc(sizeof(int*));
+				q->num_of_pars = (int*) malloc(sizeof(int));
+			}
+			else{ /* general case */
+				q->par_types = (int**) realloc(q->par_types, (q->num_of_calls + 1) * sizeof(int*));
+				q->num_of_pars = (int*) realloc(q->num_of_pars, (q->num_of_calls + 1) * sizeof(int));
+			}
+			
+			/* add info of function call */
+			q->num_of_pars[q->num_of_calls] = temp->num_of_pars;
+			q->par_types[q->num_of_calls] = (int*) malloc(temp->num_of_pars * sizeof(int));
+			/* get the types of the parameters */
+			int i;
+			for(i = 0; i < temp->num_of_pars; i++){
+				/* get datatype of parameter-expression */
+				q->par_types[q->num_of_calls][i] = expression_data_type(temp->params[i]);
+			}
+			
+			/* increment number of calls */
+			q->num_of_calls++;
 		}
-	}	
-}
+		else{
+			/* function declared before call */
+			if($1->st_type == FUNCTION_TYPE){
+				/* check number of parameters */
+				if($1->num_of_pars != temp->num_of_pars){
+					fprintf(stderr, "Function call of %s has wrong num of parameters!\n", $1->st_name);
+					exit(1);
+				}
+				/* check if parameters are compatible */
+				int i;
+				for(i = 0; i < temp->num_of_pars; i++){
+					/* type of parameter in function declaration */
+					int type_1 = expression_data_type(temp->params[i]);
+					
+					/* type of parameter in function call*/
+					int type_2 = $1->parameters[i].par_type;
+					
+					/* check compatibility for function call */
+					get_result_type(type_1, type_2, NONE);
+					/* error occurs automatically in the function */
+				}
+			}
+		}
+	}
 ;
 
 call_params: 
@@ -577,14 +614,17 @@ functions:
 
 function: { incr_scope(); } function_head function_tail
     { 
+		/* perform revisit */
+		revisit(temp_function->entry->st_name);
+
         hide_scope();
         $$ = (AST_Node *) temp_function;
     } 
 ;
 
-function_head: { declare = 1; } return_type ID LPAREN
+function_head: { function_decl = 1; } return_type ID LPAREN
 	{ 
-		declare = 0;
+		function_decl = 0;
 		
 		AST_Node_Ret_Type *temp = (AST_Node_Ret_Type *) $2;
 		temp_function = (AST_Node_Func_Decl *) new_ast_func_decl_node(temp->ret_type, temp->pointer, $3);

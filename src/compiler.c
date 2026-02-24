@@ -1,3 +1,4 @@
+#include "../include/semantics.h"
 #include "../include/symtab.h"
 #include <stdio.h>
 
@@ -13,9 +14,6 @@ int main(int argc, char *argv[]) {
     // initialize symbol table
     init_hash_table();
 
-    // initialize revisit queue
-	queue = NULL;
-
     // parsing
     int flag;
     yyin = fopen(argv[1], "r");
@@ -23,10 +21,25 @@ int main(int argc, char *argv[]) {
     fclose(yyin);
 
     printf("Parsing finished!\n");
-	
-	if(queue != NULL){
-		printf("Warning: Something has not been checked in the revisit queue!\n");
-	}
+
+    /* remove print from revisit queue */
+    revisit_queue *q = search_prev_queue("print");
+    if (q == NULL) {         /* special case: first entry */
+        if (queue != NULL) { /* check if queue not empty */
+            queue = queue->next;
+        }
+    } else {
+        q->next = q->next->next;
+    }
+
+    /* if still not empty -> Warning */
+    if (queue != NULL) {
+        printf(
+            "Warning: Something has not been checked in the revisit queue!\n");
+    }
+
+    /* declare function type of "print" */
+    func_declare("print", VOID_TYPE, 1, NULL);
 
     // symbol table dump
     yyout = fopen("symtab_dump.out", "w");
@@ -34,9 +47,9 @@ int main(int argc, char *argv[]) {
     fclose(yyout);
 
     // revisit queue dump
-	yyout = fopen("revisit_dump.out", "w");
-	revisit_dump(yyout);
-	fclose(yyout);
+    yyout = fopen("revisit_dump.out", "w");
+    revisit_dump(yyout);
+    fclose(yyout);
 
     return flag;
 }

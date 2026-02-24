@@ -145,6 +145,7 @@ Reference Node of entry res
 Function Call Node of print with 1 parameters
 Call parameters:
 Constant Node of const-type 4 with value "\n"
+Successful Parameter Check of operation
 Function Declarations Node with 1 function declarations
 Function Declaration Node of operation with ret_type 2 and 2 parameters
 Parameters:
@@ -173,8 +174,8 @@ Name         Type           Scope  Line Numbers
 i            int              0     3    6    6    6    7    7    8    9 
 val          real             0     4    7    8 
 res          array of real    0     4    7    8    9 
-operation    undef            0     7 
-print        undef            0     9   10 
+operation    func ret real    0     7   14 
+print        func ret void    0     9   10 
 ```
 
 **revisit_dump.out**
@@ -182,8 +183,6 @@ print        undef            0     9   10
 ------------ -------------
 Identifier   Revisit Type
 ------------ -------------
-operation    Parameter Check
-print        Parameter Check
 ```
 
 ## Cleaning up the build files and binaries
