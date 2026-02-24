@@ -48,6 +48,9 @@
 	Param par;
 }
 
+/* expect one shift/reduce conflict in the grammar (to silence warning) */
+%expect 1
+
 /* token definition */
 %token<val> CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
 %token<val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
