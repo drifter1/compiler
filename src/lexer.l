@@ -89,7 +89,7 @@ STRING		\"{print}*\"
 {FCONST} 		{ yylval.val.fval = atof(yytext); return FCONST; }
 {CCONST} 		{ yylval.val.cval = yytext[0];    return CCONST; }
 {STRING} 		{
-					yylval.val.sval = malloc(yyleng * sizeof(char));
+					yylval.val.sval = malloc(yyleng * sizeof(char) + 1);
 					strcpy(yylval.val.sval , yytext);	return STRING;
 				}
 
