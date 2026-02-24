@@ -8,7 +8,6 @@
 
 	int lineno = 1; // initialize to 1
 
-	void ret_print(char *token_type);
 	void yyerror(char *message);
 %}
 
@@ -27,10 +26,10 @@ STRING		\"{print}*\"
 
 %%
 
-"//".*				{ /*printf("Eat up comment at line %d\n", lineno); */ }
+"//".*				/* single-line comment */
 
-"/*"				{ /* printf("Eat up comment from line %d ", lineno); */ BEGIN(ML_COMMENT); }
-<ML_COMMENT>"*/" 	{ /* printf("to line %d\n", lineno); */ BEGIN(INITIAL); }
+"/*"				{ /* multi-line comment */ BEGIN(ML_COMMENT); } 
+<ML_COMMENT>"*/" 	{ BEGIN(INITIAL); }
 <ML_COMMENT>[^*\n]+
 <ML_COMMENT>"*"
 <ML_COMMENT>"\n"	{ lineno += 1; }
