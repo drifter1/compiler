@@ -41,7 +41,9 @@ extern revisit_queue *queue;
 void add_to_queue(list_t *entry, char *name, int type); // add to queue
 revisit_queue *search_queue(char *name);                // search queue
 revisit_queue *search_prev_queue(char *name); // search previous of element
-int revisit(char *name);     // revisit entry by also removing it from queue
-void revisit_dump(FILE *of); // dump file
+int revisit(char *name);         // revisit entry by also removing it from queue
+void revisit_dump(FILE *of);     // dump file
+void remove_print();             // remove print function  rom revisit queue
+void perform_remaining_checks(); // perform the remaining checks (for assignments)
 
 #endif /* REVQUEUE_H */

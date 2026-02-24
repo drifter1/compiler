@@ -24,32 +24,10 @@ int main(int argc, char *argv[]) {
     printf("Parsing finished!\n");
 
     /* remove print from revisit queue */
-    revisit_queue *q = search_prev_queue("print");
-    if (q == NULL) {         /* special case: first entry */
-        if (queue != NULL) { /* check if queue not empty */
-            queue = queue->next;
-        }
-    } else {
-        q->next = q->next->next;
-    }
+    remove_print();
 
     /* perform the remaining checks (assignments) */
-    if (queue != NULL) {
-        revisit_queue *cur;
-        cur = queue;
-        while (cur != NULL) {
-            if (cur->revisit_type == ASSIGN_CHECK) {
-                revisit(cur->st_name);
-            }
-            cur = cur->next;
-        }
-    }
-
-    /* if still not empty -> Warning */
-    if (queue != NULL) {
-        printf(
-            "Warning: Something has not been checked in the revisit queue!\n");
-    }
+    perform_remaining_checks();
 
     /* declare function type of "print" */
     func_declare("print", VOID_TYPE, 1, NULL);

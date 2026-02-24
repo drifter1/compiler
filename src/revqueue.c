@@ -165,3 +165,34 @@ void revisit_dump(FILE *of) {
         q = q->next;
     }
 }
+
+void remove_print() { // remove print function from revisit queue
+    revisit_queue *q = search_prev_queue("print");
+    if (q == NULL) {         /* special case: first entry */
+        if (queue != NULL) { /* check if queue not empty */
+            queue = queue->next;
+        }
+    } else {
+        q->next = q->next->next;
+    }
+}
+
+void perform_remaining_checks() { // perform the remaining checks (for
+                                  // assignments)
+    if (queue != NULL) {
+        revisit_queue *cur;
+        cur = queue;
+        while (cur != NULL) {
+            if (cur->revisit_type == ASSIGN_CHECK) {
+                revisit(cur->st_name);
+            }
+            cur = cur->next;
+        }
+    }
+
+    /* if still not empty -> Warning */
+    if (queue != NULL) {
+        printf(
+            "Warning: Something has not been checked in the revisit queue!\n");
+    }
+}
