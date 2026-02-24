@@ -94,8 +94,6 @@
 
 %start program
 
-/* expression rules */
-
 %%
 
 program: 
@@ -225,7 +223,7 @@ array_init: ID array ASSIGN LBRACE values RBRACE
         $$ = $1;
         vc = 0;
     }
-    ;
+;
 
 values: values COMMA constant 
 	{
