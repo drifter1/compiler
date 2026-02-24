@@ -12,7 +12,7 @@ The project was unfortunately abandoned for over five years due to the maintaine
 Due to the 2020 Steemit dispute, when the project was revitalized the tutorial series resumed on Hive instead.
 
 > [!IMPORTANT]
-> A major overhaul of the repository is currently underway (see open issue #5). Although the project had reached the machine code generation stage, improvements to the code base have necessitated a temporary return to the semantical analysis stage.
+> A major overhaul of the repository is currently underway (see open issue #5).
 
 # Prerequisites
 
@@ -199,7 +199,6 @@ The complete list of articles can be found [here](/docs/articles.md).
 
 # Status
 
-- Semantical Analysis pt.2 - Revisit Queue Usage (related to #5)
 - Machine Code generation in MIPS Assembly (covered up to issue #5)
 - Machine Code generation in MIPS Assembly (remaining cases)
 - Optimizations in the compiler's source code
