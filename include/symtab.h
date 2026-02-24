@@ -1,7 +1,7 @@
+#include <stdio.h>
+
 #ifndef SYMTAB_H
 #define SYMTAB_H
-
-#include <stdio.h>
 
 /* maximum size of hash table */
 #define SIZE 211
