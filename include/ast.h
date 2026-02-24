@@ -3,9 +3,6 @@
 #ifndef AST_H
 #define AST_H
 
-/* flag variable that shows revisit in assignment expression */
-extern int cont_revisit; // 1: contains revisit, 0: not
-
 /* ---------------------NODE TYPES-------------------------- */
 
 typedef enum Node_Type {

@@ -4,6 +4,9 @@
 
 extern int lineno;
 
+/* flag variable that shows revisit in assignment expression */
+int cont_revisit = 0; // 1: contains revisit, 0: not
+
 // actual types are: INT_TYPE, REAL_TYPE, CHAR_TYPE
 
 int get_result_type(int type_1, int type_2,

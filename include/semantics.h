@@ -23,6 +23,9 @@
 #define REL_OP 5    // RELOP (>, <, >=, <=)
 #define EQU_OP 6    // EQUOP (==, !=)
 
+/* flag variable that shows revisit in assignment expression */
+extern int cont_revisit; // 1: contains revisit, 0: not
+
 // Function Declarations
 int get_result_type(int type_1, int type_2,
                     int op_type); /* type check and result type */

@@ -3,9 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* flag variable that shows revisit in assignment expression */
-int cont_revisit = 0; // 1: contains revisit, 0: not
-
 /* ------------------AST NODE MANAGEMENT-------------------- */
 /* The basic node */
 AST_Node *new_ast_node(Node_Type type, AST_Node *left, AST_Node *right) {
