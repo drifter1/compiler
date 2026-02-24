@@ -40,7 +40,6 @@
 
     // for declarations
 	int data_type;
-	int const_type;
 	
 	// for arrays
 	int array_size;
