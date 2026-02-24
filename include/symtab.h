@@ -90,6 +90,10 @@ typedef struct revisit_queue {
     int *num_of_pars;
     int num_of_calls;
 
+    // assignment expression nodes
+    void **nodes;
+    int num_of_assigns;
+
     // maybe additional information to simplify the process ...
 
     struct revisit_queue *next;

@@ -1,4 +1,4 @@
-#include "../include/symtab.h"
+#include "../include/ast.h"
 #include "../include/semantics.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -359,6 +359,8 @@ void add_to_queue(list_t *entry, char *name, int type) { /* add to queue */
         /* additional info */
         if (type == PARAM_CHECK) {
             q->num_of_calls = 0;
+        } else if (type == ASSIGN_CHECK) {
+            q->num_of_assigns = 0;
         }
 
         /* q "becomes" the queue */
@@ -381,6 +383,8 @@ void add_to_queue(list_t *entry, char *name, int type) { /* add to queue */
         /* additional info */
         if (type == PARAM_CHECK) {
             q->next->num_of_calls = 0;
+        } else if (type == ASSIGN_CHECK) {
+            q->next->num_of_assigns = 0;
         }
     }
 }
@@ -418,7 +422,10 @@ revisit_queue *search_prev_queue(char *name) {
 }
 
 int revisit(char *name) { /* revisit entry by also removing it from queue */
+    int i, type1, type2;
+
     revisit_queue *q = search_queue(name);
+    revisit_queue *q2;
 
     if (q == NULL) {
         return -1; // no entry
@@ -434,7 +441,7 @@ int revisit(char *name) { /* revisit entry by also removing it from queue */
         }
 
         /* remove entry by making it point to it's next */
-        revisit_queue *q2 = search_prev_queue(name);
+        q2 = search_prev_queue(name);
         if (q2 == NULL) { /* special case: first entry */
             queue = queue->next;
         } else {
@@ -443,7 +450,27 @@ int revisit(char *name) { /* revisit entry by also removing it from queue */
 
         break;
     case ASSIGN_CHECK:
-        /* run assignment check */
+
+        /* run assignment check for each assignment */
+        type1 = get_type(q->entry->st_name);
+        for (i = 0; i < q->num_of_assigns; i++) {
+            type2 = expression_data_type(q->nodes[i]);
+
+            /* perform assignment check */
+            get_result_type(type1, /*  variable datatype  */
+                            type2, /* expression datatype */
+                            NONE /* checking compatibility only (no operator) */
+            );
+        }
+
+        /* remove entry by making it point to it's next */
+        q2 = search_prev_queue(name);
+        if (q2 == NULL) { /* special case: first entry */
+            queue = queue->next;
+        } else {
+            q2->next = q2->next->next;
+        }
+
         break;
         /* ... */
     }
@@ -464,6 +491,9 @@ void revisit_dump(FILE *of) {
         if (q->revisit_type == PARAM_CHECK) {
             fprintf(of, "%s", "Parameter Check ");
             fprintf(of, "for %d function calls", q->num_of_calls);
+        } else if (q->revisit_type == ASSIGN_CHECK) {
+            fprintf(of, "%s", "Assignment Check ");
+            fprintf(of, "for %d assignments", q->num_of_assigns);
         }
         // more later on
         fprintf(of, "\n");

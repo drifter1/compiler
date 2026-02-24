@@ -118,6 +118,7 @@ This will print out parsing debugging information in the terminal console and al
 Declarations Node with 2 declarations
 Declaration Node of data-type 1 for 1 names
 Declaration Node of data-type 2 for 2 names
+Assignment revisit for res at line 7
 Statements Node with 1 statements
 For Node with loop counter i
 Initialize:

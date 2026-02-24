@@ -474,18 +474,55 @@ constant:
 	| CCONST { $$ = new_ast_const_node(CHAR_TYPE, $1); }
 ;
 
+
 assigment: var_ref ASSIGN expression
-    {
-        AST_Node_Ref *temp = (AST_Node_Ref*) $1;
-        $$ = new_ast_assign_node(temp->entry, temp->ref, $3);
-        
-        // check assignment semantics
-        get_result_type(
-            get_type(temp->entry->st_name), /* variable datatype */
-            expression_data_type($3),       /* expression datatype */
-            NONE  /* checking compatibility only (no operator) */
-        );
-    }
+	{
+		AST_Node_Ref *temp = (AST_Node_Ref*) $1;
+		$$ = new_ast_assign_node(temp->entry, temp->ref, $3);
+		
+		/* find datatypes */
+		int type1 = get_type(temp->entry->st_name);
+		int type2 = expression_data_type($3);
+		
+		/* the last function will give us information about revisits */
+		
+		/* contains revisit => add assignment-check to revisit queue */
+		if(cont_revisit == 1){	
+			/* search if entry exists */
+			revisit_queue *q = search_queue(temp->entry->st_name);
+			if(q == NULL){
+				add_to_queue(temp->entry, temp->entry->st_name, ASSIGN_CHECK);
+				q = search_queue(temp->entry->st_name);	
+			}
+			
+			/* setup structures */
+			if(q->num_of_assigns == 0){ /* first node */
+				q->nodes = (void**) malloc(sizeof(void*));
+			}
+			else{ /* general case */
+				q->nodes = (void**) realloc(q->nodes, (q->num_of_assigns + 1) * sizeof(void*));
+			}
+			
+			/* add info of assignment */
+			q->nodes[q->num_of_assigns] = (void*) $3;
+			
+			/* increment number of assignments */
+			q->num_of_assigns++;
+			
+			/* reset revisit flag */
+			cont_revisit = 0;
+			
+			printf("Assignment revisit for %s at line %d\n", temp->entry->st_name, lineno);
+		}
+		else{ /* no revisit */
+			/* check assignment semantics */
+			get_result_type(
+				type1,       /*  variable datatype  */
+				type2,       /* expression datatype */
+				NONE  /* checking compatibility only (no operator) */
+			);
+		}
+	}
 ;
 
 var_ref: variable
@@ -497,6 +534,7 @@ var_ref: variable
 		$$ = new_ast_ref_node($2, 1); /* reference */
 	}
 ; 
+
 
 function_call: ID LPAREN call_params RPAREN
 	{

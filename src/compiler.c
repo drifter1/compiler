@@ -32,6 +32,18 @@ int main(int argc, char *argv[]) {
         q->next = q->next->next;
     }
 
+    /* perform the remaining checks (assignments) */
+    if (queue != NULL) {
+        revisit_queue *cur;
+        cur = queue;
+        while (cur != NULL) {
+            if (cur->revisit_type == ASSIGN_CHECK) {
+                revisit(cur->st_name);
+            }
+            cur = cur->next;
+        }
+    }
+
     /* if still not empty -> Warning */
     if (queue != NULL) {
         printf(

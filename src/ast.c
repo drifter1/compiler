@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* flag variable that shows revisit in assignment expression */
+int cont_revisit = 0; // 1: contains revisit, 0: not
+
 /* ------------------AST NODE MANAGEMENT-------------------- */
 /* The basic node */
 AST_Node *new_ast_node(Node_Type type, AST_Node *left, AST_Node *right) {
@@ -396,6 +399,16 @@ int expression_data_type(AST_Node *node) {
     switch (node->type) {
     case ARITHM_NODE: /* arithmetic expression */
         temp_arithm = (AST_Node_Arithm *)node;
+
+        /* set datatype again */
+        temp_arithm->data_type = get_result_type(
+            expression_data_type(
+                temp_arithm->left), /* data type of left expression */
+            expression_data_type(
+                temp_arithm->right), /* data type of right expression */
+            ARITHM_OP                /* operation type */
+        );
+
         return temp_arithm->data_type;
         break;
     case INCR_NODE: /* special case of increment */
@@ -404,14 +417,53 @@ int expression_data_type(AST_Node *node) {
         break;
     case BOOL_NODE: /* boolean expression */
         temp_bool = (AST_Node_Bool *)node;
+
+        /* set datatype again */
+        if (temp_bool->op != NOT) { /* AND or OR */
+            temp_bool->data_type = get_result_type(
+                expression_data_type(
+                    temp_bool->left), /* data type of left expression */
+                expression_data_type(
+                    temp_bool->right), /* data type of right expression */
+                BOOL_OP                /* operation type */
+            );
+        } else { /* NOT */
+            temp_bool->data_type = get_result_type(
+                expression_data_type(
+                    temp_bool->left), /* data type of left expression */
+                UNDEF,                /* there is no right expression */
+                NOT_OP                /* operation type */
+            );
+        }
+
         return temp_bool->data_type;
         break;
     case REL_NODE: /* relational expression */
         temp_rel = (AST_Node_Rel *)node;
+
+        /* set datatype again */
+        temp_rel->data_type = get_result_type(
+            expression_data_type(
+                temp_rel->left), /* data type of left expression  */
+            expression_data_type(
+                temp_rel->right), /* data type of right expression */
+            REL_OP                /* operation type */
+        );
+
         return temp_rel->data_type;
         break;
     case EQU_NODE: /* equality expression */
         temp_equ = (AST_Node_Equ *)node;
+
+        /* set datatype again */
+        temp_equ->data_type = get_result_type(
+            expression_data_type(
+                temp_equ->left), /* data type of left expression  */
+            expression_data_type(
+                temp_equ->right), /* data type of right expression */
+            EQU_OP                /* operation type */
+        );
+
         return temp_equ->data_type;
         break;
     case REF_NODE: /* identifier reference */
@@ -432,7 +484,15 @@ int expression_data_type(AST_Node *node) {
         break;
     case FUNC_CALL: /* function call */
         temp_func_call = (AST_Node_Func_Call *)node;
-        return 1;                               /* just for testing */
+
+        /* check if it needs revisit */
+        if (temp_func_call->entry->st_type == UNDEF) {
+            if (temp_func_call->entry->inf_type == UNDEF) {
+                cont_revisit = 1; /* contains revisit */
+                return INT_TYPE;  /*   dummy return   */
+            }
+        }
+
         return temp_func_call->entry->inf_type; /* return type */
         break;
     default: /* wrong choice case */
