@@ -1,3 +1,4 @@
+#include "../include/revqueue.h"
 #include "../include/semantics.h"
 #include "../include/symtab.h"
 #include <stdio.h>

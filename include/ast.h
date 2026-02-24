@@ -1,4 +1,4 @@
-#include "../include/symtab.h"
+#include "symtab.h"
 
 #ifndef AST_H
 #define AST_H
@@ -382,8 +382,6 @@ AST_Node *new_ast_bool_node(enum Bool_op op, AST_Node *left, AST_Node *right);
 AST_Node *new_ast_rel_node(enum Rel_op op, AST_Node *left, AST_Node *right);
 AST_Node *new_ast_equ_node(enum Equ_op op, AST_Node *left, AST_Node *right);
 AST_Node *new_ast_ref_node(list_t *entry, int ref);
-int expression_data_type(
-    AST_Node *node); // returns the data type of an expression
 
 /* Functions */
 AST_Node *new_func_declarations_node(AST_Node **func_declarations,

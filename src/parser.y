@@ -2,6 +2,7 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include "../include/symtab.h"
+	#include "../include/revqueue.h"
     #include "../include/semantics.h"
     #include "../include/ast.h"
 

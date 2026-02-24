@@ -1,3 +1,5 @@
+#include "ast.h"
+
 #ifndef SEMANTICS_H
 #define SEMANTICS_H
 
@@ -25,5 +27,7 @@
 int get_result_type(int type_1, int type_2,
                     int op_type); /* type check and result type */
 void type_error(int type_1, int type_2, int op_type); /* print type error */
+int expression_data_type(
+    AST_Node *node); // returns the data type of an expression
 
 #endif /* SEMANTICS_H */

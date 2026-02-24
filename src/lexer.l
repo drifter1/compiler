@@ -2,6 +2,7 @@
 
 %{
 	#include "../include/symtab.h"
+	#include "../include/revqueue.h"
 	#include "../include/semantics.h"
 	#include "../include/ast.h"
 	#include "../build/parser.tab.h"
