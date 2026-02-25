@@ -31,7 +31,7 @@ sudo pacman -S --needed base-devel
 > `base-devel` includes `gcc`, `make`, `flex`, `bison`, and other core development tools. Alternatively, you can install each separately.
 
 
-For Debian-based distributions
+For Debian-based distributions:
 ```
 sudo apt update
 sudo apt install build-essential flex bison
@@ -40,7 +40,7 @@ sudo apt install build-essential flex bison
 > [!NOTE]
 > `build-essential` includes `gcc`, `make`, and other core build tools. Alternatively, you can install each separately.
 
-For Fedora-based distributions
+For Fedora-based distributions:
 ```
 sudo dnf makecache
 sudo dnf group install development-tools
