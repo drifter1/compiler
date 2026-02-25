@@ -144,7 +144,6 @@ int revisit(char *name) { /* revisit entry by also removing it from queue */
 }
 
 void revisit_dump(FILE *of) {
-    int i;
     revisit_queue *q;
     q = queue;
 
