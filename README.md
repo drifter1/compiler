@@ -119,7 +119,7 @@ To clean the build files and binary executable, you just have to type `make clea
 
 # Articles
 
-A comprehensive tutorail series is also available.
+A comprehensive tutorial series is also available.
 
 The complete list of articles can be found [here](/docs/articles.md).
 
