@@ -6,7 +6,7 @@
 This repository contains the code for a compiler implementation for a simple, C-like language that relies on the C tools Flex and Bison.
 
 > [!IMPORTANT]
-> A major overhaul of the repository is currently underway (see open issue #5). The final commit prior to the major overhaul is 7fbcd3f94851b5abfe7b1c7622102a621ca0f971.
+> A major overhaul of the repository is currently underway (see open issue #5). The final commit prior to the major overhaul is #7fbcd3f94851b5abfe7b1c7622102a621ca0f971.
 
 # Prerequisites
 
