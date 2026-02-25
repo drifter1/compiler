@@ -6,3 +6,6 @@
 
 build/
 bin/
+
+examples/bison_example/calc
+examples/bison_example/calc.tab.c
