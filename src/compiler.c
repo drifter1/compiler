@@ -2,6 +2,7 @@
 #include "../include/semantics.h"
 #include "../include/symtab.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 extern FILE *yyin;
 extern FILE *yyout;
@@ -10,37 +11,50 @@ extern int lineno;
 int yylex();
 int yyparse();
 
+char *filename;
+
 int main(int argc, char *argv[]) {
 
-    // initialize symbol table
-    init_hash_table();
+    if (argc == 2) {
+        filename = argv[1];
 
-    // parsing
-    int flag;
-    yyin = fopen(argv[1], "r");
-    flag = yyparse();
-    fclose(yyin);
+        // open file
+        if (!(yyin = fopen(filename, "r"))) {
+            fprintf(stderr, "Unable to open file %s\n", filename);
+            exit(EXIT_FAILURE);
+        }
 
-    printf("Parsing finished!\n");
+        // initialize symbol table
+        init_hash_table();
 
-    /* remove print from revisit queue */
-    remove_print();
+        // parsing
+        yyparse();
+        fclose(yyin);
 
-    /* perform the remaining checks (assignments) */
-    perform_remaining_checks();
+        printf("Parsing finished!\n");
 
-    /* declare function type of "print" */
-    func_declare("print", VOID_TYPE, 1, NULL);
+        /* remove print from revisit queue */
+        remove_print();
 
-    // symbol table dump
-    yyout = fopen("symtab_dump.out", "w");
-    symtab_dump(yyout);
-    fclose(yyout);
+        /* perform the remaining checks (assignments) */
+        perform_remaining_checks();
 
-    // revisit queue dump
-    yyout = fopen("revisit_dump.out", "w");
-    revisit_dump(yyout);
-    fclose(yyout);
+        /* declare function type of "print" */
+        func_declare("print", VOID_TYPE, 1, NULL);
 
-    return flag;
+        // symbol table dump
+        yyout = fopen("symtab_dump.out", "w");
+        symtab_dump(yyout);
+        fclose(yyout);
+
+        // revisit queue dump
+        yyout = fopen("revisit_dump.out", "w");
+        revisit_dump(yyout);
+        fclose(yyout);
+
+        exit(EXIT_SUCCESS);
+    }
+    
+    fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+    exit(EXIT_FAILURE);
 }
