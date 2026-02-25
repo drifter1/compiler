@@ -1,13 +1,18 @@
 %{
-#include<stdio.h>
-#include<ctype.h>
-void yyerror(char const*s)
-{
-	fprintf(stderr,"%s\n",s);
-}
+	#include<stdio.h>
+	#include<ctype.h>
+
+	int yylex();
+	void yyerror(char const*s)
+	{
+		fprintf(stderr,"%s\n",s);
+	}
 %}
+
 %token DIGIT
+
 %%
+
 line : expr '\n' { printf ("%d\n" , $1 ) ; }
 expr : expr '+' term { $$ = $1 + $3 ; }
 	| term
@@ -19,7 +24,8 @@ factor : '(' expr ')' { $$ = $2 ; }
 	| DIGIT
 	;
 %%
-yylex( ){
+
+int yylex(){
 	int c;
 	c = getchar( ) ;
 	if (isdigit(c ) ) {
@@ -28,7 +34,9 @@ yylex( ){
 	}
 	return c ;
 }
-int yyparse(void);
-int main ( ) {
+
+int yyparse();
+
+int main () {
 	return yyparse( ) ;
 }
