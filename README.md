@@ -126,6 +126,12 @@ The complete list of articles can be found [here](/docs/articles.md).
 > [!NOTE]
 > Please be advised that significant changes have been made to the source code and repository, meaning that they are no longer 1:1 correlated. The tutorial series has also been discontinued.
 
+# Simple C Language
+
+The programming language is being explained [here](/docs/simple-c-language.md).
+
+> [!NOTE]
+> Please be advised that this text is still a work in progress.
 
 # Status
 
