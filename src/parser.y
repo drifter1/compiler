@@ -1,6 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include <string.h>
 	#include "../include/symtab.h"
 	#include "../include/revqueue.h"
     #include "../include/semantics.h"
@@ -777,10 +778,15 @@ return_optional:
 
 %%
 
-void yyerror (char *message)
+void yyerror(char *message)
 {
-  fprintf(stderr, "Syntax error at line %d\n", lineno);
-  exit(1);
+	if (strlen(message) == 0) {
+		fprintf(stderr, "Syntax error at line %d\n", lineno);
+	}
+	else{
+		fprintf(stderr, "%s\n", message);
+	}  	
+  	exit(1);
 }
 
 void add_to_names(list_t *entry){
