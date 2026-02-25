@@ -5,12 +5,6 @@
 
 This repository contains the code for a compiler implementation for a simple, C-like language that relies on the C tools Flex and Bison.
 
-A comprehensive tutorial series is also available.
-
-The project was unfortunately abandoned for over five years due to the maintainer's time constraints.
-
-Due to the 2020 Steemit dispute, when the project was revitalized the tutorial series resumed on Hive instead.
-
 > [!IMPORTANT]
 > A major overhaul of the repository is currently underway (see open issue #5).
 
@@ -20,7 +14,7 @@ Due to the 2020 Steemit dispute, when the project was revitalized the tutorial s
 - Make
 - Flex (derivative of Lex)
 - Bison (derivative of Yacc)
-- QtSpim (MIPS32 Simulator)
+- QtSpim (or any other MIPS32 Simulator)
 
 
 # Basic Installation
@@ -81,9 +75,9 @@ brew install flex bison
 
 ## MIPS32 Emulation (QtSpim)
 
-Regarding MIPS32 simulation, note that there is a Flatpak package for *QtSpim* that appears to work just fine on Arch Linux.
-
 If you are on Microsoft Windows, macOS, or a Debian-based Linux distribution, you should be good to go with one of the [recent releases of QtSpim on SourceForge](https://sourceforge.net/projects/spimsimulator/files/).
+
+For other Linux distributions, it is possible to install a version of QtSpim via Flatpak, which is sadly no longer under active maintenance, or consider using a container or virtual machine instead.
 
 
 # Getting Started
@@ -101,90 +95,19 @@ To build the compiler simply type `make` in this directory.
 
 By default, the executable will be located in the subdirectory *bin* and called *compiler*.
 
+
 ## Running the included examples
 
 Examples are included in the *examples* subdirectory.
 
-You can compile *example2.c* in the Simple-C language via:
+You can compile *example1.c* in the Simple-C language via:
 
 ```
-./bin/compiler examples/simple_c_examples/example2.c
+./bin/compiler examples/simple_c_examples/example1.c
 ```
 
 This will print out parsing debugging information in the terminal console and also create the *symtab_dump.out* and *revisit_dump.out* debugging files.
 
-**terminal output:**
-```
-Declarations Node with 2 declarations
-Declaration Node of data-type 1 for 1 names
-Declaration Node of data-type 2 for 2 names
-Assignment revisit for res at line 7
-Statements Node with 1 statements
-For Node with loop counter i
-Initialize:
-Assign Node of entry i
-Assigning:
-Constant Node of const-type 1 with value 0
-Condition:
-Relational Node of operator 1
-Increment:
-Increment Node of entry i being 0 0
-For branch:
-Statements Node with 4 statements
-Assign Node of entry res
-Assigning:
-Function Call Node of operation with 2 parameters
-Call parameters:
-Reference Node of entry val
-Reference Node of entry i
-Assign Node of entry val
-Assigning:
-Reference Node of entry res
-Function Call Node of print with 1 parameters
-Call parameters:
-Reference Node of entry res
-Function Call Node of print with 1 parameters
-Call parameters:
-Constant Node of const-type 4 with value "\n"
-Successful Parameter Check of operation
-Function Declarations Node with 1 function declarations
-Function Declaration Node of operation with ret_type 2 and 2 parameters
-Parameters:
-Parameter value of type 2
-Parameter i of type 1
-Function declarations:
-Declarations Node with 1 declarations
-Declaration Node of data-type 2 for 1 names
-Function statements:
-Statements Node with 1 statements
-Assign Node of entry res
-Assigning:
-Arithmetic Node of operator 0 with result type 2
-Return node:
-Return Node of ret_type 2
-Returning:
-Reference Node of entry res
-Parsing finished!
-```
-
-**symtab_dump.out**
-```
------------- -------------- ------ ------------
-Name         Type           Scope  Line Numbers
------------- -------------- ------ ------------
-i            int              0     3    6    6    6    7    7    8    9 
-val          real             0     4    7    8 
-res          array of real    0     4    7    8    9 
-operation    func ret real    0     7   14 
-print        func ret void    0     9   10 
-```
-
-**revisit_dump.out**
-```
------------- -------------
-Identifier   Revisit Type
------------- -------------
-```
 
 ## Cleaning up the build files and binaries
 
@@ -193,9 +116,16 @@ To clean the build files and binary executable, you just have to type `make clea
 > [!NOTE]
 > The above command does not remove debugging files such as *symtab_dump.out* and *revisit_dump.out*, as well as the assembly outputs (*.s* files), which are created when you use the compiler itself. These files need to be removed manually.
 
+
 # Articles
 
+A comprehensive tutorail series is also available.
+
 The complete list of articles can be found [here](/docs/articles.md).
+
+> [!NOTE]
+> Please be advised that significant changes have been made to the source code and repository, meaning that they are no longer 1:1 correlated. The tutorial series has also been discontinued.
+
 
 # Status
 
