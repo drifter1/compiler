@@ -59,8 +59,8 @@ clean:
 	@rm -rf $(BIN_DIR) $(OBJ_DIR)
 
 # Run the program
-run: $(TARGET)
-	@./$< $(EXAMPLE)
+run:
+	@./$(TARGET) $(EXAMPLE)
 
 # Clean run files
 clean-run:
