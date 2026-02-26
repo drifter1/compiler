@@ -1,4 +1,7 @@
 %option noyywrap
+%option never-interactive
+%option noinput 
+%option nounput
 
 %{
 	#include "../include/symtab.h"
