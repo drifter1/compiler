@@ -98,23 +98,25 @@ By default, the executable will be located in the subdirectory *bin* and called 
 
 ## Running the included examples
 
-Examples are included in the *examples* subdirectory.
+Examples are included in the *examples* directory.
 
-You can compile *example1.c* in the Simple-C language via:
+By default, typing `make run` will compile *example1.c* from the *simple_c_examples* subdirectory using the compiled binary from `make`. It's essentially the same as:
 
 ```
 ./bin/compiler examples/simple_c_examples/example1.c
 ```
 
-This will print out parsing debugging information in the terminal console and also create the *symtab_dump.out* and *revisit_dump.out* debugging files.
+The execution of the compiler prints out parsing debugging information in the terminal console and also creates the *symtab_dump.out* and *revisit_dump.out* debugging files.
 
 
 ## Cleaning up the build files and binaries
 
 To clean the build files and binary executable, you just have to type `make clean`.
 
-> [!NOTE]
-> The above command does not remove debugging files such as *symtab_dump.out* and *revisit_dump.out*, as well as the assembly outputs (*.s* files), which are created when you use the compiler itself. These files need to be removed manually.
+
+## Cleaning up the run files
+
+To clean the debugging files (with *.out* extension) after usage of the compiler with `make run` you just have to type `make clean-run`.
 
 
 # Articles
