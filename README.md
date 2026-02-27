@@ -3,10 +3,7 @@
 ![Compiler Design Steps](/assets/steps_dark.jpg#gh-dark-mode-only)
 ![Compiler Design Steps](/assets/steps_light.jpg#gh-light-mode-only)
 
-This repository contains the code for a compiler implementation for a simple, C-like language that relies on the C tools Flex and Bison.
-
-> [!IMPORTANT]
-> A major overhaul of the repository is currently underway (see open issue #5). The final commit prior to the major overhaul is [7fbcd3f](https://github.com/drifter1/compiler/tree/7fbcd3f94851b5abfe7b1c7622102a621ca0f971).
+This repository contains the code for a compiler implementation written in the C programming language that relies on the tools Flex and Bison. The target language is a [simple, C-like language](#simple-c-language).
 
 # Prerequisites
 
@@ -121,12 +118,13 @@ To clean the debugging files (with *.out* extension) after usage of the compiler
 
 # Articles
 
-A comprehensive tutorial series is also available.
+A comprehensive tutorial series is also available, which covers most aspects of implementation.
 
 The complete list of articles can be found [here](/docs/articles.md).
 
-> [!NOTE]
-> Please be advised that significant changes have been made to the source code and repository, meaning that they are no longer 1:1 correlated. The tutorial series has also been discontinued.
+> [!IMPORTANT]
+> Please be advised that significant changes have been made to the source code and repository (issue [#5](https://github.com/drifter1/compiler/issues/5)), meaning that the tutorial series and repository are no longer perfectly aligned. The tutorial series has also been discontinued. The final commit prior to the major overhaul is [7fbcd3f](https://github.com/drifter1/compiler/tree/7fbcd3f94851b5abfe7b1c7622102a621ca0f971). It should help you work your way through the series more easily, since every single article has its own folder.
+
 
 # Simple C Language
 
@@ -135,9 +133,9 @@ The programming language is being explained [here](/docs/simple-c-language.md).
 > [!NOTE]
 > Please be advised that this text is still a work in progress.
 
+
 # Status
 
-- Machine Code generation in MIPS Assembly (covered up to issue #5)
-- Machine Code generation in MIPS Assembly (remaining cases)
+- Machine Code generation in MIPS Assembly
 - Optimizations in the compiler's source code
 - Fixing errors, bugs, issues, ...
