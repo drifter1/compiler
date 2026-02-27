@@ -161,8 +161,8 @@ void ast_print_node(AST_Node *node) {
         printf("Return Node of ret_type %d\n", temp_return->ret_type);
         break;
     default: /* wrong choice case */
-        fprintf(stderr, "Error in node selection!\n");
-        exit(1);
+        fprintf(stderr, "Error in AST node selection!\n");
+        exit(EXIT_FAILURE);
     }
 }
 

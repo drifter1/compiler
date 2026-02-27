@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int lineno;
+// line number
+extern int yylineno;
 
 /* flag variable that shows revisit in assignment expression */
 int cont_revisit = 0; // 1: contains revisit, 0: not
@@ -202,7 +203,7 @@ int get_result_type(int type_1, int type_2,
     /* ---------------------------------------------------------- */
     default: /* wrong choice case */
         fprintf(stderr, "Error in operator selection!\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -256,13 +257,13 @@ void type_error(int type_1, int type_2, int op_type) { /* print type error */
         break;
     default:
         fprintf(stderr, "Error in operator selection!\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* line */
-    fprintf(stderr, " in line %d\n", lineno);
+    fprintf(stderr, " in line %d\n", yylineno);
 
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 int expression_data_type(AST_Node *node) {
@@ -377,7 +378,7 @@ int expression_data_type(AST_Node *node) {
         return temp_func_call->entry->inf_type; /* return type */
         break;
     default: /* wrong choice case */
-        fprintf(stderr, "Error in node selection!\n");
-        exit(1);
+        fprintf(stderr, "Error in AST node selection!\n");
+        exit(EXIT_FAILURE);
     }
 }

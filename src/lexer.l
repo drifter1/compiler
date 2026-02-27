@@ -1,19 +1,12 @@
-%option noyywrap
-%option never-interactive
-%option noinput 
-%option nounput
-
 %{
 	#include "../include/symtab.h"
 	#include "../include/revqueue.h"
 	#include "../include/semantics.h"
 	#include "../include/ast.h"
 	#include "../build/parser.tab.h"
-
-	int lineno = 1; // initialize to 1
-
-	void yyerror(char *message);
 %}
+
+%option yylineno noyywrap noinput nounput never-interactive
 
 %x ML_COMMENT
 
@@ -36,7 +29,7 @@ STRING		\"{print}*\"
 <ML_COMMENT>"*/" 	{ BEGIN(INITIAL); }
 <ML_COMMENT>[^*\n]+
 <ML_COMMENT>"*"
-<ML_COMMENT>"\n"	{ lineno += 1; }
+<ML_COMMENT>"\n"
 
 
 "char"|"CHAR"       	{ return CHAR; }
@@ -84,7 +77,7 @@ STRING		\"{print}*\"
 
 {ID} 		{
 				// insert identifier into symbol table
-				insert(yytext, strlen(yytext), UNDEF, lineno);
+				insert(yytext, strlen(yytext), UNDEF, yylineno);
 				yylval.symtab_item = lookup(yytext);
 				return ID;
 			}
@@ -97,9 +90,13 @@ STRING		\"{print}*\"
 				}
 
 
-"\n"			{ lineno += 1; }
 [ \t\r\f]+		/* eat up whitespace */
-
-.			{ yyerror("Unrecognized character"); }
+"\n"			
+"<<EOF>>"		{ return 0; }
+.				{
+					fprintf(stderr, "Lexical error at line %d. Unrecognized Token: \"%s\"\n",
+							yylineno, yytext);
+    				exit(EXIT_FAILURE);
+				}
 
 %%

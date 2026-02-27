@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern int yylineno;
+
 /* ------------------AST NODE MANAGEMENT-------------------- */
 /* The basic node */
 AST_Node *new_ast_node(Node_Type type, AST_Node *left, AST_Node *right) {
@@ -167,8 +169,10 @@ void set_loop_counter(AST_Node *node) {
     AST_Node_Incr *incr_node = (AST_Node_Incr *)for_node->increment;
     if (strcmp(incr_node->entry->st_name, assign_node->entry->st_name)) {
         fprintf(stderr,
-                "Variable used in init and incr of for are not the same!\n");
-        exit(1);
+                "Semantic error at line %d. Variable used in init and incr of "
+                "for are not the same\n",
+                yylineno);
+        exit(EXIT_FAILURE);
     }
 
     /* type-cast back to AST_Node */

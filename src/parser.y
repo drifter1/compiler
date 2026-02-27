@@ -7,9 +7,9 @@
     #include "../include/semantics.h"
     #include "../include/ast.h"
 
-	extern int lineno;
+	extern int yylineno;
 	extern int yylex();
-	void yyerror(char *message);
+	void yyerror();
 
     // for declarations
 	void add_to_names(list_t *entry);
@@ -189,8 +189,8 @@ array: /* for now only one-dimensional arrays */
 	{
 		// if declaration then error!
 		if(declare == 1){
-			fprintf(stderr, "Array declaration at %d contains expression!\n", lineno);
-			exit(1);
+			fprintf(stderr, "Semantic error at line %d. Array declaration contains expression\n", yylineno);
+    		exit(EXIT_FAILURE);
 		}
 	}
 	| LBRACK ICONST RBRACK
@@ -217,7 +217,8 @@ var_init : ID ASSIGN constant
 array_init: ID array ASSIGN LBRACE values RBRACE
     {
         if($1->array_size != vc){
-            fprintf(stderr, "Array init at %d doesn't contain the right amount of values!\n", lineno);
+			fprintf(stderr, "Semantic error at line %d. Array init doesn't contain the right amount of values\n", yylineno);
+			exit(EXIT_FAILURE);
         }
         $1->vals = vals;
         $1->array_size = $2;
@@ -440,8 +441,8 @@ expression:
 	{
 		/* plus sign error */
 		if($1.ival == ADD){
-			fprintf(stderr, "Error having plus as a sign!\n");
-			exit(1);
+			fprintf(stderr, "Semantic error at line %d. Plus sign is used as a constant sign\n", yylineno);
+			exit(EXIT_FAILURE);
 		}
 		else{
 			AST_Node_Const *temp = (AST_Node_Const*) $2;
@@ -456,8 +457,8 @@ expression:
 					break;
 				case CHAR_TYPE:
 					/* sign before char error */
-					fprintf(stderr, "Error having sign before character constant!\n");
-					exit(1);
+					fprintf(stderr, "Semantic error at line %d. Sign before character constant\n", yylineno);
+					exit(EXIT_FAILURE);
 					break;
 			}
 			
@@ -514,7 +515,7 @@ assigment: var_ref ASSIGN expression
 			/* reset revisit flag */
 			cont_revisit = 0;
 			
-			printf("Assignment revisit for %s at line %d\n", temp->entry->st_name, lineno);
+			printf("Assignment revisit for %s at line %d\n", temp->entry->st_name, yylineno);
 		}
 		else{ /* no revisit */
 			/* check assignment semantics */
@@ -574,8 +575,8 @@ function_call: ID LPAREN call_params RPAREN
 			if($1->st_type == FUNCTION_TYPE){
 				/* check number of parameters */
 				if($1->num_of_pars != temp->num_of_pars){
-					fprintf(stderr, "Function call of %s has wrong num of parameters!\n", $1->st_name);
-					exit(1);
+					fprintf(stderr, "Semantic error at line %d. Function call of %s has wrong number of parameters\n", yylineno, $1->st_name);
+					exit(EXIT_FAILURE);
 				}
 				/* check if parameters are compatible */
 				int i;
@@ -778,15 +779,9 @@ return_optional:
 
 %%
 
-void yyerror(char *message)
-{
-	if (strlen(message) == 0) {
-		fprintf(stderr, "Syntax error at line %d\n", lineno);
-	}
-	else{
-		fprintf(stderr, "%s\n", message);
-	}  	
-  	exit(1);
+void yyerror(){
+	fprintf(stderr, "Syntax error at line %d\n", yylineno);
+    exit(EXIT_FAILURE);
 }
 
 void add_to_names(list_t *entry){

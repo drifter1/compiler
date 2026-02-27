@@ -6,9 +6,7 @@
 
 extern FILE *yyin;
 extern FILE *yyout;
-extern int lineno;
 
-int yylex();
 int yyparse();
 
 char *filename;
@@ -54,7 +52,7 @@ int main(int argc, char *argv[]) {
 
         exit(EXIT_SUCCESS);
     }
-    
+
     fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
     exit(EXIT_FAILURE);
 }
