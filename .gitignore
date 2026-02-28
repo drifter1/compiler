@@ -9,3 +9,6 @@ bin/
 
 examples/bison_example/calc
 examples/bison_example/calc.tab.c
+
+examples/flex_example/lexer
+examples/flex_example/lex.yy.c
