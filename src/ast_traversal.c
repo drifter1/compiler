@@ -29,8 +29,8 @@ void ast_print_node(AST_Node *node) {
     AST_Node_Return *temp_return;
 
     switch (node->type) {
-    case BASIC_NODE:
-        printf("Basic Node\n");
+    case PROGRAM_NODE:
+        printf("Program Node\n");
         break;
     case DECLARATIONS:
         temp_declarations = (struct AST_Node_Declarations *)node;
@@ -175,12 +175,19 @@ void ast_traversal(AST_Node *node) {
     }
 
     /* left and right child cases */
-    if (node->type == BASIC_NODE || node->type == ARITHM_NODE ||
-        node->type == BOOL_NODE || node->type == REL_NODE ||
-        node->type == EQU_NODE) {
+    if (node->type == ARITHM_NODE || node->type == BOOL_NODE ||
+        node->type == REL_NODE || node->type == EQU_NODE) {
         // ast_traversal(node->left);
         // ast_traversal(node->right);
         ast_print_node(node); // postfix
+    }
+    /* program case*/
+    else if (node->type == PROGRAM_NODE) {
+        AST_Node_Program *temp_program = (struct AST_Node_Program *)node;
+        ast_print_node(node);
+        ast_traversal(temp_program->declarations);
+        ast_traversal(temp_program->statements);
+        ast_traversal(temp_program->func_declarations);
     }
     /* declarations case */
     else if (node->type == DECLARATIONS) {

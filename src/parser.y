@@ -98,9 +98,11 @@
 %%
 
 program: 
-	declarations { ast_traversal($1); }
-	statements   { ast_traversal($3); }
-	RETURN SEMI functions_optional { ast_traversal($7); }
+	declarations statements RETURN SEMI functions_optional
+	{
+		$$ = new_program_node($1, $2, $5);
+		ast_traversal($$);
+	}
 ;
 
 

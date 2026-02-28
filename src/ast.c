@@ -6,18 +6,23 @@
 extern int yylineno;
 
 /* ------------------AST NODE MANAGEMENT-------------------- */
-/* The basic node */
-AST_Node *new_ast_node(Node_Type type, AST_Node *left, AST_Node *right) {
+/* Program */
+AST_Node *new_program_node(AST_Node *declarations, AST_Node *statements,
+                           AST_Node *func_declarations) {
+
     // allocate memory
-    AST_Node *v = malloc(sizeof(AST_Node));
+    AST_Node_Program *v = malloc(sizeof(AST_Node_Program));
+
+    // set node type
+    v->type = PROGRAM_NODE;
 
     // set entries
-    v->type = type;
-    v->left = left;
-    v->right = right;
+    v->declarations = declarations;
+    v->statements = statements;
+    v->func_declarations = func_declarations;
 
-    // return the result
-    return v;
+    // return type-casted result
+    return (struct AST_Node *)v;
 }
 
 /* Declarations */

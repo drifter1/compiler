@@ -6,7 +6,7 @@
 /* ---------------------NODE TYPES-------------------------- */
 
 typedef enum Node_Type {
-    BASIC_NODE, // no special usage (for roots only)
+    PROGRAM_NODE, // program
     // declarations
     DECLARATIONS, // declarations
     DECL_NODE,    // declaration
@@ -73,6 +73,15 @@ typedef struct AST_Node {
     struct AST_Node *left;  // left child
     struct AST_Node *right; // right child
 } AST_Node;
+
+/* Program */
+typedef struct AST_Node_Program {
+    enum Node_Type type; // node type
+
+    struct AST_Node *declarations;
+    struct AST_Node *statements;
+    struct AST_Node *func_declarations;
+} AST_Node_Program;
 
 /* Declarations */
 typedef struct AST_Node_Declarations {
@@ -341,9 +350,9 @@ typedef struct AST_Node_Return {
 
 /* ------------------AST NODE MANAGEMENT-------------------- */
 
-/* The basic node */
-AST_Node *new_ast_node(Node_Type type, AST_Node *left,
-                       AST_Node *right); // simple nodes
+/* Program */
+AST_Node *new_program_node(AST_Node *declarations, AST_Node *statements,
+                           AST_Node *func_declarations);
 
 /* Declarations */
 AST_Node *new_declarations_node(AST_Node **declarations, int declaration_count,
