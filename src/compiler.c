@@ -1,13 +1,6 @@
-#include "../include/revqueue.h"
-#include "../include/semantics.h"
-#include "../include/symtab.h"
+#include "../include/compiler.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-extern FILE *yyin;
-extern FILE *yyout;
-
-int yyparse();
 
 char *filename;
 
@@ -29,10 +22,12 @@ int main(int argc, char *argv[]) {
         yyparse();
         fclose(yyin);
 
-        printf("Parsing finished!\n");
+        if (DEBUG)
+            printf("Parsing finished!\n");
 
         // AST traversal
-        ast_traversal(ast);
+        if (DEBUG)
+            ast_traversal(ast);
 
         /* remove print from revisit queue */
         remove_print();
@@ -44,14 +39,18 @@ int main(int argc, char *argv[]) {
         func_declare("print", VOID_TYPE, 1, NULL);
 
         // symbol table dump
-        yyout = fopen("symtab_dump.out", "w");
-        symtab_dump(yyout);
-        fclose(yyout);
+        if (DEBUG) {
+            yyout = fopen("symtab_dump.out", "w");
+            symtab_dump(yyout);
+            fclose(yyout);
+        }
 
         // revisit queue dump
-        yyout = fopen("revisit_dump.out", "w");
-        revisit_dump(yyout);
-        fclose(yyout);
+        if (DEBUG) {
+            yyout = fopen("revisit_dump.out", "w");
+            revisit_dump(yyout);
+            fclose(yyout);
+        }
 
         exit(EXIT_SUCCESS);
     }
