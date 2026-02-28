@@ -348,6 +348,10 @@ typedef struct AST_Node_Return {
     struct AST_Node *ret_val;
 } AST_Node_Return;
 
+/* ---------------------AST STRUCTURE----------------------- */
+
+extern AST_Node *ast;
+
 /* ------------------AST NODE MANAGEMENT-------------------- */
 
 /* Program */

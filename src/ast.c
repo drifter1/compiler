@@ -5,6 +5,8 @@
 
 extern int yylineno;
 
+AST_Node *ast;
+
 /* ------------------AST NODE MANAGEMENT-------------------- */
 /* Program */
 AST_Node *new_program_node(AST_Node *declarations, AST_Node *statements,

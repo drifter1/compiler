@@ -31,6 +31,9 @@ int main(int argc, char *argv[]) {
 
         printf("Parsing finished!\n");
 
+        // AST traversal
+        ast_traversal(ast);
+
         /* remove print from revisit queue */
         remove_print();
 
