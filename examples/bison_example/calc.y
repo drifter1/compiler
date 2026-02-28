@@ -3,6 +3,7 @@
 	#include<ctype.h>
 
 	int yylex();
+	int yyparse();
 	void yyerror(char const*s)
 	{
 		fprintf(stderr,"%s\n",s);
@@ -27,16 +28,14 @@ factor : '(' expr ')' { $$ = $2 ; }
 
 int yylex(){
 	int c;
-	c = getchar( ) ;
-	if (isdigit(c ) ) {
+	c = getchar();
+	if (isdigit(c)){
 		yylval= c - '0';
-		return DIGIT ;
+		return DIGIT;
 	}
 	return c ;
 }
 
-int yyparse();
-
 int main () {
-	return yyparse( ) ;
+	return yyparse();
 }
