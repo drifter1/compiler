@@ -9,11 +9,12 @@
 
 alpha 		[a-zA-Z]
 digit 		[0-9]
+nzdigit		[1-9]
 alnum 		{alpha}|{digit}
 print		[ -~]
 
-ID 			{alpha}+{alnum}*
-ICONST		"0"|[1-9]{digit}*
+ID 			{alpha}{alnum}*
+ICONST		"0"|{nzdigit}{digit}*
 FCONST		"0"|{digit}*"."{digit}+
 CCONST		(\'{print}\')|(\'\\[nftrbv]\')
 STRING		\"{print}*\"
