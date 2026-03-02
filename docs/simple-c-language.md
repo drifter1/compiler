@@ -1,6 +1,8 @@
 # Simple C Language
 
-## Tokens
+The language Simple C is similar to the high-level programming language [C](https://www.c-language.org/) and is described in detail in this document. It is a simplified version of C, designed purely for educational purposes. In opposition to C, functions do not require declaration before use. There is also no main function. A program in this language begins with variable declarations for the main function and continues with statements for the main function. A return statement then ends the main function. Finally, optional function declarations are included at the end. Of course, using a function other than the built-in `print()` without subsequently declaring/defining it yields an error.
+
+## Terminal Symbols (or Lexical Units)
 
 ### Keywords
 
@@ -19,15 +21,20 @@
 
 ### Operators
 
+#### Mathematical Operators
 - `+` -> addition (**ADDOP** of type *ADD*)
 - `-` -> subtraction (**ADDOP** of type *SUB*)
 - `*` -> multiplication (**MULOP**)
 - `/` -> division (**DIVOP**)
 - `++` -> increment by 1 (**INCR** of type *INC*)
-- `--` -> decrement by 1 (**INCR** of type DE*C)
-- `||` -> or (**OROP**)
-- `&&` -> and (**ANDOP**)
-- `!` -> not (**NOTOP**)
+- `--` -> decrement by 1 (**INCR** of type *DEC*)
+
+#### Logical Operators
+- `||` -> logical or (**OROP**)
+- `&&` -> logical and (**ANDOP**)
+- `!` -> logical not (**NOTOP**)
+
+#### Relational Operators
 - `==` -> equality (**EQUOP** of type *EQUAL*)
 - `!=` -> inequality (**EQUOP** of type *NOT_EQUAL*)
 - `>` -> greater (**RELOP** of type *GREATER*)
@@ -144,3 +151,19 @@
 - **statements_optional**: statements | ;
 
 - **return_optional**: RETURN expression SEMI | ;
+
+## Semantics
+
+### Data Types
+
+### Declarations
+
+### Initializations
+
+### Function Declarations
+
+### Expressions
+
+### Precedencies and Associativities
+
+### Statements
