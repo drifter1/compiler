@@ -1,8 +1,5 @@
 %{
-	#include "../include/symtab.h"
-	#include "../include/revqueue.h"
-	#include "../include/semantics.h"
-	#include "../include/ast.h"
+	#include "../include/compiler.h"
 	#include "../build/parser.tab.h"
 %}
 
@@ -23,10 +20,20 @@ STRING		\"{print}*\"
 
 %%
 
-"//".*				/* single-line comment */
+"//".*				{ 
+						/* single-line comment */
+						if(DEBUG) printf("Eat up comment at line %d\n", yylineno);
+					}
 
-"/*"				{ /* multi-line comment */ BEGIN(ML_COMMENT); } 
-<ML_COMMENT>"*/" 	{ BEGIN(INITIAL); }
+"/*"				{
+						/* multi-line comment */ 
+						if(DEBUG) printf("Eat up comment from line %d ", yylineno);
+						BEGIN(ML_COMMENT);
+					} 
+<ML_COMMENT>"*/" 	{
+						if(DEBUG) printf("to line %d\n", yylineno);
+						BEGIN(INITIAL);
+					}
 <ML_COMMENT>[^*\n]+
 <ML_COMMENT>"*"
 <ML_COMMENT>"\n"

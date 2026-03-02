@@ -2,14 +2,7 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
-	#include "../include/symtab.h"
-	#include "../include/revqueue.h"
-    #include "../include/semantics.h"
-    #include "../include/ast.h"
-
-	extern int yylineno;
-	extern int yylex();
-	void yyerror();
+	#include "../include/compiler.h"
 
     // for declarations
 	void add_to_names(list_t *entry);

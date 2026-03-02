@@ -14,6 +14,10 @@
 extern FILE *yyin;
 extern FILE *yyout;
 
+extern int yylineno;
+
+int yylex();
 int yyparse();
+void yyerror();
 
 #endif /* COMPILER_H */
