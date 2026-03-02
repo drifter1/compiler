@@ -1,6 +1,6 @@
 # compiler and flags
 CC = gcc
-CFLAGS = -g -Wall -Wextra -std=c11
+CFLAGS = -g -Wall -Wextra -std=c99
 
 # lexer and flags
 LEX = flex

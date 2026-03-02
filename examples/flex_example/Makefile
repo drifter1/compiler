@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS = -g -Wall -Wextra -std=c11
+CFLAGS = -g -Wall -Wextra -std=c99
 
 LEX = flex
 
