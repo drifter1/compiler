@@ -40,18 +40,18 @@ STRING		\"{print}*\"
 <ML_COMMENT>"\n"
 
 
-"char"|"CHAR"       	{ return CHAR; }
-"int"|"INT"				{ return INT; }
-"float"|"FLOAT"			{ return FLOAT; }
-"double"|"DOUBLE"		{ return DOUBLE; }
-"if"|"IF"				{ return IF; }
-"else"|"ELSE"			{ return ELSE; }
-"while"|"WHILE"			{ return WHILE; }
-"for"|"FOR"				{ return FOR; }
-"continue"|"CONTINUE"	{ return CONTINUE; }
-"break"|"BREAK"			{ return BREAK; }
-"void"|"VOID"			{ return VOID; }
-"return"|"RETURN"		{ return RETURN; }
+"char"      { return CHAR; }
+"int"		{ return INT; }
+"float"		{ return FLOAT; }
+"double"	{ return DOUBLE; }
+"if"		{ return IF; }
+"else"		{ return ELSE; }
+"while"		{ return WHILE; }
+"for"		{ return FOR; }
+"continue"	{ return CONTINUE; }
+"break"		{ return BREAK; }
+"void"		{ return VOID; }
+"return"	{ return RETURN; }
 
 
 "+"					    { yylval.val.ival = ADD; return ADDOP; }
