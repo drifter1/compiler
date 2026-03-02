@@ -84,7 +84,7 @@ The language Simple C is similar to the high-level programming language [C](http
 
 - **pointer**: MULOP ;
 
-- **array**: LBRACK expression RBRACK | LBRACK ICONST RBRACK ;
+- **array**: LBRACK expression RBRACK ;
 
 - **init**:	var_init | array_init ; 
 

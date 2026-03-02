@@ -42,9 +42,6 @@
 	Param par;
 }
 
-/* expect one shift/reduce conflict in the grammar (to silence warning) */
-%expect 1
-
 /* token definition */
 %token<val> CHAR INT FLOAT DOUBLE IF ELSE WHILE FOR CONTINUE BREAK VOID RETURN
 %token<val> ADDOP MULOP DIVOP INCR OROP ANDOP NOTOP EQUOP RELOP
@@ -176,18 +173,25 @@ variable: ID { $$ = $1; }
 pointer: MULOP ; /* for now only single pointers! */
 
 array: /* for now only one-dimensional arrays */
-	LBRACK expression RBRACK /* can only be used in expressions */
+	LBRACK expression RBRACK 
 	{
-		// if declaration then error!
-		if(declare == 1){
-			fprintf(stderr, "Semantic error at line %d. Array declaration contains expression\n", yylineno);
-    		exit(EXIT_FAILURE);
+		if (declare == 1) {
+			// if declaration and not constant node then error!
+			if ($2->type != CONST_NODE){
+				fprintf(stderr, "Semantic error at line %d. Array declaration contains expression\n", yylineno);
+    			exit(EXIT_FAILURE);
+			}
+			
+			AST_Node_Const *temp = (AST_Node_Const*) $2;
+
+			if (temp->const_type != INT_TYPE) {
+				fprintf(stderr, "Semantic error at line %d. Array declaration contains non-integer constant\n", yylineno);
+    			exit(EXIT_FAILURE);
+			}
+
+			// set array_size for declaration purposes
+			$$ = temp->val.ival;
 		}
-	}
-	| LBRACK ICONST RBRACK
-	{
-		// set array_size for declaration purposes
-		$$ = $2.ival;
 	}
 ;
 
