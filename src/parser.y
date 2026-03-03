@@ -3,11 +3,6 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "../include/compiler.h"
-
-    // for declarations
-	void add_to_names(list_t *entry);
-	list_t **names;
-	int nc = 0;
 	
 	// for the initializations of arrays
 	void add_to_vals(Value val);
@@ -33,6 +28,7 @@
     AST_Node* node;
 
     // for declarations
+	_names names_helper;
 	int data_type;
 	
 	// for arrays
@@ -72,6 +68,7 @@
 %type <node> program
 %type <node> declarations declaration
 %type <data_type> type
+%type <names_helper> names
 %type <symtab_item> variable
 %type <array_size> array
 %type <symtab_item> init var_init array_init
@@ -105,13 +102,13 @@ declarations:
 declaration: type { declare = 1; } names { declare = 0; } SEMI
 	{
 		int i;
-		$$ = new_ast_decl_node($1, names, nc);
-		nc = 0;
+
+		$$ = new_ast_decl_node($1, $3.names, $3.names_count);
 		
 		AST_Node_Decl *temp = (AST_Node_Decl*) $$;
 		
 		// declare types of the names
-		for(i=0; i < temp->names_count; i++){
+		for(i = 0; i < temp->names_count; i++){
 			// variable
 			if(temp->names[i]->st_type == UNDEF){
 				set_type(temp->names[i]->st_name, temp->data_type, UNDEF);
@@ -137,19 +134,27 @@ type: INT  		{ $$ = INT_TYPE;   }
 
 names: names COMMA variable
 	{
-		add_to_names($3);
+		$$.names = (list_t **) realloc($1.names, ($1.names_count + 1) * sizeof(list_t *));
+		$$.names[$1.names_count] = $3;
+		$$.names_count = $1.names_count + 1;
 	}
 	| names COMMA init
 	{
-		add_to_names($3);
+		$$.names = (list_t **) realloc($1.names, ($1.names_count + 1) * sizeof(list_t *));
+		$$.names[$1.names_count] = $3;
+		$$.names_count = $1.names_count + 1;
 	}
 	| variable
 	{
-		add_to_names($1);
+		$$.names = (list_t **) malloc(1 * sizeof(list_t *));
+		$$.names[0] = $1;
+		$$.names_count = 1;
 	}
 	| init
 	{ 
-		add_to_names($1);
+		$$.names = (list_t **) malloc(1 * sizeof(list_t *));
+		$$.names[0] = $1;
+		$$.names_count = 1;
 	}
 ;
 
@@ -778,21 +783,6 @@ return_optional:
 void yyerror(){
 	fprintf(stderr, "Syntax error at line %d\n", yylineno);
     exit(EXIT_FAILURE);
-}
-
-void add_to_names(list_t *entry){
-	// first entry
-	if(nc == 0){
-		nc = 1;
-		names = (list_t **) malloc( 1 * sizeof(list_t *));
-		names[0] = entry;
-	}
-	// general case
-	else{
-		nc++;
-		names = (list_t **) realloc(names, nc * sizeof(list_t *));
-		names[nc - 1] = entry;		
-	}
 }
 
 void add_to_vals(Value val){

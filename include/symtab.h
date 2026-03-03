@@ -77,6 +77,12 @@ typedef struct list_t {
     struct list_t *next;
 } list_t;
 
+// helper for the names rule
+typedef struct _names {
+    list_t **names;
+    int names_count;
+} _names;
+
 /* structure */
 extern list_t **hash_table;
 
