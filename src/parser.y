@@ -592,7 +592,7 @@ call_params:
 	| STRING
 	{
 		AST_Node *temp = new_ast_const_node(STR_TYPE, $1);
-		$$ = new_ast_call_params_node(NULL, 0, temp);
+		$$ = new_ast_call_params_node(NULL, temp);
 	}
 	| /* empty */
 	{
@@ -605,15 +605,8 @@ call_params:
 ;
 
 call_param: 
-	call_param COMMA expression
-	{
-		AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $1;
-		$$ = new_ast_call_params_node(temp->params, temp->num_of_pars, $3);
-	}
-	| expression
-	{
-		$$ = new_ast_call_params_node(NULL, 0, $1);
-	}	
+	call_param COMMA expression { $$ = new_ast_call_params_node($1, $3); }
+	| expression { $$ = new_ast_call_params_node(NULL, $1); }	
 ;
 
 /* functions */

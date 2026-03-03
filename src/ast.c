@@ -244,31 +244,26 @@ AST_Node *new_ast_func_call_node(list_t *entry, AST_Node **params,
     return (struct AST_Node *)v;
 }
 
-AST_Node *new_ast_call_params_node(AST_Node **params, int num_of_pars,
-                                   AST_Node *param) {
-    // allocate memory
-    AST_Node_Call_Params *v = malloc(sizeof(AST_Node_Call_Params));
+AST_Node *new_ast_call_params_node(AST_Node *params, AST_Node *param) {
 
-    // set type
-    v->type = CALL_PARAMS;
+    AST_Node_Call_Params *v;
 
     // first parameter
     if (params == NULL) {
-        params = (AST_Node **)malloc(sizeof(AST_Node *));
-        params[0] = param;
-        num_of_pars = 1;
+        v = malloc(sizeof(AST_Node_Call_Params));
+        v->type = CALL_PARAMS;
+        v->params = (AST_Node **)malloc(sizeof(AST_Node *));
+        v->params[0] = param;
+        v->num_of_pars = 1;
     }
     // add new parameter
     else {
-        params = (AST_Node **)realloc(params,
-                                      (num_of_pars + 1) * sizeof(AST_Node *));
-        params[num_of_pars] = param;
-        num_of_pars++;
+        v = (AST_Node_Call_Params *)params;
+        v->params = (AST_Node **)realloc(v->params, (v->num_of_pars + 1) *
+                                                        sizeof(AST_Node *));
+        v->params[v->num_of_pars] = param;
+        v->num_of_pars++;
     }
-
-    // set entries
-    v->params = params;
-    v->num_of_pars = num_of_pars;
 
     // return type-casted result
     return (struct AST_Node *)v;

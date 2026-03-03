@@ -380,8 +380,7 @@ AST_Node *new_ast_incr_node(list_t *entry, int incr_type,
                             int pf_type); // increment decrement
 AST_Node *new_ast_func_call_node(list_t *entry, AST_Node **params,
                                  int num_of_pars); // function call
-AST_Node *new_ast_call_params_node(AST_Node **params, int num_of_pars,
-                                   AST_Node *param);
+AST_Node *new_ast_call_params_node(AST_Node *params, AST_Node *param);
 
 /* Expressions */
 AST_Node *new_ast_arithm_node(enum Arithm_op op, AST_Node *left,
