@@ -28,31 +28,26 @@ AST_Node *new_program_node(AST_Node *declarations, AST_Node *statements,
 }
 
 /* Declarations */
-AST_Node *new_declarations_node(AST_Node **declarations, int declaration_count,
-                                AST_Node *declaration) {
-    // allocate memory
-    AST_Node_Declarations *v = malloc(sizeof(AST_Node_Declarations));
+AST_Node *new_declarations_node(AST_Node *declarations, AST_Node *declaration) {
 
-    // set node type
-    v->type = DECLARATIONS;
+    AST_Node_Declarations *v;
 
     // first declaration
     if (declarations == NULL) {
-        declarations = (AST_Node **)malloc(sizeof(AST_Node *));
-        declarations[0] = declaration;
-        declaration_count = 1;
+        v = malloc(sizeof(AST_Node_Declarations));
+        v->type = DECLARATIONS;
+        v->declarations = (AST_Node **)malloc(sizeof(AST_Node *));
+        v->declarations[0] = declaration;
+        v->declaration_count = 1;
     }
     // add new declaration
     else {
-        declarations = (AST_Node **)realloc(
-            declarations, (declaration_count + 1) * sizeof(AST_Node *));
-        declarations[declaration_count] = declaration;
-        declaration_count++;
+        v = (AST_Node_Declarations *)declarations;
+        v->declarations = (AST_Node **)realloc(
+            v->declarations, (v->declaration_count + 1) * sizeof(AST_Node *));
+        v->declarations[v->declaration_count] = declaration;
+        v->declaration_count++;
     }
-
-    // set entries
-    v->declarations = declarations;
-    v->declaration_count = declaration_count;
 
     // return type-casted result
     return (struct AST_Node *)v;

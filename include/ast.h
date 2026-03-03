@@ -359,8 +359,7 @@ AST_Node *new_program_node(AST_Node *declarations, AST_Node *statements,
                            AST_Node *func_declarations);
 
 /* Declarations */
-AST_Node *new_declarations_node(AST_Node **declarations, int declaration_count,
-                                AST_Node *declaration);
+AST_Node *new_declarations_node(AST_Node *declarations, AST_Node *declaration);
 AST_Node *new_ast_decl_node(int data_type, list_t **names,
                             int names_count);            // declaration
 AST_Node *new_ast_const_node(int const_type, Value val); // constant

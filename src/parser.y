@@ -98,15 +98,8 @@ program:
 
 /* declarations */
 declarations: 
-	declarations declaration
-	{
-		AST_Node_Declarations *temp = (AST_Node_Declarations*) $1;
-		$$ = new_declarations_node(temp->declarations, temp->declaration_count, $2);
-	}
-	| declaration
-	{
-		$$ = new_declarations_node(NULL, 0, $1);
-	}
+	declarations declaration { $$ = new_declarations_node($1, $2); }
+	| declaration { $$ = new_declarations_node(NULL, $1); }
 ;
 
 declaration: type { declare = 1; } names { declare = 0; } SEMI
@@ -160,7 +153,11 @@ names: names COMMA variable
 	}
 ;
 
-variable: ID { $$ = $1; }
+variable: 
+	ID
+	{
+		$$ = $1; /* just pass information */
+	}
 	| pointer ID
 	{
 		$2->st_type = POINTER_TYPE;
@@ -206,7 +203,7 @@ init:
 
 var_init : ID ASSIGN constant
     { 
-        AST_Node_Const *temp = (AST_Node_Const*) $$;
+        AST_Node_Const *temp = (AST_Node_Const*) $3;
         $1->val = temp->val;
         $1->st_type = temp->const_type;
         $$ = $1;
