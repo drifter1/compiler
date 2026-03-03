@@ -98,25 +98,21 @@ declarations:
 
 declaration: type { declare = 1; } names { declare = 0; } SEMI
 	{
-		int i;
-
 		$$ = new_ast_decl_node($1, $3.names, $3.names_count);
-		
-		AST_Node_Decl *temp = (AST_Node_Decl*) $$;
-		
+
 		// declare types of the names
-		for(i = 0; i < temp->names_count; i++){
+		for (int i = 0 ; i < $3.names_count; i++){
 			// variable
-			if(temp->names[i]->st_type == UNDEF){
-				set_type(temp->names[i]->st_name, temp->data_type, UNDEF);
+			if($3.names[i]->st_type == UNDEF){
+				set_type($3.names[i]->st_name, $1, UNDEF);
 			}
 			// pointer
-			else if(temp->names[i]->st_type == POINTER_TYPE){
-				set_type(temp->names[i]->st_name, POINTER_TYPE, temp->data_type);
+			else if($3.names[i]->st_type == POINTER_TYPE){
+				set_type($3.names[i]->st_name, POINTER_TYPE, $1);
 			}
 			// array
-			else if(temp->names[i]->st_type == ARRAY_TYPE){
-				set_type(temp->names[i]->st_name, ARRAY_TYPE, temp->data_type);
+			else if($3.names[i]->st_type == ARRAY_TYPE){
+				set_type($3.names[i]->st_name, ARRAY_TYPE, $1);
 			}
 		}
 	}
