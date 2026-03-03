@@ -237,15 +237,8 @@ values: values COMMA constant
 
 /* statements */
 statements:
-	statements statement
-	{
-		AST_Node_Statements *temp = (AST_Node_Statements*) $1;
-		$$ = new_statements_node(temp->statements, temp->statement_count, $2);
-	}
-	| statement
-	{
-		$$ = new_statements_node(NULL, 0, $1);
-	}
+	statements statement { $$ = new_statements_node($1, $2); }
+	| statement { $$ = new_statements_node(NULL, $1); }
 ;
 
 statement:

@@ -82,31 +82,26 @@ AST_Node *new_ast_const_node(int const_type, Value val) {
 
 /* Statements */
 
-AST_Node *new_statements_node(AST_Node **statements, int statement_count,
-                              AST_Node *statement) {
-    // allocate memory
-    AST_Node_Statements *v = malloc(sizeof(AST_Node_Statements));
+AST_Node *new_statements_node(AST_Node *statements, AST_Node *statement) {
 
-    // set node type
-    v->type = STATEMENTS;
+    AST_Node_Statements *v;
 
     // first statement
     if (statements == NULL) {
-        statements = (AST_Node **)malloc(sizeof(AST_Node *));
-        statements[0] = statement;
-        statement_count = 1;
+        v = malloc(sizeof(AST_Node_Statements));
+        v->type = STATEMENTS;
+        v->statements = (AST_Node **)malloc(sizeof(AST_Node *));
+        v->statements[0] = statement;
+        v->statement_count = 1;
     }
     // add new statement
     else {
-        statements = (AST_Node **)realloc(statements, (statement_count + 1) *
-                                                          sizeof(AST_Node *));
-        statements[statement_count] = statement;
-        statement_count++;
+        v = (AST_Node_Statements *)statements;
+        v->statements = (AST_Node **)realloc(
+            v->statements, (v->statement_count + 1) * sizeof(AST_Node *));
+        v->statements[v->statement_count] = statement;
+        v->statement_count++;
     }
-
-    // set entries
-    v->statements = statements;
-    v->statement_count = statement_count;
 
     // return type-casted result
     return (struct AST_Node *)v;
