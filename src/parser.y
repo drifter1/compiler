@@ -3,11 +3,6 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "../include/compiler.h"
-	
-	// for the initializations of arrays
-	void add_to_vals(Value val);
-	Value *vals;
-	int vc = 0;
 
     // for else ifs
 	void add_elseif(AST_Node *elsif);
@@ -32,6 +27,7 @@
 	int data_type;
 	
 	// for arrays
+	_values values_helper;
 	int array_size;
 
     // for parameters
@@ -72,6 +68,7 @@
 %type <symtab_item> variable
 %type <array_size> array
 %type <symtab_item> init var_init array_init
+%type <values_helper> values
 %type <node> constant
 %type <node> expression var_ref
 %type <node> statement assigment
@@ -217,26 +214,27 @@ var_init : ID ASSIGN constant
 
 array_init: ID array ASSIGN LBRACE values RBRACE
     {
-        if($1->array_size != vc){
+        if($2 != $5.val_count){
 			fprintf(stderr, "Semantic error at line %d. Array init doesn't contain the right amount of values\n", yylineno);
 			exit(EXIT_FAILURE);
         }
-        $1->vals = vals;
+        $1->vals = $5.vals;
         $1->array_size = $2;
         $$ = $1;
-        vc = 0;
     }
 ;
 
 values: values COMMA constant 
 	{
-		AST_Node_Const *temp = (AST_Node_Const*) $3;
-		add_to_vals(temp->val);
+		$$.vals = (Value *) realloc($1.vals, ($1.val_count + 1) * sizeof(Value));
+		$$.vals[$1.val_count] = ((AST_Node_Const*) $3)->val;
+		$$.val_count = $1.val_count + 1;
 	}
 	| constant
 	{
-		AST_Node_Const *temp = (AST_Node_Const*) $1;
-		add_to_vals(temp->val);
+		$$.vals = (Value *) malloc(1 * sizeof(Value));
+		$$.vals[0] = ((AST_Node_Const*) $1)->val;
+		$$.val_count = 1;
 	}
 ;
 
@@ -783,21 +781,6 @@ return_optional:
 void yyerror(){
 	fprintf(stderr, "Syntax error at line %d\n", yylineno);
     exit(EXIT_FAILURE);
-}
-
-void add_to_vals(Value val){
-	// first entry
-	if(vc == 0){
-		vc = 1;
-		vals = (Value *) malloc(1 * sizeof(Value));
-		vals[0] = val;
-	}
-	// general case
-	else{
-		vc++;
-		vals = (Value *) realloc(vals, vc * sizeof(Value));
-		vals[vc - 1] = val;
-	}
 }
 
 void add_elseif(AST_Node *elsif){

@@ -83,6 +83,12 @@ typedef struct _names {
     int names_count;
 } _names;
 
+// helper for the values rule
+typedef struct _values {
+    Value *vals;
+    int val_count;
+} _values;
+
 /* structure */
 extern list_t **hash_table;
 
