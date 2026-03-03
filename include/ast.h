@@ -234,53 +234,53 @@ typedef struct AST_Node_Call_Params {
 typedef struct AST_Node_Arithm {
     enum Node_Type type; // node type
 
+    struct AST_Node *left;  // left child
+    struct AST_Node *right; // right child
+
     // data type of result
     int data_type;
 
     // operator
     enum Arithm_op op;
-
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
 } AST_Node_Arithm;
 
 typedef struct AST_Node_Bool {
     enum Node_Type type; // node type
+
+    struct AST_Node *left;  // left child
+    struct AST_Node *right; // right child
 
     // data type of result
     int data_type;
 
     // operator
     enum Bool_op op;
-
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
 } AST_Node_Bool;
 
 typedef struct AST_Node_Rel {
     enum Node_Type type; // node type
+
+    struct AST_Node *left;  // left child
+    struct AST_Node *right; // right child
 
     // data type of result
     int data_type;
 
     // operator
     enum Rel_op op;
-
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
 } AST_Node_Rel;
 
 typedef struct AST_Node_Equ {
     enum Node_Type type; // node type
+
+    struct AST_Node *left;  // left child
+    struct AST_Node *right; // right child
 
     // data type of result
     int data_type;
 
     // operator
     enum Equ_op op;
-
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
 } AST_Node_Equ;
 
 typedef struct AST_Node_Ref {

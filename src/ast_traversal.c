@@ -5,6 +5,7 @@
 /* Tree Traversal */
 
 void ast_print_node(AST_Node *node) {
+    int i;
     /* temp nodes */
     AST_Node_Declarations *temp_declarations;
     AST_Node_Decl *temp_decl;
@@ -41,6 +42,10 @@ void ast_print_node(AST_Node *node) {
         temp_decl = (struct AST_Node_Decl *)node;
         printf("Declaration Node of data-type %d for %d names\n",
                temp_decl->data_type, temp_decl->names_count);
+        printf("Names:\n");
+        for (i = 0; i < temp_decl->names_count; i++) {
+            printf("%s\n", temp_decl->names[i]->st_name);
+        }
         break;
     case CONST_NODE:
         temp_const = (struct AST_Node_Const *)node;
@@ -132,7 +137,8 @@ void ast_print_node(AST_Node *node) {
         break;
     case FUNC_DECLS:
         temp_func_declarations = (struct AST_Node_Func_Declarations *)node;
-        printf("Function Declarations Node with %d function declarations\n",
+        printf("Function Declarations Node with %d function "
+               "declarations\n",
                temp_func_declarations->func_declaration_count);
         break;
     case FUNC_DECL:
@@ -177,9 +183,15 @@ void ast_traversal(AST_Node *node) {
     /* left and right child cases */
     if (node->type == ARITHM_NODE || node->type == BOOL_NODE ||
         node->type == REL_NODE || node->type == EQU_NODE) {
-        // ast_traversal(node->left);
-        // ast_traversal(node->right);
-        ast_print_node(node); // postfix
+        ast_print_node(node);
+        if (node->left != NULL) {
+            printf("Left child:\n");
+            ast_traversal(node->left);
+        }
+        if (node->right != NULL) {
+            printf("Right child:\n");
+            ast_traversal(node->right);
+        }
     }
     /* program case*/
     else if (node->type == PROGRAM_NODE) {
