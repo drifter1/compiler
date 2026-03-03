@@ -388,33 +388,28 @@ AST_Node *new_ast_ref_node(list_t *entry, int ref) {
 }
 
 /* Functions */
-AST_Node *new_func_declarations_node(AST_Node **func_declarations,
-                                     int func_declaration_count,
+AST_Node *new_func_declarations_node(AST_Node *func_declarations,
                                      AST_Node *func_declaration) {
-    // allocate memory
-    AST_Node_Func_Declarations *v = malloc(sizeof(AST_Node_Func_Declarations));
 
-    // set node type
-    v->type = FUNC_DECLS;
+    AST_Node_Func_Declarations *v;
 
-    // first declaration
+    // first function declaration
     if (func_declarations == NULL) {
-        func_declarations = (AST_Node **)malloc(sizeof(AST_Node *));
-        func_declarations[0] = func_declaration;
-        func_declaration_count = 1;
+        v = malloc(sizeof(AST_Node_Func_Declarations));
+        v->type = FUNC_DECLS;
+        v->func_declarations = (AST_Node **)malloc(sizeof(AST_Node *));
+        v->func_declarations[0] = func_declaration;
+        v->func_declaration_count = 1;
     }
-    // add new declaration
+    // add new function declaration
     else {
-        func_declarations = (AST_Node **)realloc(func_declarations,
-                                                 (func_declaration_count + 1) *
-                                                     sizeof(AST_Node *));
-        func_declarations[func_declaration_count] = func_declaration;
-        func_declaration_count++;
+        v = (AST_Node_Func_Declarations *)func_declarations;
+        v->func_declarations = (AST_Node **)realloc(
+            v->func_declarations,
+            (v->func_declaration_count + 1) * sizeof(AST_Node *));
+        v->func_declarations[v->func_declaration_count] = func_declaration;
+        v->func_declaration_count++;
     }
-
-    // set entries
-    v->func_declarations = func_declarations;
-    v->func_declaration_count = func_declaration_count;
 
     // return type-casted result
     return (struct AST_Node *)v;

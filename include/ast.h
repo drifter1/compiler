@@ -393,8 +393,7 @@ AST_Node *new_ast_equ_node(enum Equ_op op, AST_Node *left, AST_Node *right);
 AST_Node *new_ast_ref_node(list_t *entry, int ref);
 
 /* Functions */
-AST_Node *new_func_declarations_node(AST_Node **func_declarations,
-                                     int func_declaration_count,
+AST_Node *new_func_declarations_node(AST_Node *func_declarations,
                                      AST_Node *func_declaration);
 AST_Node *new_ast_func_decl_node(int ret_type, int pointer, list_t *entry);
 AST_Node *new_ast_ret_type_node(int ret_type,

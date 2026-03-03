@@ -636,15 +636,8 @@ functions_optional:
 ;
 
 functions: 
-	functions function
-	{
-		AST_Node_Func_Declarations *temp = (AST_Node_Func_Declarations*) $1;
-		$$ = new_func_declarations_node(temp->func_declarations, temp->func_declaration_count, $2);
-	}
-	| function
-	{
-		$$ = new_func_declarations_node(NULL, 0, $1);
-	}
+	functions function { $$ = new_func_declarations_node($1, $2); }
+	| function { $$ = new_func_declarations_node(NULL, $1); }
 ;
 
 
