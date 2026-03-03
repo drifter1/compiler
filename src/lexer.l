@@ -58,8 +58,8 @@ STRING		\"{print}*\"
 "-"					    { yylval.val.ival = SUB; return ADDOP; }
 "*"						{ return MULOP; }
 "/"						{ return DIVOP; }
-"++"				    { yylval.val.ival = INC; return INCR; }
-"--"				    { yylval.val.ival = DEC; return INCR; }
+"++"				    { yylval.val.ival = INC; return INCDEC; }
+"--"				    { yylval.val.ival = DEC; return INCDEC; }
 "||"					{ return OROP; }
 "&&"					{ return ANDOP; }
 "!"						{ return NOTOP; }

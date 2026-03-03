@@ -26,8 +26,8 @@ The language Simple C is similar to the high-level programming language [C](http
 - `-` -> subtraction (**ADDOP** of type *SUB*)
 - `*` -> multiplication (**MULOP**)
 - `/` -> division (**DIVOP**)
-- `++` -> increment by 1 (**INCR** of type *INC*)
-- `--` -> decrement by 1 (**INCR** of type *DEC*)
+- `++` -> increment by 1 (**INCDEC** of type *INC*)
+- `--` -> decrement by 1 (**INCDEC** of type *DEC*)
 
 #### Logical Operators
 - `||` -> logical or (**OROP**)
@@ -98,7 +98,7 @@ The language Simple C is similar to the high-level programming language [C](http
 
 - **statements**: statements statement | statement ;
 
-- **statement**: if_statement | for_statement | while_statement	| assigment SEMI | CONTINUE SEMI | BREAK SEMI | function_call SEMI | ID INCR SEMI | INCR ID SEMI ;
+- **statement**: if_statement | for_statement | while_statement	| assigment SEMI | CONTINUE SEMI | BREAK SEMI | function_call SEMI | ID INCDEC SEMI | INCDEC ID SEMI ;
 
 - **if_statement**: IF LPAREN expression RPAREN tail else_if optional_else | IF LPAREN expression RPAREN tail optional_else ;
 
@@ -106,13 +106,13 @@ The language Simple C is similar to the high-level programming language [C](http
 
 - **optional_else** : ELSE tail	| ;
 
-- **for_statement**: FOR LPAREN assigment SEMI expression SEMI ID INCR RPAREN tail ;
+- **for_statement**: FOR LPAREN assigment SEMI expression SEMI ID INCDEC RPAREN tail ;
 
 - **while_statement**: WHILE LPAREN expression RPAREN tail ;
 
 - **tail**: LBRACE statements RBRACE ;
 
-- **expression**: expression ADDOP expression | expression MULOP expression | expression DIVOP expression | ID INCR | INCR ID | expression OROP expression | expression ANDOP expression | NOTOP expression | expression EQUOP expression | expression RELOP expression	| LPAREN expression RPAREN | var_ref | constant | ADDOP constant %prec MINUS | function_call ;
+- **expression**: expression ADDOP expression | expression MULOP expression | expression DIVOP expression | ID INCDEC | INCDEC ID | expression OROP expression | expression ANDOP expression | NOTOP expression | expression EQUOP expression | expression RELOP expression	| LPAREN expression RPAREN | var_ref | constant | ADDOP constant %prec MINUS | function_call ;
 
 - **constant**: ICONST  | FCONST | CCONST ;
 

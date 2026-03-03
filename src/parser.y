@@ -38,7 +38,7 @@
 %token CHAR INT FLOAT DOUBLE
 %token IF ELSE WHILE FOR
 %token CONTINUE BREAK VOID RETURN
-%token <val> ADDOP INCR EQUOP RELOP
+%token <val> ADDOP INCDEC EQUOP RELOP
 %token MULOP DIVOP OROP ANDOP NOTOP
 %token LPAREN RPAREN LBRACK RBRACK
 %token LBRACE RBRACE SEMI COMMA ASSIGN REFER
@@ -57,7 +57,7 @@
 %left RELOP
 %left ADDOP
 %left MULOP DIVOP
-%right NOTOP INCR REFER MINUS
+%right NOTOP INCDEC REFER MINUS
 %left LPAREN RPAREN LBRACK RBRACK
 
 /* rule (non-terminal) definitions */
@@ -281,7 +281,7 @@ statement:
 	{ 
 		$$ = $1; /* just pass information */
 	}
-	| ID INCR SEMI
+	| ID INCDEC SEMI
 	{
 		/* increment */
 		if($2.ival == INC){
@@ -291,7 +291,7 @@ statement:
 			$$ = new_ast_incr_node($1, 1, 0);
 		}
 	}
-	| INCR ID SEMI
+	| INCDEC ID SEMI
 	{
 		/* increment */
 		if($1.ival == INC){
@@ -343,7 +343,7 @@ optional_else:
 	}
 ;
 
-for_statement: FOR LPAREN assigment SEMI expression SEMI ID INCR RPAREN tail
+for_statement: FOR LPAREN assigment SEMI expression SEMI ID INCDEC RPAREN tail
     {
         /* create increment node*/
         AST_Node *incr_node;
@@ -384,7 +384,7 @@ expression:
 	{
 		$$ = new_ast_arithm_node(DIV, $1, $3);
 	}
-	| ID INCR
+	| ID INCDEC
 	{
 		/* increment */
 		if($2.ival == INC){
@@ -394,7 +394,7 @@ expression:
 			$$ = new_ast_incr_node($1, 1, 0);
 		}
 	}
-	| INCR ID
+	| INCDEC ID
 	{ 
 		/* increment */
 		if($1.ival == INC){
