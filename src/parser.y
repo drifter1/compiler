@@ -4,11 +4,6 @@
 	#include <string.h>
 	#include "../include/compiler.h"
 
-    // for else ifs
-	void add_elseif(AST_Node *elsif);
-	AST_Node **elsifs;
-	int elseif_count = 0;
-
     // for functions
 	AST_Node_Func_Decl *temp_function;
 %}
@@ -29,6 +24,9 @@
 	// for arrays
 	_values values_helper;
 	int array_size;
+
+	// for else if
+	_else_if else_if_helper;
 
     // for parameters
 	Param par;
@@ -73,7 +71,9 @@
 %type <node> expression var_ref
 %type <node> statement assigment
 %type <node> statements tail
-%type <node> if_statement else_if optional_else
+%type <node> if_statement
+%type <else_if_helper> else_if
+%type <node> optional_else
 %type <node> for_statement while_statement
 %type <node> functions_optional functions function
 %type <node> parameters_optional parameters
@@ -295,9 +295,7 @@ statement:
 if_statement:
 	IF LPAREN expression RPAREN tail else_if optional_else
 	{
-		$$ = new_ast_if_node($3, $5, elsifs, elseif_count, $7);
-		elseif_count = 0;
-		elsifs = NULL;
+		$$ = new_ast_if_node($3, $5, $6.elsifs, $6.elseif_count, $7);
 	}
 	| IF LPAREN expression RPAREN tail optional_else
 	{
@@ -309,13 +307,18 @@ if_statement:
 else_if:
 	else_if ELSE IF LPAREN expression RPAREN tail
 	{
-		AST_Node *temp = new_ast_elsif_node($5, $7);
-		add_elseif(temp);
+		printf("additional else if");
+		$$.elsifs = (AST_Node **) realloc($1.elsifs, ($1.elseif_count + 1) * sizeof(AST_Node *));
+		$$.elsifs[$1.elseif_count] = new_ast_elsif_node($5, $7);
+		$$.elseif_count = $1.elseif_count + 1;
+
 	}
 	| ELSE IF LPAREN expression RPAREN tail
-	{
-		AST_Node *temp = new_ast_elsif_node($4, $6);
-		add_elseif(temp);
+	{	
+		printf("first else if");
+		$$.elsifs = (AST_Node **) malloc(1 * sizeof(AST_Node *));
+		$$.elsifs[0] = new_ast_elsif_node($4, $6);
+		$$.elseif_count = 1;
 	}
 ;
 
@@ -756,19 +759,4 @@ return_optional:
 void yyerror(){
 	fprintf(stderr, "Syntax error at line %d\n", yylineno);
     exit(EXIT_FAILURE);
-}
-
-void add_elseif(AST_Node *elsif){
-	// first entry
-	if(elseif_count == 0){
-		elseif_count = 1;
-		elsifs = (AST_Node **) malloc(1 * sizeof(AST_Node));
-		elsifs[0] = elsif;
-	}
-	// general case
-	else{
-		elseif_count++;
-		elsifs = (AST_Node **) realloc(elsifs, elseif_count * sizeof(AST_Node));
-		elsifs[elseif_count - 1] = elsif;
-	}
 }

@@ -1,4 +1,4 @@
-#include "symtab.h"
+#include "ast.h"
 
 #ifndef PARSER_H
 #define PARSER_H
@@ -14,5 +14,11 @@ typedef struct _values {
     Value *vals;
     int val_count;
 } _values;
+
+// helper for the else_if rule
+typedef struct _else_if {
+    AST_Node **elsifs;
+    int elseif_count;
+} _else_if;
 
 #endif /* PARSER_H */

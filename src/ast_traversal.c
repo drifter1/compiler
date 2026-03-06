@@ -233,7 +233,7 @@ void ast_traversal(AST_Node *node) {
         if (temp_if->elseif_count > 0) {
             printf("Else if branches:\n");
             for (i = 0; i < temp_if->elseif_count; i++) {
-                printf("Else if branch%d:\n", i);
+                printf("Else if branch %d:\n", i);
                 ast_traversal(temp_if->elsif_branches[i]);
             }
         }
