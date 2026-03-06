@@ -307,7 +307,6 @@ if_statement:
 else_if:
 	else_if ELSE IF LPAREN expression RPAREN tail
 	{
-		printf("additional else if");
 		$$.elsifs = (AST_Node **) realloc($1.elsifs, ($1.elseif_count + 1) * sizeof(AST_Node *));
 		$$.elsifs[$1.elseif_count] = new_ast_elsif_node($5, $7);
 		$$.elseif_count = $1.elseif_count + 1;
@@ -315,7 +314,6 @@ else_if:
 	}
 	| ELSE IF LPAREN expression RPAREN tail
 	{	
-		printf("first else if");
 		$$.elsifs = (AST_Node **) malloc(1 * sizeof(AST_Node *));
 		$$.elsifs[0] = new_ast_elsif_node($4, $6);
 		$$.elseif_count = 1;
