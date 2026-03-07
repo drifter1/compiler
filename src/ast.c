@@ -63,6 +63,22 @@ AST_Node *new_ast_decl_node(int data_type, list_t **names, int names_count) {
     v->names = names;
     v->names_count = names_count;
 
+    // declare types of the names
+    for (int i = 0; i < names_count; i++) {
+        // variable
+        if (v->names[i]->st_type == UNDEF) {
+            set_type(v->names[i]->st_name, data_type, UNDEF);
+        }
+        // pointer
+        else if (v->names[i]->st_type == POINTER_TYPE) {
+            set_type(v->names[i]->st_name, POINTER_TYPE, data_type);
+        }
+        // array
+        else if (v->names[i]->st_type == ARRAY_TYPE) {
+            set_type(v->names[i]->st_name, ARRAY_TYPE, data_type);
+        }
+    }
+
     // return type-casted result
     return (struct AST_Node *)v;
 }
