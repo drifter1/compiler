@@ -3,9 +3,6 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "../include/compiler.h"
-
-    // for functions
-	AST_Node_Func_Decl *temp_function;
 %}
 
 /* YYSTYPE union */
@@ -27,6 +24,9 @@
 
 	// for else if
 	_else_if else_if_helper;
+
+	// for function head
+	_function_head function_head_helper;
 
 	// for function tail
 	_function_tail function_tail_helper;
@@ -79,6 +79,7 @@
 %type <node> optional_else
 %type <node> for_statement while_statement
 %type <node> functions_optional functions function
+%type <function_head_helper> function_head
 %type <node> parameters_optional parameters
 %type <par>  parameter
 %type <node> return_type
@@ -634,63 +635,38 @@ functions:
 
 
 function: { incr_scope(); } function_head function_tail
-    { 
-		temp_function->declarations = $3.declarations; 
-		temp_function->statements = $3.statements;
-		temp_function->return_node = $3.return_node;
-
+    { 	
+		AST_Node_Func_Decl *temp_func_decl;
+		temp_func_decl = (AST_Node_Func_Decl*) new_ast_func_decl_node($2.ret_type,
+				$2.entry, $2.decl_params, $3.declarations, $3.statements, $3.return_node);
+		
 		/* perform revisit */
-		revisit(temp_function->entry->st_name);
+		revisit(temp_func_decl->entry->st_name);
 
         hide_scope();
-        $$ = (AST_Node *) temp_function;
+
+		$$ = (AST_Node *) temp_func_decl;
     } 
 ;
 
-function_head: { function_decl = 1; } return_type ID LPAREN
+function_head: { function_decl = 1; } return_type ID LPAREN parameters_optional RPAREN
 	{ 
 		function_decl = 0;
-		
-		AST_Node_Ret_Type *temp = (AST_Node_Ret_Type *) $2;
-		temp_function = (AST_Node_Func_Decl *) new_ast_func_decl_node(temp->ret_type, temp->pointer, $3);
-		temp_function->entry->st_type = FUNCTION_TYPE;
-		temp_function->entry->inf_type = temp->ret_type;
-	}
-	parameters_optional RPAREN
-	{
-		if($6 != NULL){
-			AST_Node_Decl_Params *temp = (AST_Node_Decl_Params *) $6;
-			
-			temp_function->entry->parameters = temp->parameters;
-			temp_function->entry->num_of_pars = temp->num_of_pars;
-		}
-		else{
-			temp_function->entry->parameters = NULL;
-			temp_function->entry->num_of_pars = 0;
-		}		
+
+		$$.ret_type = $2;
+		$$.entry = $3;
+		$$.decl_params = $5;
 	}
 ;
 
 return_type:
-	type
-	{
-		$$ = new_ast_ret_type_node($1, 0);
-	}
-	| type pointer
-	{
-		$$ = new_ast_ret_type_node($1, 1);
-	}
+	type { $$ = new_ast_ret_type_node($1, 0); }
+	| type pointer { $$ = new_ast_ret_type_node($1, 1);	}
 ;
 
 parameters_optional: 
-	parameters
-	{
-		$$ = $1;
-	}
-	| /* empty */
-	{
-		$$ = NULL;
-	}
+	parameters { $$ = $1; }
+	| /* empty */ { $$ = NULL; }
 ;
 
 parameters: 
@@ -744,7 +720,7 @@ statements_optional:
 ;
 
 return_optional:
-	RETURN expression SEMI { $$ = new_ast_return_node(temp_function->ret_type, $2); }
+	RETURN expression SEMI { $$ = new_ast_return_node(UNDEF, $2); }
 	| /* empty */ { $$ = NULL; }
 ;
 

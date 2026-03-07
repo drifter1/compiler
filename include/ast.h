@@ -393,7 +393,9 @@ AST_Node *new_ast_ref_node(list_t *entry, int ref);
 /* Functions */
 AST_Node *new_func_declarations_node(AST_Node *func_declarations,
                                      AST_Node *func_declaration);
-AST_Node *new_ast_func_decl_node(int ret_type, int pointer, list_t *entry);
+AST_Node *new_ast_func_decl_node(AST_Node *ret_type, list_t *entry,
+                                 AST_Node *decl_params, AST_Node *declarations,
+                                 AST_Node *statements, AST_Node *return_node);
 AST_Node *new_ast_ret_type_node(int ret_type,
                                 int pointer); // function return type
 AST_Node *new_ast_decl_params_node(Param *parameters, int num_of_pars,

@@ -21,6 +21,13 @@ typedef struct _else_if {
     int elseif_count;
 } _else_if;
 
+// helper for the function_head rule
+typedef struct _function_head {
+    AST_Node *ret_type;
+    list_t *entry;
+    AST_Node *decl_params;
+} _function_head;
+
 // helper for the function_tail rule
 typedef struct _function_tail {
     AST_Node *declarations;
