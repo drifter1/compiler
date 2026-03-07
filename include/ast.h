@@ -400,8 +400,7 @@ AST_Node *new_ast_ret_type_node(int ret_type,
                                 int pointer); // function return type
 AST_Node *new_ast_decl_params_node(Param *parameters, int num_of_pars,
                                    Param param);
-AST_Node *new_ast_return_node(int ret_type,
-                              AST_Node *ret_val); // function return
+AST_Node *new_ast_return_node(AST_Node *ret_val); // function return
 
 /* Tree Traversal */
 void ast_print_node(AST_Node *node); // print information of node

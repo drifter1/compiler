@@ -434,10 +434,7 @@ AST_Node *new_ast_func_decl_node(AST_Node *ret_type, list_t *entry,
 
     v->declarations = declarations;
     v->statements = statements;
-
-    AST_Node_Return *temp_return_node = (AST_Node_Return *)return_node;
-    temp_return_node->ret_type = v->ret_type;
-    v->return_node = (AST_Node *)temp_return_node;
+    v->return_node = return_node;
 
     // return type-casted result
     return (struct AST_Node *)v;
@@ -486,13 +483,13 @@ AST_Node *new_ast_decl_params_node(Param *parameters, int num_of_pars,
     return (struct AST_Node *)v;
 }
 
-AST_Node *new_ast_return_node(int ret_type, AST_Node *ret_val) {
+AST_Node *new_ast_return_node(AST_Node *ret_val) {
     // allocate memory
     AST_Node_Return *v = malloc(sizeof(AST_Node_Return));
 
     // set entries
     v->type = RETURN_NODE;
-    v->ret_type = ret_type;
+    v->ret_type = expression_data_type(ret_val);
     v->ret_val = ret_val;
 
     // return type-casted result

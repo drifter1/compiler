@@ -720,7 +720,7 @@ statements_optional:
 ;
 
 return_optional:
-	RETURN expression SEMI { $$ = new_ast_return_node(UNDEF, $2); }
+	RETURN expression SEMI { $$ = new_ast_return_node($2); }
 	| /* empty */ { $$ = NULL; }
 ;
 
