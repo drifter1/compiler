@@ -21,4 +21,11 @@ typedef struct _else_if {
     int elseif_count;
 } _else_if;
 
+// helper for the function_tail rule
+typedef struct _function_tail {
+    AST_Node *declarations;
+    AST_Node *statements;
+    AST_Node *return_node;
+} _function_tail;
+
 #endif /* PARSER_H */

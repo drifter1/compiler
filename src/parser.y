@@ -28,6 +28,9 @@
 	// for else if
 	_else_if else_if_helper;
 
+	// for function tail
+	_function_tail function_tail_helper;
+
     // for parameters
 	Param par;
 }
@@ -80,6 +83,8 @@
 %type <par>  parameter
 %type <node> return_type
 %type <node> function_call call_params call_param
+%type <function_tail_helper> function_tail
+%type <node> declarations_optional statements_optional return_optional
 
 %start program
 
@@ -630,6 +635,10 @@ functions:
 
 function: { incr_scope(); } function_head function_tail
     { 
+		temp_function->declarations = $3.declarations; 
+		temp_function->statements = $3.statements;
+		temp_function->return_node = $3.return_node;
+
 		/* perform revisit */
 		revisit(temp_function->entry->st_name);
 
@@ -716,40 +725,27 @@ parameter : { declare = 1; } type variable
     }
 ;
 
-function_tail: LBRACE declarations_optional statements_optional return_optional RBRACE ;
+function_tail: LBRACE declarations_optional statements_optional return_optional RBRACE 
+	{
+		$$.declarations = $2; 
+		$$.statements = $3;
+		$$.return_node = $4;
+	}
+;
 
-declarations_optional: 
-	declarations 
-	{
-		temp_function->declarations = $1;
-	}
-	| /* empty */
-	{
-		temp_function->declarations = NULL;
-	}
+declarations_optional:
+	declarations { $$ = $1;}
+	| /* empty */ {	$$ = NULL; }
 ;
 
 statements_optional: 
-	statements
-	{
-		temp_function->statements = $1;
-	} 
-	| /* empty */
-	{
-		temp_function->statements = NULL;
-	}
+	statements { $$ = $1; } 
+	| /* empty */ { $$ = NULL; }
 ;
 
-
 return_optional:
-	RETURN expression SEMI
-	{
-		temp_function->return_node = new_ast_return_node(temp_function->ret_type, $2);
-	}
-	| /* empty */
-	{
-		temp_function->return_node = NULL;
-	}
+	RETURN expression SEMI { $$ = new_ast_return_node(temp_function->ret_type, $2); }
+	| /* empty */ { $$ = NULL; }
 ;
 
 %%
