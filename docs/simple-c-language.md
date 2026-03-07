@@ -6,18 +6,18 @@ The language Simple C is similar to the high-level programming language [C](http
 
 ### Keywords
 
-- `char` or `CHAR` -> to define char datatype
-- `int` or `INT` -> to define int datatype
-- `float` or `FLOAT` -> to define float datatype
-- `double` or `DOUBLE` -> to define double datatype
-- `if` or `IF` -> for conditional statement declaration
-- `else` or `ELSE` -> else condition
-- `while` or `WHILE` -> while loop declaration
-- `for` or `FOR` -> for loop declaration
-- `continue` or `CONTINUE` -> to get to the next iteration of a loop
-- `break` or `BREAK` -> to break out of a loop
-- `void` or `VOID` -> to declare void datatype or function that doesn't return
-- `return` or `RETURN` -> return to function that called (maybe even with return-value) or to the operating system
+- `char` -> to define char datatype
+- `int` -> to define int datatype
+- `float` -> to define float datatype
+- `double` -> to define double datatype
+- `if` -> for conditional statement declaration
+- `else` -> else condition
+- `while` -> while loop declaration
+- `for` -> for loop declaration
+- `continue` -> to get to the next iteration of a loop
+- `break` -> to break out of a loop
+- `void` -> to declare void datatype or function that doesn't return
+- `return` -> return to function that called (maybe even with return-value) or to the operating system
 
 ### Operators
 
@@ -42,13 +42,21 @@ The language Simple C is similar to the high-level programming language [C](http
 - `>=` -> greater equal (**RELOP** of type *GREATER_EQUAL*)
 - `<=` -> less equal (**RELOP** of type *LESS_EQUAL*)
 
-### Identifiers, Constants and Strings
+### Identifiers
 
-- Identifier (**ID**) 
-- Integer constant (**ICONST**)
-- Floating point constant (**FCONST**)
-- Printable ASCII character within single quotes `'` (**CCONST**)
-- Printable ASCII character within double quotes `"` (**STRING**)
+A valid identifier (**ID**) must start with at least one alphabetical letter and may be followed by any number of letters or digits.
+
+### Constants
+
+An integer constant (**ICONST**) is either the literal 0 or a sequence of digits that does not begin with 0.
+
+A floating-point constant (**FCONST**) is either the literal 0, or a number with a decimal point and at least one digit after it. It may have zero or more digits before the decimal point.
+
+A character constant (**CCONST**) is either a single printable ASCII character or one of the common escape sequences (e.g. `\n`, `\f`, `\t`, `\r`, `\b`, `\v`) enclosed in single quotes `'`,
+
+### String
+
+A string (**STRING**) is a sequence of zero or more printable ASCII characters enclosed within double quotes `"`.
 
 ### Other Tokens
 
