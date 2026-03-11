@@ -15,7 +15,7 @@ print				[ -~]
 
 ID 					{alpha}{alnum}*
 ICONST				"0"|{nzdigit}{digit}*
-FCONST				"0"|{digit}*"."{digit}+
+FCONST				(("0"|{nzdigit}{digit}*)?"."{digit}+)|({nzdigit}{digit}*".")
 CCONST				(\'{print}\')|(\'\\[nftrbv]\')
 STRING				\"{print}*\"
 
