@@ -19,8 +19,11 @@ FCONST				(("0"|{nzdigit}{digit}*)?"."{digit}+)|({nzdigit}{digit}*".")
 CCONST				(\'{print}\')|(\'\\[nftrbv]\')
 STRING				\"{print}*\"
 
+WHITESPACE			[ \t\r\f]+
+
 %%
 
+ /* Comments */
 "//".*				{ 
 						/* single-line comment */
 						if(DEBUG) printf("Eat up comment at line %d\n", yylineno);
@@ -40,20 +43,23 @@ STRING				\"{print}*\"
 <ML_COMMENT>"\n"
 
 
-"char"      		{ return CHAR; }
-"int"				{ return INT; }
-"float"				{ return FLOAT; }
-"double"			{ return DOUBLE; }
-"if"				{ return IF; }
-"else"				{ return ELSE; }
-"while"				{ return WHILE; }
-"for"				{ return FOR; }
-"continue"			{ return CONTINUE; }
+ /* Keywords */
 "break"				{ return BREAK; }
-"void"				{ return VOID; }
+"char"      		{ return CHAR; }
+"continue"			{ return CONTINUE; }
+"double"			{ return DOUBLE; }
+"else"				{ return ELSE; }
+"float"				{ return FLOAT; }
+"for"				{ return FOR; }
+"if"				{ return IF; }
+"int"				{ return INT; }
 "return"			{ return RETURN; }
+"void"				{ return VOID; }
+"while"				{ return WHILE; }
 
 
+ /* Operators */
+"="					{ return ASSIGN; }
 "+"					{ yylval.val.ival = ADD; return ADDOP; }
 "-"					{ yylval.val.ival = SUB; return ADDOP; }
 "*"					{ return MULOP; }
@@ -69,8 +75,10 @@ STRING				\"{print}*\"
 "<"					{ yylval.val.ival = LESS; return RELOP; }
 ">="				{ yylval.val.ival = GREATER_EQUAL; return RELOP; }
 "<="				{ yylval.val.ival = LESS_EQUAL; return RELOP; }
+"&"					{ return REFER; }
 
 
+ /* Other tokens */
 "("					{ return LPAREN; }
 ")"					{ return RPAREN; }
 "["					{ return LBRACK; }
@@ -79,10 +87,9 @@ STRING				\"{print}*\"
 "}"					{ return RBRACE; }
 ";"					{ return SEMI; }
 ","					{ return COMMA; }
-"="					{ return ASSIGN; }
-"&"					{ return REFER; }
 
 
+ /* Identifiers, Constants, Strings */
 {ID} 				{
 						// insert identifier into symbol table
 						insert(yytext, strlen(yytext), UNDEF, yylineno);
@@ -98,9 +105,13 @@ STRING				\"{print}*\"
 					}
 
 
-[ \t\r\f]+			/* eat up whitespace */
-"\n"			
+ /* Whitespace, Newline and EOF */
+{WHITESPACE}		{}
+"\n"				{}
 "<<EOF>>"			{ return 0; }
+
+
+ /* Unrecognized tokens - Error */
 .					{
 						fprintf(stderr, "Lexical error at line %d. Unrecognized Token: \"%s\"\n",
 									yylineno, yytext);
