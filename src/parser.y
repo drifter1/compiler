@@ -59,7 +59,7 @@
 %left ADDOP
 %left MULOP DIVOP
 %right NOTOP INCDEC REFER MINUS
-%left LPAREN RPAREN LBRACK RBRACK
+%left LPAREN RPAREN LBRACK RBRACK SUFFIX
 
 /* rule (non-terminal) definitions */
 %type <node> program
@@ -362,7 +362,7 @@ expression:
 	{
 		$$ = new_ast_arithm_node(DIV, $1, $3);
 	}
-	| ID INCDEC
+	| ID INCDEC %prec SUFFIX
 	{
 		/* increment */
 		if($2.ival == INC){
