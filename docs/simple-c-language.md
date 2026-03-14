@@ -6,41 +6,52 @@ The language Simple C is similar to the high-level programming language [C](http
 
 ### Keywords
 
-- `char` -> to define char datatype
-- `int` -> to define int datatype
-- `float` -> to define float datatype
-- `double` -> to define double datatype
-- `if` -> for conditional statement declaration
-- `else` -> else condition
-- `while` -> while loop declaration
-- `for` -> for loop declaration
-- `continue` -> to get to the next iteration of a loop
-- `break` -> to break out of a loop
-- `void` -> to declare void datatype or function that doesn't return
-- `return` -> return to function that called (maybe even with return-value) or to the operating system
+|  Keyword   |               Usage                |
+| :--------: | :--------------------------------: |
+| `break`    | Declaration of break statement     |
+| `char`     | Type specifier for character types |
+| `continue` | Declaration of continue statement  |
+| `double`   | Type specifier for double types    |
+| `else`     | Declaration of alternative branch  |
+| `float`    | Type specifier for float types     |
+| `for`      | Declaration of for loop            |
+| `if`       | Declaration of if statement        |
+| `int`      | Type specifier for int types       |
+| `return`   | Declaration of return statement    |
+| `void`     | Type specifier for void types      |
+| `while`    | Declaration of while loop          |
 
 ### Operators
 
-#### Mathematical Operators
-- `+` -> addition (**ADDOP** of type *ADD*)
-- `-` -> subtraction (**ADDOP** of type *SUB*)
-- `*` -> multiplication (**MULOP**)
-- `/` -> division (**DIVOP**)
-- `++` -> increment by 1 (**INCDEC** of type *INC*)
-- `--` -> decrement by 1 (**INCDEC** of type *DEC*)
+#### Assignment Operator
+
+- `=` → assignment (**ASSIGN**)
+
+#### Arithmetic Operators
+- `+` → addition (**ADDOP** of type *ADD*)
+- `-` → subtraction (**ADDOP** of type *SUB*)
+- `*` → multiplication (**MULOP**)
+- `/` → division (**DIVOP**)
+- `++` → increment by 1 (**INCDEC** of type *INC*)
+- `--` → decrement by 1 (**INCDEC** of type *DEC*)
 
 #### Logical Operators
-- `||` -> logical or (**OROP**)
-- `&&` -> logical and (**ANDOP**)
-- `!` -> logical not (**NOTOP**)
+- `||` → logical or (**OROP**)
+- `&&` → logical and (**ANDOP**)
+- `!` → logical not (**NOTOP**)
 
 #### Relational Operators
-- `==` -> equality (**EQUOP** of type *EQUAL*)
-- `!=` -> inequality (**EQUOP** of type *NOT_EQUAL*)
-- `>` -> greater (**RELOP** of type *GREATER*)
-- `<` -> less (**RELOP** of type *LESS*)
-- `>=` -> greater equal (**RELOP** of type *GREATER_EQUAL*)
-- `<=` -> less equal (**RELOP** of type *LESS_EQUAL*)
+- `==` → equality (**EQUOP** of type *EQUAL*)
+- `!=` → inequality (**EQUOP** of type *NOT_EQUAL*)
+- `>` → greater (**RELOP** of type *GREATER*)
+- `<` → less (**RELOP** of type *LESS*)
+- `>=` → greater equal (**RELOP** of type *GREATER_EQUAL*)
+- `<=` → less equal (**RELOP** of type *LESS_EQUAL*)
+
+#### Other Operators
+
+- `*` → pointer dereference (**MULOP** ?)
+- `&` → "*address of*" or reference (**REFER**)
 
 ### Identifiers
 
@@ -48,9 +59,15 @@ A valid identifier (**ID**) must start with at least one alphabetical letter and
 
 ### Constants
 
+#### Integer constant
+
 An integer constant (**ICONST**) is either the literal 0 or a sequence of digits that does not begin with 0.
 
-A floating-point constant (**FCONST**) is either the literal 0, or a number with a decimal point and at least one digit after it. It may have zero or more digits before the decimal point.
+#### Floating-point constant
+
+A floating-point constant (**FCONST**) contains a decimal point, with digits either before and after it, or only before or after it. Before the decimal point, there can be either the literal 0 or a sequence of digits that does not start with 0.
+
+#### Character constant
 
 A character constant (**CCONST**) is either a single printable ASCII character or one of the common escape sequences (e.g. `\n`, `\f`, `\t`, `\r`, `\b`, `\v`) enclosed in single quotes `'`,
 
@@ -60,19 +77,17 @@ A string (**STRING**) is a sequence of zero or more printable ASCII characters e
 
 ### Other Tokens
 
-- `(` and `)` -> parentheses (**LPAREN**, **RPAREN**)
-- `[` and `]` -> brackets (**LBRACK**, **RBRACK**)
-- `{` and `}` -> bracelets (**LBRACE**, **RBRACE**)
-- `;` -> semicolon (**SEMI**)
-- `,` -> comma (**COMMA**)
-- `=` -> assignment (**ASSIGN**)
-- `&` -> reference (**REFER**)
-- `(EOF)` -> end of file
+- `(` and `)` → parentheses (**LPAREN**, **RPAREN**)
+- `[` and `]` → brackets (**LBRACK**, **RBRACK**)
+- `{` and `}` → bracelets (**LBRACE**, **RBRACE**)
+- `;` → semicolon (**SEMI**)
+- `,` → comma (**COMMA**)
+- `(EOF)` → end of file
 
 ### Comments
 
-- `//` -> single-line comment
-- Text between `/*` and `*/` -> multi-line comment
+- `//` → single-line comment
+- Text between `/*` and `*/` → multi-line comment
 
 ## Grammar
 
@@ -162,16 +177,48 @@ A string (**STRING**) is a sequence of zero or more printable ASCII characters e
 
 ## Semantics
 
-### Data Types
+### Basic Data Types
 
-### Declarations
+- `int` type → for integer numbers
+- `float` type → for single precision floating-point numbers
+- `double` type → for double precision floating-point numbers
+- `char` type → for characters
+- `void` type → for incomplete types
 
-### Initializations
+### Variable Declarations
+
+Variables are declared with a specific type and an identifier (ID) that represents them.
+
+### Variable Initializations
+
+Variables may be initialised during declaration by assigning a constant value to them.
 
 ### Function Declarations
 
+Functions are declared with a specific return type and an identifier (ID) that represents them. Optional parameters may be included in the parentheses.
+
 ### Expressions
+
+An expression may contain binary operations (arithmetic, logical, relational), unary operations (increment/decrement, logical NOT, unary plus/minus on constants), parenthesised sub‑expressions, variable references, constants, and non-void function calls.
 
 ### Precedencies and Associativities
 
+|          Operator         |                            Description                           | Associativity |
+| :-----------------------: | :--------------------------------------------------------------: | :-----------: |
+| `,`                       | Comma                                                            | Left-to-right |
+| `=`                       | Assignment                                                       | Right-to-left |
+| `\|\|`                    | Logical OR                                                       | Left-to-right |
+| `&&`                      | Logical AND                                                      | Left-to-right |
+| `==`, `!=`                | Equality/Inequality operators                                    | Left-to-right |
+| `<`, `<=`, `>`, `>=`      | Relational operators                                             | Left-to-right |
+| `+`, `-`                  | Addition and subtraction                                         | Left-to-right |
+| `*`, `/`                  | Multiplication and division                                      | Left-to-right |
+| `!`, `&`, `++`, `--`, `-` | Logical NOT, Address-of, prefix increment/decrement, unary minus | Right-to-left |
+| `()`, `[]`, `++`, `--`    | Function call, Array subscript, suffix increment/decrement       | Left-to-right |
+
+> [!NOTE]
+> The above table is arranged in ascending order of precedence, in line with how operator precedence is declared in Bison or Yacc.
+
 ### Statements
+
+ In this language, a statement can be one of the following: a conditional, a loop, an assignment, a control-flow keyword (continue/break), a function call, or an increment/decrement operation. Most of the above are terminated with a semicolon (`;`), except for control structures that contain nested statements within bracelets (`{}`).
