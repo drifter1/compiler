@@ -16,7 +16,6 @@
 	list_node* list_node;
 
     // for declarations
-	_names names_helper;
 	int data_type;
 	
 	// for arrays
@@ -64,7 +63,7 @@
 %type <ast_node> program
 %type <ast_node> declarations declaration
 %type <data_type> type
-%type <names_helper> names
+%type <list_node> names
 %type <symtab_item> variable
 %type <array_size> array
 %type <symtab_item> init var_init array_init
@@ -102,7 +101,7 @@ declarations:
 ;
 
 declaration:
-	type { declare = 1; } names { declare = 0; } SEMI { $$ = new_ast_decl_node($1, $3.names, $3.names_count); }
+	type { declare = 1; } names { declare = 0; } SEMI { $$ = new_ast_decl_node($1, $3, list_length($3)); }
 ;
 
 type: INT  		{ $$ = INT_TYPE;   }
@@ -112,30 +111,10 @@ type: INT  		{ $$ = INT_TYPE;   }
 	| VOID 		{ $$ = VOID_TYPE;  }
 ;
 
-names: names COMMA variable
-	{
-		$$.names = (list_t **) realloc($1.names, ($1.names_count + 1) * sizeof(list_t *));
-		$$.names[$1.names_count] = $3;
-		$$.names_count = $1.names_count + 1;
-	}
-	| names COMMA init
-	{
-		$$.names = (list_t **) realloc($1.names, ($1.names_count + 1) * sizeof(list_t *));
-		$$.names[$1.names_count] = $3;
-		$$.names_count = $1.names_count + 1;
-	}
-	| variable
-	{
-		$$.names = (list_t **) malloc(1 * sizeof(list_t *));
-		$$.names[0] = $1;
-		$$.names_count = 1;
-	}
-	| init
-	{ 
-		$$.names = (list_t **) malloc(1 * sizeof(list_t *));
-		$$.names[0] = $1;
-		$$.names_count = 1;
-	}
+names: names COMMA variable { $$ = list_add($1, $3);	}
+	| names COMMA init 		{ $$ = list_add($1, $3);	}
+	| variable 				{ $$ = list_add(NULL, $1);	}
+	| init 					{ $$ = list_add(NULL, $1);	}
 ;
 
 variable: 

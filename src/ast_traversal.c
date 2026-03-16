@@ -5,7 +5,6 @@
 /* Tree Traversal */
 
 void ast_print_node(AST_Node *node) {
-    int i;
     /* temp nodes */
     AST_Node_Declarations *temp_declarations;
     AST_Node_Decl *temp_decl;
@@ -43,8 +42,13 @@ void ast_print_node(AST_Node *node) {
         printf("Declaration Node of data-type %d for %d names\n",
                temp_decl->data_type, temp_decl->names_count);
         printf("Names:\n");
-        for (i = 0; i < temp_decl->names_count; i++) {
-            printf("%s\n", temp_decl->names[i]->st_name);
+        list_node *temp_head;
+        list_t *temp_entry;
+        temp_head = temp_decl->names;
+        while (temp_head != NULL) {
+            temp_entry = (list_t *)temp_head->data;
+            printf("%s\n", temp_entry->st_name);
+            temp_head = temp_head->next;
         }
         break;
     case CONST_NODE:
@@ -232,7 +236,7 @@ void ast_traversal(AST_Node *node) {
 
         if (temp_if->elseif_count > 0) {
             printf("Else if branches:\n");
-            struct list_node *temp_head;
+            list_node *temp_head;
             temp_head = temp_if->elsif_branches;
             i = 0;
             while (temp_head != NULL) {

@@ -53,7 +53,7 @@ AST_Node *new_declarations_node(AST_Node *declarations, AST_Node *declaration) {
     return (struct AST_Node *)v;
 }
 
-AST_Node *new_ast_decl_node(int data_type, list_t **names, int names_count) {
+AST_Node *new_ast_decl_node(int data_type, list_node *names, int names_count) {
     // allocate memory
     AST_Node_Decl *v = malloc(sizeof(AST_Node_Decl));
 
@@ -64,19 +64,27 @@ AST_Node *new_ast_decl_node(int data_type, list_t **names, int names_count) {
     v->names_count = names_count;
 
     // declare types of the names
-    for (int i = 0; i < names_count; i++) {
+    list_node *temp_head;
+    list_t *temp_entry;
+
+    temp_head = v->names;
+    while (temp_head != NULL) {
+        temp_entry = (list_t *)temp_head->data;
+
         // variable
-        if (v->names[i]->st_type == UNDEF) {
-            set_type(v->names[i]->st_name, data_type, UNDEF);
+        if (temp_entry->st_type == UNDEF) {
+            set_type(temp_entry->st_name, data_type, UNDEF);
         }
         // pointer
-        else if (v->names[i]->st_type == POINTER_TYPE) {
-            set_type(v->names[i]->st_name, POINTER_TYPE, data_type);
+        else if (temp_entry->st_type == POINTER_TYPE) {
+            set_type(temp_entry->st_name, POINTER_TYPE, data_type);
         }
         // array
-        else if (v->names[i]->st_type == ARRAY_TYPE) {
-            set_type(v->names[i]->st_name, ARRAY_TYPE, data_type);
+        else if (temp_entry->st_type == ARRAY_TYPE) {
+            set_type(temp_entry->st_name, ARRAY_TYPE, data_type);
         }
+
+        temp_head = temp_head->next;
     }
 
     // return type-casted result

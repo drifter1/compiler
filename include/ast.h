@@ -100,7 +100,7 @@ typedef struct AST_Node_Decl {
     int data_type;
 
     // symbol table entries of the variables
-    list_t **names;
+    list_node *names;
     int names_count;
 } AST_Node_Decl;
 
@@ -361,7 +361,7 @@ AST_Node *new_program_node(AST_Node *declarations, AST_Node *statements,
 
 /* Declarations */
 AST_Node *new_declarations_node(AST_Node *declarations, AST_Node *declaration);
-AST_Node *new_ast_decl_node(int data_type, list_t **names,
+AST_Node *new_ast_decl_node(int data_type, list_node *names,
                             int names_count);            // declaration
 AST_Node *new_ast_const_node(int const_type, Value val); // constant
 
