@@ -10,7 +10,7 @@ typedef struct list_node {
 
 /* ------------------------FUNCTIONS----------------------- */
 
-void list_add(list_node *head, void *element);
+list_node *list_add(list_node *head, void *element);
 void list_free(list_node *head);
 int list_length(list_node *head);
 
