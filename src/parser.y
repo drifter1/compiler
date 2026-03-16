@@ -95,22 +95,24 @@ program:
 
 /* declarations */
 declarations: 
-	declarations declaration { $$ = new_declarations_node($1, $2); }
-	| declaration { $$ = new_declarations_node(NULL, $1); }
+	  declarations declaration		{ $$ = new_declarations_node($1, $2); 	}
+	| declaration					{ $$ = new_declarations_node(NULL, $1);	}
 ;
 
 declaration:
 	type { declare = 1; } names { declare = 0; } SEMI { $$ = new_ast_decl_node($1, $3, list_length($3)); }
 ;
 
-type: INT  		{ $$ = INT_TYPE;   }
+type: 
+	  INT		{ $$ = INT_TYPE;   }
 	| CHAR 		{ $$ = CHAR_TYPE;  }
 	| FLOAT 	{ $$ = REAL_TYPE;  }
 	| DOUBLE 	{ $$ = REAL_TYPE;  }
 	| VOID 		{ $$ = VOID_TYPE;  }
 ;
 
-names: names COMMA variable { $$ = list_add($1, $3);	}
+names:
+	  names COMMA variable	{ $$ = list_add($1, $3);	}
 	| names COMMA init 		{ $$ = list_add($1, $3);	}
 	| variable 				{ $$ = list_add(NULL, $1);	}
 	| init 					{ $$ = list_add(NULL, $1);	}
@@ -160,11 +162,12 @@ array: /* for now only one-dimensional arrays */
 ;
 
 init:
-	var_init { $$ = $1; }
-	| array_init { $$ = $1; }
+	  var_init		{ $$ = $1; }
+	| array_init	{ $$ = $1; }
 ; 
 
-var_init : ID ASSIGN constant
+var_init:
+	ID ASSIGN constant
     { 
         AST_Node_Const *temp = (AST_Node_Const*) $3;
         $1->val = temp->val;
@@ -173,7 +176,8 @@ var_init : ID ASSIGN constant
     }
 ;
 
-array_init: ID array ASSIGN LBRACE values RBRACE
+array_init:
+	ID array ASSIGN LBRACE values RBRACE
     {
         if($2 != list_length($5)){
 			fprintf(stderr, "Semantic error at line %d. Array init doesn't contain the right amount of values\n", yylineno);
@@ -185,15 +189,16 @@ array_init: ID array ASSIGN LBRACE values RBRACE
     }
 ;
 
-values: values COMMA constant 	{ $$ = list_add($1, $3); 	}
+values:
+	  values COMMA constant		{ $$ = list_add($1, $3); 	}
 	| constant 					{ $$ = list_add(NULL, $1); 	}
 ;
 
 
 /* statements */
 statements:
-	statements statement { $$ = new_statements_node($1, $2); }
-	| statement { $$ = new_statements_node(NULL, $1); }
+	  statements statement 	{ $$ = new_statements_node($1, $2); 	}
+	| statement				{ $$ = new_statements_node(NULL, $1); 	}
 ;
 
 statement:
@@ -248,42 +253,23 @@ statement:
 ;
 
 if_statement:
-	IF LPAREN expression RPAREN tail else_if optional_else
-	{
-		$$ = new_ast_if_node($3, $5, $6, list_length($6), $7);
-	}
-	| IF LPAREN expression RPAREN tail optional_else
-	{
-		$$ = new_ast_if_node($3, $5, NULL, 0, $6);
-	}
+	  IF LPAREN expression RPAREN tail else_if optional_else	{ $$ = new_ast_if_node($3, $5, $6, list_length($6), $7); 	}
+	| IF LPAREN expression RPAREN tail optional_else			{ $$ = new_ast_if_node($3, $5, NULL, 0, $6); 				}
 ;
 
 
 else_if:
-	else_if ELSE IF LPAREN expression RPAREN tail
-	{
-		$$ = list_add($1, new_ast_elsif_node($5, $7));
-	}
-	| ELSE IF LPAREN expression RPAREN tail
-	{	
-		$$ = list_add(NULL, new_ast_elsif_node($4, $6));
-	}
+	  else_if ELSE IF LPAREN expression RPAREN tail		{ $$ = list_add($1, new_ast_elsif_node($5, $7)); 	}
+	| ELSE IF LPAREN expression RPAREN tail				{ $$ = list_add(NULL, new_ast_elsif_node($4, $6)); 	}
 ;
 
 optional_else:
-	ELSE tail
-	{
-		/* else exists */
-		$$ = $2;
-	}
-	| /* empty */
-	{
-		/* no else */
-		$$ = NULL;
-	}
+	  ELSE tail		{ /* else exists */ $$ = $2; 	}
+	| /* empty */	{ /* no else 	 */ $$ = NULL;	}
 ;
 
-for_statement: FOR LPAREN assigment SEMI expression SEMI ID INCDEC RPAREN tail
+for_statement:
+	FOR LPAREN assigment SEMI expression SEMI ID INCDEC RPAREN tail
     {
         /* create increment node*/
         AST_Node *incr_node;
@@ -299,16 +285,12 @@ for_statement: FOR LPAREN assigment SEMI expression SEMI ID INCDEC RPAREN tail
     }
 ;
 
-while_statement: WHILE LPAREN expression RPAREN tail
-    {
-        $$ = new_ast_while_node($3, $5);
-    }
+while_statement:
+	WHILE LPAREN expression RPAREN tail		{ $$ = new_ast_while_node($3, $5); }
 ;
 
-tail: LBRACE statements RBRACE
-    { 
-        $$ = $2; /* just pass information */
-    }
+tail:
+	LBRACE statements RBRACE		{ /* just pass information */	$$ = $2; }
 ;
 
 expression:
@@ -411,13 +393,14 @@ expression:
 ;
 
 constant:
-	ICONST   { $$ = new_ast_const_node(INT_TYPE, $1);  }
-	| FCONST { $$ = new_ast_const_node(REAL_TYPE, $1); }
-	| CCONST { $$ = new_ast_const_node(CHAR_TYPE, $1); }
+	  ICONST	{ $$ = new_ast_const_node(INT_TYPE, $1);	}
+	| FCONST	{ $$ = new_ast_const_node(REAL_TYPE, $1);	}
+	| CCONST	{ $$ = new_ast_const_node(CHAR_TYPE, $1);	}
 ;
 
 
-assigment: var_ref ASSIGN expression
+assigment:
+	var_ref ASSIGN expression
 	{
 		AST_Node_Ref *temp = (AST_Node_Ref*) $1;
 		$$ = new_ast_assign_node(temp->entry, temp->ref, $3);
@@ -435,18 +418,14 @@ assigment: var_ref ASSIGN expression
 	}
 ;
 
-var_ref: variable
-	{
-		$$ = new_ast_ref_node($1, 0); /* no reference */
-	}
-	| REFER variable
-	{
-		$$ = new_ast_ref_node($2, 1); /* reference */
-	}
+var_ref:
+	  variable			{ $$ = new_ast_ref_node($1, 0); /* no reference */ 	}
+	| REFER variable	{ $$ = new_ast_ref_node($2, 1); /* reference */ 	}
 ; 
 
 
-function_call: ID LPAREN call_params RPAREN
+function_call:
+	ID LPAREN call_params RPAREN
 	{
 		AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $3;
 		$$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);
@@ -474,29 +453,27 @@ call_params:
 ;
 
 call_param: 
-	call_param COMMA expression { $$ = new_ast_call_params_node($1, $3); }
-	| expression { $$ = new_ast_call_params_node(NULL, $1); }	
+	  call_param COMMA expression		{ $$ = new_ast_call_params_node($1, $3); 	}
+	| expression						{ $$ = new_ast_call_params_node(NULL, $1); 	}	
 ;
 
 /* functions */
 functions_optional: 
-	functions
-	{
-		$$ = $1;
-	}
-	| /* empty */
-	{
-		$$ = NULL;
-	}
+	  functions 		{ $$ = $1;		}
+	| /* empty */ 		{ $$ = NULL;	}
 ;
 
 functions: 
-	functions function { $$ = new_func_declarations_node($1, $2); }
-	| function { $$ = new_func_declarations_node(NULL, $1); }
+	  functions function		{ $$ = new_func_declarations_node($1, $2); 		}
+	| function 					{ $$ = new_func_declarations_node(NULL, $1); 	}
 ;
 
 
-function: { incr_scope(); } function_head function_tail
+function:
+	{
+		incr_scope();
+	}
+	function_head function_tail
     { 	
 		hide_scope();
 
@@ -505,7 +482,11 @@ function: { incr_scope(); } function_head function_tail
     } 
 ;
 
-function_head: { function_decl = 1; } return_type ID LPAREN parameters_optional RPAREN
+function_head:
+	{
+		function_decl = 1;
+	}
+	return_type ID LPAREN parameters_optional RPAREN
 	{ 
 		function_decl = 0;
 
@@ -516,13 +497,13 @@ function_head: { function_decl = 1; } return_type ID LPAREN parameters_optional 
 ;
 
 return_type:
-	type { $$ = new_ast_ret_type_node($1, 0); }
-	| type pointer { $$ = new_ast_ret_type_node($1, 1);	}
+	  type				{ $$ = new_ast_ret_type_node($1, 0);	}
+	| type pointer 		{ $$ = new_ast_ret_type_node($1, 1);	}
 ;
 
 parameters_optional: 
-	parameters { $$ = $1; }
-	| /* empty */ { $$ = NULL; }
+	  parameters		{ $$ = $1; 		}
+	| /* empty */ 		{ $$ = NULL; 	}
 ;
 
 parameters: 
@@ -537,7 +518,11 @@ parameters:
 	}
 ;
 
-parameter : { declare = 1; } type variable
+parameter:
+	{
+		declare = 1;
+	}
+	type variable
     { 
         declare = 0;
         
@@ -557,7 +542,8 @@ parameter : { declare = 1; } type variable
     }
 ;
 
-function_tail: LBRACE declarations_optional statements_optional return_optional RBRACE 
+function_tail:
+	LBRACE declarations_optional statements_optional return_optional RBRACE 
 	{
 		$$.declarations = $2; 
 		$$.statements = $3;
@@ -566,18 +552,18 @@ function_tail: LBRACE declarations_optional statements_optional return_optional 
 ;
 
 declarations_optional:
-	declarations { $$ = $1;}
-	| /* empty */ {	$$ = NULL; }
+	  declarations		{ $$ = $1;		}
+	| /* empty */		{ $$ = NULL; 	}
 ;
 
 statements_optional: 
-	statements { $$ = $1; } 
-	| /* empty */ { $$ = NULL; }
+	  statements		{ $$ = $1; 		} 
+	| /* empty */		{ $$ = NULL; 	}
 ;
 
 return_optional:
-	RETURN expression SEMI { $$ = new_ast_return_node($2); }
-	| /* empty */ { $$ = NULL; }
+	  RETURN expression SEMI	{ $$ = new_ast_return_node($2); }
+	| /* empty */ 				{ $$ = NULL; 					}
 ;
 
 %%
