@@ -1,3 +1,4 @@
+#include "list.h"
 #include "symtab.h"
 
 #ifndef AST_H
@@ -132,7 +133,7 @@ typedef struct AST_Node_If {
     struct AST_Node *if_branch;
 
     // else if branches
-    struct AST_Node **elsif_branches;
+    struct list_node *elsif_branches;
     int elseif_count;
 
     // else branch
@@ -367,7 +368,7 @@ AST_Node *new_ast_const_node(int const_type, Value val); // constant
 /* Statements */
 AST_Node *new_statements_node(AST_Node *statements, AST_Node *statement);
 AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch,
-                          AST_Node **elsif_branches, int elseif_count,
+                          list_node *elsif_branches, int elseif_count,
                           AST_Node *else_branch);
 AST_Node *new_ast_elsif_node(AST_Node *condition, AST_Node *elsif_branch);
 AST_Node *new_ast_for_node(AST_Node *initialize, AST_Node *condition,

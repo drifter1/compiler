@@ -1,4 +1,5 @@
 #include "../include/ast.h"
+#include "../include/list.h"
 #include "../include/parser.h"
 #include "../include/semantics.h"
 #include "../include/symtab.h"

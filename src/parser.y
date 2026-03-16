@@ -12,7 +12,8 @@
 
     // structures
 	list_t* symtab_item;
-    AST_Node* node;
+    AST_Node* ast_node;
+	list_node* list_node;
 
     // for declarations
 	_names names_helper;
@@ -21,9 +22,6 @@
 	// for arrays
 	_values values_helper;
 	int array_size;
-
-	// for else if
-	_else_if else_if_helper;
 
 	// for function head
 	_function_head function_head_helper;
@@ -63,30 +61,30 @@
 %left LPAREN RPAREN LBRACK RBRACK SUFFIX
 
 /* rule (non-terminal) definitions */
-%type <node> program
-%type <node> declarations declaration
+%type <ast_node> program
+%type <ast_node> declarations declaration
 %type <data_type> type
 %type <names_helper> names
 %type <symtab_item> variable
 %type <array_size> array
 %type <symtab_item> init var_init array_init
 %type <values_helper> values
-%type <node> constant
-%type <node> expression var_ref
-%type <node> statement assigment
-%type <node> statements tail
-%type <node> if_statement
-%type <else_if_helper> else_if
-%type <node> optional_else
-%type <node> for_statement while_statement
-%type <node> functions_optional functions function
+%type <ast_node> constant
+%type <ast_node> expression var_ref
+%type <ast_node> statement assigment
+%type <ast_node> statements tail
+%type <ast_node> if_statement
+%type <list_node> else_if
+%type <ast_node> optional_else
+%type <ast_node> for_statement while_statement
+%type <ast_node> functions_optional functions function
 %type <function_head_helper> function_head
-%type <node> parameters_optional parameters
+%type <ast_node> parameters_optional parameters
 %type <par>  parameter
-%type <node> return_type
-%type <node> function_call call_params call_param
+%type <ast_node> return_type
+%type <ast_node> function_call call_params call_param
 %type <function_tail_helper> function_tail
-%type <node> declarations_optional statements_optional return_optional
+%type <ast_node> declarations_optional statements_optional return_optional
 
 %start program
 
@@ -284,7 +282,7 @@ statement:
 if_statement:
 	IF LPAREN expression RPAREN tail else_if optional_else
 	{
-		$$ = new_ast_if_node($3, $5, $6.elsifs, $6.elseif_count, $7);
+		$$ = new_ast_if_node($3, $5, $6, list_length($6), $7);
 	}
 	| IF LPAREN expression RPAREN tail optional_else
 	{
@@ -296,16 +294,11 @@ if_statement:
 else_if:
 	else_if ELSE IF LPAREN expression RPAREN tail
 	{
-		$$.elsifs = (AST_Node **) realloc($1.elsifs, ($1.elseif_count + 1) * sizeof(AST_Node *));
-		$$.elsifs[$1.elseif_count] = new_ast_elsif_node($5, $7);
-		$$.elseif_count = $1.elseif_count + 1;
-
+		$$ = list_add($1, new_ast_elsif_node($5, $7));
 	}
 	| ELSE IF LPAREN expression RPAREN tail
 	{	
-		$$.elsifs = (AST_Node **) malloc(1 * sizeof(AST_Node *));
-		$$.elsifs[0] = new_ast_elsif_node($4, $6);
-		$$.elseif_count = 1;
+		$$ = list_add(NULL, new_ast_elsif_node($4, $6));
 	}
 ;
 

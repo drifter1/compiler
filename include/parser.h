@@ -15,12 +15,6 @@ typedef struct _values {
     int val_count;
 } _values;
 
-// helper for the else_if rule
-typedef struct _else_if {
-    AST_Node **elsifs;
-    int elseif_count;
-} _else_if;
-
 // helper for the function_head rule
 typedef struct _function_head {
     AST_Node *ret_type;
