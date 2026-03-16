@@ -103,7 +103,7 @@ By default, typing `make run` will compile *example1.c* from the *simple_c_examp
 ./bin/compiler examples/simple_c_examples/example1.c
 ```
 
-The execution of the compiler prints out parsing debugging information in the terminal console and also creates the *symtab_dump.out* and *revisit_dump.out* debugging files.
+The execution of the compiler prints out parsing debugging information in the terminal console and also creates debugging files (with *.out* extension).
 
 
 ## Cleaning up the build files and binaries
