@@ -465,44 +465,12 @@ assigment: var_ref ASSIGN expression
 		int type1 = get_type(temp->entry->st_name);
 		int type2 = expression_data_type($3);
 		
-		/* the last function will give us information about revisits */
-		
-		/* contains revisit => add assignment-check to revisit queue */
-		if(cont_revisit == 1){	
-			/* search if entry exists */
-			revisit_queue *q = search_queue(temp->entry->st_name);
-			if(q == NULL){
-				add_to_queue(temp->entry, temp->entry->st_name, ASSIGN_CHECK);
-				q = search_queue(temp->entry->st_name);	
-			}
-			
-			/* setup structures */
-			if(q->num_of_assigns == 0){ /* first node */
-				q->nodes = (void**) malloc(sizeof(void*));
-			}
-			else{ /* general case */
-				q->nodes = (void**) realloc(q->nodes, (q->num_of_assigns + 1) * sizeof(void*));
-			}
-			
-			/* add info of assignment */
-			q->nodes[q->num_of_assigns] = (void*) $3;
-			
-			/* increment number of assignments */
-			q->num_of_assigns++;
-			
-			/* reset revisit flag */
-			cont_revisit = 0;
-			
-			printf("Assignment revisit for %s at line %d\n", temp->entry->st_name, yylineno);
-		}
-		else{ /* no revisit */
-			/* check assignment semantics */
-			get_result_type(
-				type1,       /*  variable datatype  */
-				type2,       /* expression datatype */
-				NONE  /* checking compatibility only (no operator) */
-			);
-		}
+		/* check assignment semantics */
+		get_result_type(
+			type1,       /*  variable datatype  */
+			type2,       /* expression datatype */
+			NONE  /* checking compatibility only (no operator) */
+		);
 	}
 ;
 
@@ -520,57 +488,7 @@ var_ref: variable
 function_call: ID LPAREN call_params RPAREN
 	{
 		AST_Node_Call_Params *temp = (AST_Node_Call_Params*) $3;
-		$$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);	
-		
-		/* add information to revisit queue entry (if one exists) */
-		revisit_queue *q = search_queue($1->st_name);
-		if(q != NULL){
-			/* setup structures */
-			if(q->num_of_calls == 0){ /* first call */
-				q->par_types = (int**) malloc(sizeof(int*));
-				q->num_of_pars = (int*) malloc(sizeof(int));
-			}
-			else{ /* general case */
-				q->par_types = (int**) realloc(q->par_types, (q->num_of_calls + 1) * sizeof(int*));
-				q->num_of_pars = (int*) realloc(q->num_of_pars, (q->num_of_calls + 1) * sizeof(int));
-			}
-			
-			/* add info of function call */
-			q->num_of_pars[q->num_of_calls] = temp->num_of_pars;
-			q->par_types[q->num_of_calls] = (int*) malloc(temp->num_of_pars * sizeof(int));
-			/* get the types of the parameters */
-			int i;
-			for(i = 0; i < temp->num_of_pars; i++){
-				/* get datatype of parameter-expression */
-				q->par_types[q->num_of_calls][i] = expression_data_type(temp->params[i]);
-			}
-			
-			/* increment number of calls */
-			q->num_of_calls++;
-		}
-		else{
-			/* function declared before call */
-			if($1->st_type == FUNCTION_TYPE){
-				/* check number of parameters */
-				if($1->num_of_pars != temp->num_of_pars){
-					fprintf(stderr, "Semantic error at line %d. Function call of %s has wrong number of parameters\n", yylineno, $1->st_name);
-					exit(EXIT_FAILURE);
-				}
-				/* check if parameters are compatible */
-				int i;
-				for(i = 0; i < temp->num_of_pars; i++){
-					/* type of parameter in function declaration */
-					int type_1 = expression_data_type(temp->params[i]);
-					
-					/* type of parameter in function call*/
-					int type_2 = $1->parameters[i].par_type;
-					
-					/* check compatibility for function call */
-					get_result_type(type_1, type_2, NONE);
-					/* error occurs automatically in the function */
-				}
-			}
-		}
+		$$ = new_ast_func_call_node($1, temp->params, temp->num_of_pars);
 	}
 ;
 
@@ -619,16 +537,10 @@ functions:
 
 function: { incr_scope(); } function_head function_tail
     { 	
-		AST_Node_Func_Decl *temp_func_decl;
-		temp_func_decl = (AST_Node_Func_Decl*) new_ast_func_decl_node($2.ret_type,
-				$2.entry, $2.decl_params, $3.declarations, $3.statements, $3.return_node);
-		
-		/* perform revisit */
-		revisit(temp_func_decl->entry->st_name);
+		hide_scope();
 
-        hide_scope();
-
-		$$ = (AST_Node *) temp_func_decl;
+		$$ = new_ast_func_decl_node($2.ret_type, $2.entry, $2.decl_params,
+				$3.declarations, $3.statements, $3.return_node);        
     } 
 ;
 

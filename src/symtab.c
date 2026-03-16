@@ -72,11 +72,8 @@ void insert(char *name, int len, int type, int lineno) {
             l->lines->next = NULL;
             l->next = hash_table[hashval];
             hash_table[hashval] = l;
-            // printf("Inserted %s at line %d to check it again later!\n", name,
-            // lineno);
-
-            /* Adding identifier to the revisit queue */
-            add_to_queue(l, l->st_name, PARAM_CHECK);
+            printf("Inserted %s at line %d to check it again later!\n", name,
+                   lineno);
         }
     }
     /* found in table */

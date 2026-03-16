@@ -18,6 +18,10 @@ int main(int argc, char *argv[]) {
         // initialize symbol table
         init_hash_table();
 
+        /* declare function type of "print" */
+        insert("print", 5, UNDEF, -1);
+        func_declare("print", VOID_TYPE, 1, NULL);
+
         // parsing
         yyparse();
         fclose(yyin);
@@ -29,26 +33,10 @@ int main(int argc, char *argv[]) {
         if (DEBUG)
             ast_traversal(ast);
 
-        /* remove print from revisit queue */
-        remove_print();
-
-        /* perform the remaining checks (assignments) */
-        perform_remaining_checks();
-
-        /* declare function type of "print" */
-        func_declare("print", VOID_TYPE, 1, NULL);
-
         // symbol table dump
         if (DEBUG) {
             yyout = fopen("symtab_dump.out", "w");
             symtab_dump(yyout);
-            fclose(yyout);
-        }
-
-        // revisit queue dump
-        if (DEBUG) {
-            yyout = fopen("revisit_dump.out", "w");
-            revisit_dump(yyout);
             fclose(yyout);
         }
 
