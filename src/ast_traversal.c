@@ -23,7 +23,6 @@ void ast_print_node(AST_Node *node) {
     AST_Node_Equ *temp_equ;
     AST_Node_Ref *temp_ref;
     AST_Node_Func_Declarations *temp_func_declarations;
-    AST_Node_Func_Decl *temp_func_decl;
     AST_Node_Ret_Type *temp_ret_type;
     AST_Node_Decl_Params *temp_decl_params;
     AST_Node_Return *temp_return;
@@ -146,11 +145,7 @@ void ast_print_node(AST_Node *node) {
                temp_func_declarations->func_declaration_count);
         break;
     case FUNC_DECL:
-        temp_func_decl = (struct AST_Node_Func_Decl *)node;
-        printf("Function Declaration Node of %s with ret_type %d and %d "
-               "parameters\n",
-               temp_func_decl->entry->st_name, temp_func_decl->ret_type,
-               temp_func_decl->entry->num_of_pars);
+        printf("Function Declaration Node\n");
         break;
     case RET_TYPE:
         temp_ret_type = (struct AST_Node_Ret_Type *)node;
@@ -320,27 +315,44 @@ void ast_traversal(AST_Node *node) {
     }
     /* function declaration case */
     else if (node->type == FUNC_DECL) {
-        AST_Node_Func_Decl *temp_func_decl = (struct AST_Node_Func_Decl *)node;
         ast_print_node(node);
-        if (temp_func_decl->entry->num_of_pars != 0) {
+        AST_Node_Func_Decl *temp_func_decl = (struct AST_Node_Func_Decl *)node;
+        ast_traversal(temp_func_decl->func_head);
+        ast_traversal(temp_func_decl->func_tail);
+    }
+    /* function head case */
+    else if (node->type == FUNC_DECL_HEAD) {
+        AST_Node_Func_Head *temp_func_head = (struct AST_Node_Func_Head *)node;
+
+        printf("Function has name %s, ret_type %d and %d "
+               "parameters\n",
+               temp_func_head->entry->st_name, temp_func_head->ret_type,
+               temp_func_head->entry->num_of_pars);
+
+        if (temp_func_head->entry->num_of_pars != 0) {
             printf("Parameters:\n");
-            for (i = 0; i < temp_func_decl->entry->num_of_pars; i++) {
+            for (i = 0; i < temp_func_head->entry->num_of_pars; i++) {
                 printf("Parameter %s of type %d\n",
-                       temp_func_decl->entry->parameters[i].param_name,
-                       temp_func_decl->entry->parameters[i].par_type);
+                       temp_func_head->entry->parameters[i].param_name,
+                       temp_func_head->entry->parameters[i].par_type);
             }
         }
-        if (temp_func_decl->declarations != NULL) {
+    }
+    /* function tail case */
+    else if (node->type == FUNC_DECL_TAIL) {
+        AST_Node_Func_Tail *temp_func_tail = (struct AST_Node_Func_Tail *)node;
+
+        if (temp_func_tail->declarations != NULL) {
             printf("Function declarations:\n");
-            ast_traversal(temp_func_decl->declarations);
+            ast_traversal(temp_func_tail->declarations);
         }
-        if (temp_func_decl->statements != NULL) {
+        if (temp_func_tail->statements != NULL) {
             printf("Function statements:\n");
-            ast_traversal(temp_func_decl->statements);
+            ast_traversal(temp_func_tail->statements);
         }
-        if (temp_func_decl->return_node != NULL) {
+        if (temp_func_tail->return_node != NULL) {
             printf("Return node:\n");
-            ast_traversal(temp_func_decl->return_node);
+            ast_traversal(temp_func_tail->return_node);
         }
     }
     /* parameter declarations case */

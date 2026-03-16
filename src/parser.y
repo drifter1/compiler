@@ -21,12 +21,6 @@
 	// for arrays
 	int array_size;
 
-	// for function head
-	_function_head function_head_helper;
-
-	// for function tail
-	_function_tail function_tail_helper;
-
     // for parameters
 	Param par;
 }
@@ -76,12 +70,12 @@
 %type <ast_node> optional_else
 %type <ast_node> for_statement while_statement
 %type <ast_node> functions_optional functions function
-%type <function_head_helper> function_head
+%type <ast_node> function_head
 %type <ast_node> parameters_optional parameters
 %type <par>  parameter
 %type <ast_node> return_type
 %type <ast_node> function_call call_params call_param
-%type <function_tail_helper> function_tail
+%type <ast_node> function_tail
 %type <ast_node> declarations_optional statements_optional return_optional
 
 %start program
@@ -477,8 +471,7 @@ function:
     { 	
 		hide_scope();
 
-		$$ = new_ast_func_decl_node($2.ret_type, $2.entry, $2.decl_params,
-				$3.declarations, $3.statements, $3.return_node);        
+		$$ = new_ast_func_decl_node($2, $3);        
     } 
 ;
 
@@ -489,10 +482,8 @@ function_head:
 	return_type ID LPAREN parameters_optional RPAREN
 	{ 
 		function_decl = 0;
-
-		$$.ret_type = $2;
-		$$.entry = $3;
-		$$.decl_params = $5;
+		
+		$$ = new_ast_func_head_node($2, $3, $5);
 	}
 ;
 
@@ -543,12 +534,7 @@ parameter:
 ;
 
 function_tail:
-	LBRACE declarations_optional statements_optional return_optional RBRACE 
-	{
-		$$.declarations = $2; 
-		$$.statements = $3;
-		$$.return_node = $4;
-	}
+	LBRACE declarations_optional statements_optional return_optional RBRACE		{ $$ = new_ast_func_tail_node($2, $3, $4); }
 ;
 
 declarations_optional:

@@ -30,11 +30,13 @@ typedef enum Node_Type {
     EQU_NODE,    // equality expression
     REF_NODE,    // identifier in expression
     // functions
-    FUNC_DECLS,  // function declarations
-    FUNC_DECL,   // function declaration
-    RET_TYPE,    // function return type
-    DECL_PARAMS, // function parameters
-    RETURN_NODE, // return statement of functions
+    FUNC_DECLS,     // function declarations
+    FUNC_DECL,      // function declaration
+    FUNC_DECL_HEAD, // function head
+    FUNC_DECL_TAIL, // function tail
+    RET_TYPE,       // function return type
+    DECL_PARAMS,    // function parameters
+    RETURN_NODE     // return statement of functions
 } Node_Type;
 
 /* --------------------OPERATOR TYPES----------------------- */
@@ -45,7 +47,7 @@ typedef enum Arithm_op {
     MUL, // * operator
     DIV, // / operator
     INC, // ++ operator
-    DEC, // -- operator
+    DEC  // -- operator
 } Arithm_op;
 
 typedef enum Bool_op {
@@ -306,6 +308,13 @@ typedef struct AST_Node_Func_Declarations {
 typedef struct AST_Node_Func_Decl {
     enum Node_Type type; // node type
 
+    struct AST_Node *func_head;
+    struct AST_Node *func_tail;
+} AST_Node_Func_Decl;
+
+typedef struct AST_Node_Func_Head {
+    enum Node_Type type; // node type
+
     // return type
     int ret_type;
 
@@ -314,12 +323,16 @@ typedef struct AST_Node_Func_Decl {
 
     // symbol table entry
     list_t *entry;
+} AST_Node_Func_Head;
+
+typedef struct AST_Node_Func_Tail {
+    enum Node_Type type; // node type
 
     // declarations, statements and return
     struct AST_Node *declarations;
     struct AST_Node *statements;
     struct AST_Node *return_node;
-} AST_Node_Func_Decl;
+} AST_Node_Func_Tail;
 
 typedef struct AST_Node_Ret_Type {
     enum Node_Type type; // node type
@@ -394,9 +407,11 @@ AST_Node *new_ast_ref_node(list_t *entry, int ref);
 /* Functions */
 AST_Node *new_func_declarations_node(AST_Node *func_declarations,
                                      AST_Node *func_declaration);
-AST_Node *new_ast_func_decl_node(AST_Node *ret_type, list_t *entry,
-                                 AST_Node *decl_params, AST_Node *declarations,
-                                 AST_Node *statements, AST_Node *return_node);
+AST_Node *new_ast_func_decl_node(AST_Node *func_head, AST_Node *func_tail);
+AST_Node *new_ast_func_head_node(AST_Node *ret_type, list_t *entry,
+                                 AST_Node *decl_params);
+AST_Node *new_ast_func_tail_node(AST_Node *declarations, AST_Node *statements,
+                                 AST_Node *return_node);
 AST_Node *new_ast_ret_type_node(int ret_type,
                                 int pointer); // function return type
 AST_Node *new_ast_decl_params_node(Param *parameters, int num_of_pars,

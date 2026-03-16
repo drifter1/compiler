@@ -429,15 +429,27 @@ AST_Node *new_func_declarations_node(AST_Node *func_declarations,
     return (struct AST_Node *)v;
 }
 
-AST_Node *new_ast_func_decl_node(AST_Node *ret_type, list_t *entry,
-                                 AST_Node *decl_params, AST_Node *declarations,
-                                 AST_Node *statements, AST_Node *return_node) {
+AST_Node *new_ast_func_decl_node(AST_Node *func_head, AST_Node *func_tail) {
 
     // allocate memory
     AST_Node_Func_Decl *v = malloc(sizeof(AST_Node_Func_Decl));
 
     // set entries
     v->type = FUNC_DECL;
+    v->func_head = func_head;
+    v->func_tail = func_tail;
+
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
+
+AST_Node *new_ast_func_head_node(AST_Node *ret_type, list_t *entry,
+                                 AST_Node *decl_params) {
+    // allocate memory
+    AST_Node_Func_Head *v = malloc(sizeof(AST_Node_Func_Head));
+
+    // set entries
+    v->type = FUNC_DECL_HEAD;
     AST_Node_Ret_Type *temp_ret_type = (AST_Node_Ret_Type *)ret_type;
     v->ret_type = temp_ret_type->ret_type;
     v->pointer = temp_ret_type->pointer;
@@ -456,6 +468,17 @@ AST_Node *new_ast_func_decl_node(AST_Node *ret_type, list_t *entry,
         v->entry->num_of_pars = 0;
     }
 
+    // return type-casted result
+    return (struct AST_Node *)v;
+}
+AST_Node *new_ast_func_tail_node(AST_Node *declarations, AST_Node *statements,
+                                 AST_Node *return_node) {
+
+    // allocate memory
+    AST_Node_Func_Tail *v = malloc(sizeof(AST_Node_Func_Tail));
+
+    // set entries
+    v->type = FUNC_DECL_TAIL;
     v->declarations = declarations;
     v->statements = statements;
     v->return_node = return_node;
