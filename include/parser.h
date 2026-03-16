@@ -3,12 +3,6 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-// helper for the values rule
-typedef struct _values {
-    Value *vals;
-    int val_count;
-} _values;
-
 // helper for the function_head rule
 typedef struct _function_head {
     AST_Node *ret_type;

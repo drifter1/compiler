@@ -1,3 +1,4 @@
+#include "list.h"
 #include <stdio.h>
 
 #ifndef SYMTAB_H
@@ -66,7 +67,7 @@ typedef struct list_t {
     int inf_type;
 
     // array stuff
-    Value *vals;
+    list_node *vals;
     int array_size;
 
     // function parameters

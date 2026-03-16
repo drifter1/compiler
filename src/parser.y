@@ -19,7 +19,6 @@
 	int data_type;
 	
 	// for arrays
-	_values values_helper;
 	int array_size;
 
 	// for function head
@@ -67,7 +66,7 @@
 %type <symtab_item> variable
 %type <array_size> array
 %type <symtab_item> init var_init array_init
-%type <values_helper> values
+%type <list_node> values
 %type <ast_node> constant
 %type <ast_node> expression var_ref
 %type <ast_node> statement assigment
@@ -176,28 +175,18 @@ var_init : ID ASSIGN constant
 
 array_init: ID array ASSIGN LBRACE values RBRACE
     {
-        if($2 != $5.val_count){
+        if($2 != list_length($5)){
 			fprintf(stderr, "Semantic error at line %d. Array init doesn't contain the right amount of values\n", yylineno);
 			exit(EXIT_FAILURE);
         }
-        $1->vals = $5.vals;
+        $1->vals = $5;
         $1->array_size = $2;
         $$ = $1;
     }
 ;
 
-values: values COMMA constant 
-	{
-		$$.vals = (Value *) realloc($1.vals, ($1.val_count + 1) * sizeof(Value));
-		$$.vals[$1.val_count] = ((AST_Node_Const*) $3)->val;
-		$$.val_count = $1.val_count + 1;
-	}
-	| constant
-	{
-		$$.vals = (Value *) malloc(1 * sizeof(Value));
-		$$.vals[0] = ((AST_Node_Const*) $1)->val;
-		$$.val_count = 1;
-	}
+values: values COMMA constant 	{ $$ = list_add($1, $3); 	}
+	| constant 					{ $$ = list_add(NULL, $1); 	}
 ;
 
 
