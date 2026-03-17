@@ -11,7 +11,7 @@ This repository contains the code for a compiler implementation written in the C
 - Make
 - Flex (derivative of Lex)
 - Bison (derivative of Yacc)
-- QtSpim (or any other MIPS32 Simulator)
+- MIPS32 Simulator (for original implementation)
 
 
 # Basic Installation
@@ -19,7 +19,7 @@ This repository contains the code for a compiler implementation written in the C
 ## Linux
 
 For Arch-based distributions:
-```
+```sh
 sudo pacman -Syu
 sudo pacman -S --needed base-devel
 ```
@@ -29,7 +29,7 @@ sudo pacman -S --needed base-devel
 
 
 For Debian-based distributions:
-```
+```sh
 sudo apt update
 sudo apt install build-essential flex bison
 ```
@@ -38,7 +38,7 @@ sudo apt install build-essential flex bison
 > `build-essential` includes `gcc`, `make`, and other core build tools. Alternatively, you can install each separately.
 
 For Fedora-based distributions:
-```
+```sh
 sudo dnf makecache
 sudo dnf group install development-tools
 sudo dnf install flex flex-devel bison bison-devel
@@ -64,17 +64,11 @@ I am not very familiar with Macintosh systems.
 However, it seems that you first need to install Apple's command-line developer tools, which will provide you with `make`, `clang` and `gcc` (via clang), as well as other development tools.
 Next, install a package manager such as Homebrew (`brew`), through which you can then install `flex` and `bison`.
 
-```
+```sh
 xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install flex bison
 ```
-
-## MIPS32 Emulation (QtSpim)
-
-If you are on Microsoft Windows, macOS, or a Debian-based Linux distribution, you should be good to go with one of the [recent releases of QtSpim on SourceForge](https://sourceforge.net/projects/spimsimulator/files/).
-
-For other Linux distributions, it is possible to install a version of QtSpim via Flatpak, which is sadly no longer under active maintenance, or consider using a container or virtual machine instead.
 
 
 # Getting Started
@@ -83,7 +77,7 @@ For other Linux distributions, it is possible to install a version of QtSpim via
 
 Clone the repository and change into the directory:
 
-```
+```sh
 git clone https://github.com/drifter1/compiler.git
 cd compiler
 ```
@@ -99,7 +93,7 @@ Examples are included in the *examples* directory.
 
 By default, typing `make run` will compile *example1.c* from the *simple_c_examples* subdirectory using the compiled binary from `make`. It's essentially the same as:
 
-```
+```sh
 ./bin/compiler examples/simple_c_examples/example1.c
 ```
 
@@ -118,24 +112,22 @@ To clean the debugging files (with *.out* extension) after usage of the compiler
 
 # Articles
 
-A comprehensive tutorial series is also available, which covers most aspects of implementation.
+A comprehensive tutorial series is also available, which should cover most aspects of the original implementation.
 
 The complete list of articles can be found [here](/docs/articles.md).
 
 > [!IMPORTANT]
-> Please be advised that significant changes have been made to the source code and repository (issue [#5](https://github.com/drifter1/compiler/issues/5)), meaning that the tutorial series and repository are no longer perfectly aligned. The tutorial series has also been discontinued. The final commit prior to the major overhaul is [7fbcd3f](https://github.com/drifter1/compiler/tree/7fbcd3f94851b5abfe7b1c7622102a621ca0f971). It should help you work your way through the series more easily, since every single article has its own folder.
+> Please be advised that significant changes have been made to the source code and repository (issue [#5](https://github.com/drifter1/compiler/issues/5)), meaning that the tutorial series and repository are no longer perfectly aligned. The tutorial series has also been discontinued. It is planned for the repository to have helpful, detailed documentation instead. The final commit prior to the major overhaul is [7fbcd3f](https://github.com/drifter1/compiler/tree/7fbcd3f94851b5abfe7b1c7622102a621ca0f971). It should help you work your way through the series more easily, since every single article has its own folder.
 
 
 # Simple C Language
 
 The programming language is being explained [here](/docs/simple-c-language.md).
 
-> [!NOTE]
-> Please be advised that this text is still a work in progress.
-
 
 # Status
 
-- Machine Code generation in MIPS Assembly
-- Optimizations in the compiler's source code
-- Fixing errors, bugs, issues, ...
+- Separate syntax and semantic analysis stages (issue [#6](https://github.com/drifter1/compiler/issues/6))
+- Update and simplification of language grammar (issue [#11](https://github.com/drifter1/compiler/issues/11))
+- Further optimizations and enhancements in the compiler's source code
+- Machine code generation (Originally targeted MIPS Assembly. Might switch to RISC-V instead).
