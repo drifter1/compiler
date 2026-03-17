@@ -1,6 +1,6 @@
 # Simple C Language
 
-The language Simple C is similar to the high-level programming language [C](https://www.c-language.org/) and is described in as much detail as possible in this document. It is a simplified version of C, designed purely for educational purposes.The functionality and keyword coverage are both very limited. There are no preprocessor directives. Only basic types being supported. A program in this language begins with optional global variable declarations, followed by optional function declarations and finally the declaration of the main function. Contrary to C, the special identifier `main` of the main function is reserved as a keyword. The body of functions has a strict order. The body starts with optional variable declarations, followed by optional statements. Built-in `print` and `input` statements (with reserved keyword) make it possible to interact with standard output and input, respectively. This enables the output of strings and expression values, as well as the capture of user input into variables.
+The language Simple C is similar to the high-level programming language [C](https://www.c-language.org/) and is described in as much detail as possible in this document. It is a simplified version of C, designed purely for educational purposes. The functionality and keyword coverage are both very limited. There are no preprocessor directives. Only basic types are supported. A program in this language begins with optional global variable declarations, followed by optional function declarations and finally the declaration of the main function. Contrary to C, the special identifier `main` of the main function is reserved as a keyword. The body of functions has a strict order. The body starts with optional variable declarations, followed by optional statements. Built-in `print` and `input` statements (with reserved keyword) make it possible to interact with standard output and input, respectively. This enables the output of strings and expression values, as well as the capture of user input into variables.
 
 > [!IMPORTANT]
 > Please bear in mind that this documentation is still a work in progress. The language described is also not identical to the current implementation.
@@ -194,9 +194,6 @@ c           → printable ASCII character but not enclosed in single quotes
 '␀'         → non-printable character enclosed in single quotes
 ```
 
-> [!NOTE]
-> The character `␀` denotes a non-printable ASCII character.
-
 </details>
 
 ### String
@@ -220,9 +217,6 @@ A string (**STRING**) is a sequence of zero or more printable ASCII characters e
 pi          → printable ASCII characters but not enclosed in double quotes
 "la␀"       → double quote enclosed sequence includes non-printable character
 ```
-
-> [!NOTE]
-> The character `␀` denotes a non-printable ASCII character.
 
 </details>
 
