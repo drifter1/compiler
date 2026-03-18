@@ -89,7 +89,7 @@ The language Simple C is similar to the high-level programming language [C](http
 A valid identifier (**ID**) must start with at least one alphabetical letter and may be followed by any number of letters or digits. Special characters are not allowed, nor can it be a reserved keyword.
 
 <details>
-    <summary><b>Valid example</b></summary>
+    <summary><b>Valid examples</b></summary>
 
 ```
 a           → is a letter
@@ -272,7 +272,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **statements** → statements statement | statement ;
 
-- **statement** → if_statement | for_statement | while_statement | assigment SEMI | CONTINUE SEMI | BREAK SEMI | function_call SEMI | variable INCDEC SEMI | INCDEC variable SEMI | print_statement | input_statement | return_statement ;
+- **statement** → if_statement | for_statement | while_statement | assigment SEMI | CONTINUE SEMI | BREAK SEMI | function_call SEMI | var_ref INCDEC SEMI | INCDEC var_ref SEMI | print_statement | input_statement | return_statement ;
 
 - **if_statement** → IF LPAREN expression RPAREN tail else_if optional_else | IF LPAREN expression RPAREN tail optional_else ;
 
@@ -280,17 +280,17 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **optional_else** → ELSE tail	| ;
 
-- **for_statement** → FOR LPAREN assignment SEMI expression SEMI variable INCDEC RPAREN tail ;
+- **for_statement** → FOR LPAREN assignment SEMI expression SEMI var_ref INCDEC RPAREN tail ;
 
 - **while_statement** → WHILE LPAREN expression RPAREN tail ;
 
 - **tail** → LBRACE statements RBRACE ;
 
-- **expression** → expression ADDOP expression | expression MULOP expression | expression DIVOP expression | variable INCDEC | INCDEC variable | expression OROP expression | expression ANDOP expression | NOTOP expression | expression EQUOP expression | expression RELOP expression | LPAREN expression RPAREN | variable | constant | ADDOP constant | function_call ;
+- **expression** → expression ADDOP expression | expression MULOP expression | expression DIVOP expression | var_ref INCDEC | INCDEC var_ref | expression OROP expression | expression ANDOP expression | NOTOP expression | expression EQUOP expression | expression RELOP expression | LPAREN expression RPAREN | var_ref | constant | ADDOP constant | function_call ;
 
-- **assignment** → variable ASSIGN expression ;
+- **assignment** → var_ref ASSIGN expression ;
 
-- **variable** → ID ;
+- **var_ref** → ID ;
 
 - **function_call** → ID LPAREN call_params RPAREN | ID LPAREN RPAREN ;
 
@@ -298,7 +298,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **print_statement** → PRINT expression SEMI | PRINT STRING SEMI ;
 
-- **input_statement** → INPUT variable SEMI ;
+- **input_statement** → INPUT var_ref SEMI ;
 
 - **return_statement** → RETURN expression SEMI | RETURN SEMI ;
 
