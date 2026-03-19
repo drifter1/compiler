@@ -232,7 +232,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **main_function** → main_head function_tail ;
 
-- **main_head** → INT MAIN LPAREN RPAREN
+- **main_head** → INT MAIN LPAREN RPAREN ;
 
 ### Functions
 
@@ -246,7 +246,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **parameters** → parameters COMMA parameter | parameter ;
 
-- **parameter** → type ID ;
+- **parameter** → type variable ;
 
 - **function_tail** → LBRACE declarations_optional statements_optional RBRACE ;
 
@@ -260,7 +260,9 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **type** → INT | CHAR | FLOAT | DOUBLE | VOID ;
 
-- **names** → names COMMA ID init | ID init ;
+- **names** → names COMMA variable init | variable init ;
+
+- **variable** → ID ;
 
 - **init** →  ASSIGN constant | ;
 
@@ -272,7 +274,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **statements** → statements statement | statement ;
 
-- **statement** → if_statement | for_statement | while_statement | assigment SEMI | CONTINUE SEMI | BREAK SEMI | function_call SEMI | var_ref INCDEC SEMI | INCDEC var_ref SEMI | print_statement | input_statement | return_statement ;
+- **statement** → if_statement | for_statement | while_statement | assignment SEMI | CONTINUE SEMI | BREAK SEMI | function_call SEMI | var_ref INCDEC SEMI | INCDEC var_ref SEMI | print_statement | input_statement | return_statement ;
 
 - **if_statement** → IF LPAREN expression RPAREN tail else_if optional_else | IF LPAREN expression RPAREN tail optional_else ;
 
@@ -290,7 +292,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **assignment** → var_ref ASSIGN expression ;
 
-- **var_ref** → ID ;
+- **var_ref** → variable ;
 
 - **function_call** → ID LPAREN call_params RPAREN | ID LPAREN RPAREN ;
 
