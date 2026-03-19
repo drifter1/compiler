@@ -228,7 +228,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 ## Grammar
 
-- **program** → declarations functions main_function | declarations main_function | function main_function | main_function ;
+- **program** → declarations functions main_function | declarations main_function | functions main_function | main_function ;
 
 - **main_function** → main_head function_tail ;
 
