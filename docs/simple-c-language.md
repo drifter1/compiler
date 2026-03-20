@@ -11,82 +11,82 @@ The language Simple C is similar to the high-level programming language [C](http
 
 #### C Keywords
 
-|  Keyword   |               Usage                |
-| :--------: | :--------------------------------: |
-| `break`    | Declaration of break statement     |
-| `char`     | Type specifier for character types |
-| `continue` | Declaration of continue statement  |
-| `double`   | Type specifier for double types    |
-| `else`     | Declaration of alternative branch  |
-| `float`    | Type specifier for float types     |
-| `for`      | Declaration of for loop            |
-| `if`       | Declaration of if statement        |
-| `int`      | Type specifier for int types       |
-| `return`   | Declaration of return statement    |
-| `void`     | Type specifier for void types      |
-| `while`    | Declaration of while loop          |
+|  Keyword   |               Usage                |      Token     |
+| :--------: | :--------------------------------: | :------------: |
+| `break`    | Declaration of break statement     | **T_BREAK**    |
+| `char`     | Type specifier for character types | **T_CHAR**     |
+| `continue` | Declaration of continue statement  | **T_CONTINUE** |
+| `double`   | Type specifier for double types    | **T_DOUBLE**   |
+| `else`     | Declaration of alternative branch  | **T_ELSE**     |
+| `float`    | Type specifier for float types     | **T_FLOAT**    |
+| `for`      | Declaration of for loop            | **T_FOR**      |
+| `if`       | Declaration of if statement        | **T_IF**       |
+| `int`      | Type specifier for int types       | **T_INT**      |
+| `return`   | Declaration of return statement    | **T_RETURN**   |
+| `void`     | Type specifier for void types      | **T_VOID**     |
+| `while`    | Declaration of while loop          | **T_WHILE**    |
 
 #### Supplementary Keywords
 
-|  Keyword |             Usage              |
-| :------: | :----------------------------: |
-| `input`  | Declaration of input statement |
-| `main`   | Identifier of main function    |
-| `print`  | Declaration of print statement |
+|  Keyword |             Usage              |    Token    |
+| :------: | :----------------------------: | :---------: |
+| `input`  | Declaration of input statement | **T_INPUT** |
+| `main`   | Identifier of main function    | **T_MAIN**  |
+| `print`  | Declaration of print statement | **T_PRINT** |
 
 ### Operators
 
 #### Assignment Operator
 
-- `=` → assignment (**ASSIGN**)
+- `=` → assignment (**T_ASSIGN** of operator type *ASSIGN*)
 
 #### Increment/Decrement Operators
 
-- `++` → increment by 1 (**INCDEC** of type *INC*)
-- `--` → decrement by 1 (**INCDEC** of type *DEC*)
+- `++` → increment by 1 (**T_INCDEC** of operator type *INC*)
+- `--` → decrement by 1 (**T_INCDEC** of operator type *DEC*)
 
 > [!NOTE]
-> The increment (`++`) and decrement (`--`) operators can be applied as prefix or suffix operations, e.g. `++a` or `a++`.
+> The increment (`++`) and decrement (`--`) operators can be applied as prefix or postfix operations, e.g. `++a` or `a++`. Once the exact type is clear, the operator type is changed to *PRE_INC*, *PRE_DEC*, *POST_INC* or *POST_DEC*, respectively.
 
 #### Arithmetic Operators
 
-- `+` → addition (**ADDOP** of type *ADD*)
-- `-` → subtraction (**ADDOP** of type *SUB*)
-- `*` → multiplication (**MULOP** of type *MUL*)
-- `/` → division (**MULOP** of type *DIV*)
-- `%` → remainder (**MULOP** of type *REM*)
+- `+` → addition (**T_ADDOP** of operator type *ADD*)
+- `-` → subtraction (**T_ADDOP** of operator type *SUB*)
+- `*` → multiplication (**T_MULOP** of operator type *MUL*)
+- `/` → division (**T_MULOP** of operator type *DIV*)
+- `%` → remainder (**T_MULOP** of operator type *REM*)
 
 > [!NOTE]
-> The lexical units `+` and `-` are also used for the unary plus and unary minus operations, i.e. `+1` or `-1`.
+> The lexical units `+` and `-` are also used for the unary plus and unary minus operations, i.e. `+1` or `-1`. When the addition or subtraction operators are used as unary operators, the operator type changes to *UNARY_PLUS* or *UNARY_MINUS*, respectively.
 
 #### Logical Operators
 
-- `||` → logical or (**OROP**)
-- `&&` → logical and (**ANDOP**)
-- `!` → logical not (**NOTOP**)
+- `||` → logical or (**T_OROP** of operator type *OR*)
+- `&&` → logical and (**T_ANDOP** of operator type *AND*)
+- `!` → logical not (**T_NOTOP** of operator type *NOT*)
 
 #### Relational Operators
 
-- `==` → equality (**EQUOP** of type *EQUAL*)
-- `!=` → inequality (**EQUOP** of type *NOT_EQUAL*)
-- `>` → greater (**RELOP** of type *GREATER*)
-- `<` → less (**RELOP** of type *LESS*)
-- `>=` → greater equal (**RELOP** of type *GREATER_EQUAL*)
-- `<=` → less equal (**RELOP** of type *LESS_EQUAL*)
+- `==` → equality (**T_EQUOP** of operator type *EQUAL*)
+- `!=` → inequality (**T_EQUOP** of operator type *NOT_EQUAL*)
+- `>` → greater (**T_RELOP** of operator type *GREATER*)
+- `<` → less (**T_RELOP** of operator type *LESS*)
+- `>=` → greater equal (**T_RELOP** of operator type *GREATER_EQUAL*)
+- `<=` → less equal (**T_RELOP** of operator type *LESS_EQUAL*)
 
 ### Other Tokens
 
-- `(` → left parenthesis (**LPAREN**)
-- `)` → right parenthesis (**RPAREN**)
-- `{` → left curly brace (**LBRACE**)
-- `}` → right curly brace (**RBRACE**)
-- `,` → comma (**COMMA**)
-- `;` → semicolon (**SEMI**)
+- `(` → left parenthesis (**T_LPAREN**)
+- `)` → right parenthesis (**T_RPAREN**)
+- `{` → left curly brace (**T_LBRACE**)
+- `}` → right curly brace (**T_RBRACE**)
+- `,` → comma (**T_COMMA**)
+- `;` → semicolon (**T_SEMI**)
 - `<<EOF>>` → end of file
 
 ### Identifiers
 
-A valid identifier (**ID**) must start with at least one alphabetical letter and may be followed by any number of letters or digits. Special characters are not allowed, nor can it be a reserved keyword.
+A valid identifier (**T_ID**) must start with at least one alphabetical letter and may be followed by any number of letters or digits. Special characters are not allowed, nor can it be a reserved keyword.
 
 <details>
     <summary><b>Valid examples</b></summary>
@@ -118,7 +118,7 @@ return      → is a reserved keyword
 
 #### Integer constant
 
-An integer constant (**ICONST**) is either the literal 0 or a sequence of digits that does not begin with 0. Only digits are permitted. Integer constants must not contain letters or special characters.
+An integer constant (**T_ICONST**) is either the literal 0 or a sequence of digits that does not begin with 0. Only digits are permitted. Integer constants must not contain letters or special characters.
 
 <details>
     <summary><b>Valid examples</b></summary>
@@ -144,7 +144,7 @@ An integer constant (**ICONST**) is either the literal 0 or a sequence of digits
 
 #### Floating-point constant
 
-A floating-point constant (**FCONST**) contains a decimal point, with digits either before and after it, or only before or after it. Before the decimal point, there can be either the literal 0 or a sequence of digits that does not start with 0.
+A floating-point constant (**T_FCONST**) contains a decimal point, with digits either before and after it, or only before or after it. Before the decimal point, there can be either the literal 0 or a sequence of digits that does not start with 0.
 
 <details>
     <summary><b>Valid examples</b></summary>
@@ -173,7 +173,7 @@ A floating-point constant (**FCONST**) contains a decimal point, with digits eit
 
 #### Character constant
 
-A character constant (**CCONST**) is either a single printable ASCII character or one of the common escape sequences (e.g. `\n`, `\f`, `\t`, `\r`, `\b`, `\v`) enclosed in single quotes `'`,
+A character constant (**T_CCONST**) is either a single printable ASCII character or one of the common escape sequences (e.g. `\n`, `\f`, `\t`, `\r`, `\b`, `\v`) enclosed in single quotes `'`,
 
 <details>
     <summary><b>Valid examples</b></summary>
@@ -198,7 +198,7 @@ c           → printable ASCII character but not enclosed in single quotes
 
 ### String
 
-A string (**STRING**) is a sequence of zero or more printable ASCII characters enclosed within double quotes `"`.
+A string (**T_STRING**) is a sequence of zero or more printable ASCII characters enclosed within double quotes `"`.
 
 <details>
     <summary><b>Valid examples</b></summary>
@@ -232,69 +232,69 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **declarations** → declarations declaration | declaration ;
 
-- **declaration** → type names SEMI ;
+- **declaration** → type names T_SEMI ;
 
-- **type** → INT | CHAR | FLOAT | DOUBLE | VOID ;
+- **type** → T_INT | T_CHAR | T_FLOAT | T_DOUBLE | T_VOID ;
 
-- **names** → names COMMA var_init | var_init ;
+- **names** → names T_COMMA var_init | var_init ;
 
 - **var_init** → variable init ;
 
-- **variable** → ID ;
+- **variable** → T_ID ;
 
-- **init** →  ASSIGN constant | /* empty */ ;
+- **init** →  T_ASSIGN constant | /* empty */ ;
 
-- **constant** → ICONST  | FCONST | CCONST ;
+- **constant** → T_ICONST | T_FCONST | T_CCONST ;
 
 - **functions** → functions function | function ;
 
 - **function** → function_head function_tail ;
 
-- **function_head** → type ID LPAREN parameters RPAREN | type ID LPAREN RPAREN ;
+- **function_head** → type T_ID T_LPAREN parameters T_RPAREN | type T_ID T_LPAREN T_RPAREN ;
 
-- **parameters** → parameters COMMA parameter | parameter ;
+- **parameters** → parameters T_COMMA parameter | parameter ;
 
 - **parameter** → type variable ;
 
-- **function_tail** → LBRACE declarations statements RBRACE | LBRACE statements RBRACE;
+- **function_tail** → T_LBRACE declarations statements T_RBRACE | T_LBRACE statements T_RBRACE;
 
 - **statements** → statements statement | statement ;
 
-- **statement** → if_statement | for_statement | while_statement | assignment SEMI | CONTINUE SEMI | BREAK SEMI | function_call SEMI | var_ref INCDEC SEMI | INCDEC var_ref SEMI | print_statement | input_statement | return_statement ;
+- **statement** → if_statement | for_statement | while_statement | assignment T_SEMI | T_CONTINUE T_SEMI | T_BREAK T_SEMI | function_call T_SEMI | var_ref T_INCDEC T_SEMI | T_INCDEC var_ref T_SEMI | print_statement | input_statement | return_statement ;
 
-- **if_statement** → IF LPAREN expression RPAREN tail else_if optional_else | IF LPAREN expression RPAREN tail optional_else ;
+- **if_statement** → T_IF T_LPAREN expression T_RPAREN tail else_if optional_else | T_IF T_LPAREN expression T_RPAREN tail optional_else ;
 
-- **expression** → expression ADDOP expression | expression MULOP expression | expression DIVOP expression | var_ref INCDEC | INCDEC var_ref | expression OROP expression | expression ANDOP expression | NOTOP expression | expression EQUOP expression | expression RELOP expression | LPAREN expression RPAREN | var_ref | constant | ADDOP constant | function_call ;
+- **expression** → expression T_ADDOP expression | expression T_MULOP expression | var_ref T_INCDEC | T_INCDEC var_ref | expression T_OROP expression | expression T_ANDOP expression | T_NOTOP expression | expression T_EQUOP expression | expression T_RELOP expression | T_PAREN expression T_RPAREN | var_ref | constant | T_ADDOP constant | function_call ;
 
 - **var_ref** → variable ;
 
-- **function_call** → ID LPAREN arguments RPAREN | ID LPAREN RPAREN ;
+- **function_call** → T_ID T_LPAREN arguments T_RPAREN | T_ID T_LPAREN T_RPAREN ;
 
-- **arguments** → arguments COMMA argument | argument ;
+- **arguments** → arguments T_COMMA argument | argument ;
 
-- **argument** → var_ref | constant | ADDOP constant ;
+- **argument** → var_ref | constant | T_ADDOP constant ;
 
-- **tail** → LBRACE statements RBRACE ;
+- **tail** → T_LBRACE statements T_RBRACE ;
 
-- **else_if** → else_if ELSE IF LPAREN expression RPAREN tail | ELSE IF LPAREN expression RPAREN tail ;
+- **else_if** → else_if T_ELSE T_IF T_LPAREN expression T_RPAREN tail | T_ELSE T_IF T_LPAREN expression T_RPAREN tail ;
 
-- **optional_else** → ELSE tail	| /* empty */ ;
+- **optional_else** → T_ELSE tail	| /* empty */ ;
 
-- **for_statement** → FOR LPAREN assignment SEMI expression SEMI var_ref INCDEC RPAREN tail ;
+- **for_statement** → T_FOR T_LPAREN assignment T_SEMI expression T_SEMI var_ref T_INCDEC T_RPAREN tail ;
 
-- **assignment** → var_ref ASSIGN expression ;
+- **assignment** → var_ref T_ASSIGN expression ;
 
-- **while_statement** → WHILE LPAREN expression RPAREN tail ;
+- **while_statement** → T_WHILE T_LPAREN expression T_RPAREN tail ;
 
-- **print_statement** → PRINT expression SEMI | PRINT STRING SEMI ;
+- **print_statement** → T_PRINT expression T_SEMI | T_PRINT T_STRING T_SEMI ;
 
-- **input_statement** → INPUT var_ref SEMI ;
+- **input_statement** → T_INPUT var_ref T_SEMI ;
 
-- **return_statement** → RETURN expression SEMI | RETURN SEMI ;
+- **return_statement** → T_RETURN expression T_SEMI | T_RETURN T_SEMI ;
 
 - **main_function** → main_head function_tail ;
 
-- **main_head** → INT MAIN LPAREN RPAREN ;
+- **main_head** → T_INT T_MAIN T_LPAREN T_RPAREN ;
 
 <details>
     <summary><b>Example program</b></summary>
@@ -453,7 +453,7 @@ add(a, 3)
 | `+`, `-`                  | Addition and subtraction                                  | Left-to-right |
 | `*`, `/`, `%`             | Multiplication, division and remainder                    | Left-to-right |
 | `!`, `++`, `--`, `+`, `-` | Logical NOT, prefix increment/decrement, unary plus/minus | Right-to-left |
-| `()`, `++`, `--`          | Function call, suffix increment/decrement                 | Left-to-right |
+| `()`, `++`, `--`          | Function call, postfix increment/decrement                | Left-to-right |
 
 > [!NOTE]
 > The above table is arranged in ascending order of precedence, in line with how operator precedence is declared in Bison or Yacc.
