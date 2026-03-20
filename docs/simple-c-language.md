@@ -230,22 +230,6 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **program** → declarations functions main_function | declarations main_function | functions main_function | main_function ;
 
-- **main_function** → main_head function_tail ;
-
-- **main_head** → INT MAIN LPAREN RPAREN ;
-
-- **functions** → functions function | function ;
-
-- **function** → function_head function_tail ;
-
-- **function_head** → type ID LPAREN parameters RPAREN | type ID LPAREN RPAREN ;
-
-- **parameters** → parameters COMMA parameter | parameter ;
-
-- **parameter** → type variable ;
-
-- **function_tail** → LBRACE declarations statements RBRACE | LBRACE statements RBRACE;
-
 - **declarations** → declarations declaration | declaration ;
 
 - **declaration** → type names SEMI ;
@@ -260,25 +244,25 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **constant** → ICONST  | FCONST | CCONST ;
 
+- **functions** → functions function | function ;
+
+- **function** → function_head function_tail ;
+
+- **function_head** → type ID LPAREN parameters RPAREN | type ID LPAREN RPAREN ;
+
+- **parameters** → parameters COMMA parameter | parameter ;
+
+- **parameter** → type variable ;
+
+- **function_tail** → LBRACE declarations statements RBRACE | LBRACE statements RBRACE;
+
 - **statements** → statements statement | statement ;
 
 - **statement** → if_statement | for_statement | while_statement | assignment SEMI | CONTINUE SEMI | BREAK SEMI | function_call SEMI | var_ref INCDEC SEMI | INCDEC var_ref SEMI | print_statement | input_statement | return_statement ;
 
 - **if_statement** → IF LPAREN expression RPAREN tail else_if optional_else | IF LPAREN expression RPAREN tail optional_else ;
 
-- **else_if** → else_if ELSE IF LPAREN expression RPAREN tail | ELSE IF LPAREN expression RPAREN tail ;
-
-- **optional_else** → ELSE tail	| /* empty */ ;
-
-- **for_statement** → FOR LPAREN assignment SEMI expression SEMI var_ref INCDEC RPAREN tail ;
-
-- **while_statement** → WHILE LPAREN expression RPAREN tail ;
-
-- **tail** → LBRACE statements RBRACE ;
-
 - **expression** → expression ADDOP expression | expression MULOP expression | expression DIVOP expression | var_ref INCDEC | INCDEC var_ref | expression OROP expression | expression ANDOP expression | NOTOP expression | expression EQUOP expression | expression RELOP expression | LPAREN expression RPAREN | var_ref | constant | ADDOP constant | function_call ;
-
-- **assignment** → var_ref ASSIGN expression ;
 
 - **var_ref** → variable ;
 
@@ -286,11 +270,27 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **call_params** → call_params COMMA expression | expression ;
 
+- **tail** → LBRACE statements RBRACE ;
+
+- **else_if** → else_if ELSE IF LPAREN expression RPAREN tail | ELSE IF LPAREN expression RPAREN tail ;
+
+- **optional_else** → ELSE tail	| /* empty */ ;
+
+- **for_statement** → FOR LPAREN assignment SEMI expression SEMI var_ref INCDEC RPAREN tail ;
+
+- **assignment** → var_ref ASSIGN expression ;
+
+- **while_statement** → WHILE LPAREN expression RPAREN tail ;
+
 - **print_statement** → PRINT expression SEMI | PRINT STRING SEMI ;
 
 - **input_statement** → INPUT var_ref SEMI ;
 
 - **return_statement** → RETURN expression SEMI | RETURN SEMI ;
+
+- **main_function** → main_head function_tail ;
+
+- **main_head** → INT MAIN LPAREN RPAREN ;
 
 <details>
     <summary><b>Example program</b></summary>
