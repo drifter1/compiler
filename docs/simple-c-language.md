@@ -442,18 +442,18 @@ add(a, 3)
 
 ### Precedencies and Associativities
 
-|        Operator        |                      Description                     | Associativity |
-| :--------------------: | :--------------------------------------------------: | :-----------: |
-| `,`                    | Comma                                                | Left-to-right |
-| `=`                    | Assignment                                           | Right-to-left |
-| `\|\|`                 | Logical OR                                           | Left-to-right |
-| `&&`                   | Logical AND                                          | Left-to-right |
-| `==`, `!=`             | Equality/Inequality operators                        | Left-to-right |
-| `<`, `<=`, `>`, `>=`   | Relational operators                                 | Left-to-right |
-| `+`, `-`               | Addition and subtraction                             | Left-to-right |
-| `*`, `/`, `%`          | Multiplication, division and remainder               | Left-to-right |
-| `!`, `++`, `--`, `-`   | Logical NOT, prefix increment/decrement, unary minus | Right-to-left |
-| `()`, `++`, `--`       | Function call, suffix increment/decrement            | Left-to-right |
+|          Operator         |                        Description                        | Associativity |
+| :-----------------------: | :-------------------------------------------------------: | :-----------: |
+| `,`                       | Comma                                                     | Left-to-right |
+| `=`                       | Assignment                                                | Right-to-left |
+| `\|\|`                    | Logical OR                                                | Left-to-right |
+| `&&`                      | Logical AND                                               | Left-to-right |
+| `==`, `!=`                | Equality/Inequality operators                             | Left-to-right |
+| `<`, `<=`, `>`, `>=`      | Relational operators                                      | Left-to-right |
+| `+`, `-`                  | Addition and subtraction                                  | Left-to-right |
+| `*`, `/`, `%`             | Multiplication, division and remainder                    | Left-to-right |
+| `!`, `++`, `--`, `+`, `-` | Logical NOT, prefix increment/decrement, unary plus/minus | Right-to-left |
+| `()`, `++`, `--`          | Function call, suffix increment/decrement                 | Left-to-right |
 
 > [!NOTE]
 > The above table is arranged in ascending order of precedence, in line with how operator precedence is declared in Bison or Yacc.
