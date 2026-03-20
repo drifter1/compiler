@@ -236,7 +236,9 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **type** → INT | CHAR | FLOAT | DOUBLE | VOID ;
 
-- **names** → names COMMA variable init | variable init ;
+- **names** → names COMMA var_init | var_init ;
+
+- **var_init** → variable init ;
 
 - **variable** → ID ;
 
