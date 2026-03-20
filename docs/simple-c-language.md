@@ -46,7 +46,7 @@ The language Simple C is similar to the high-level programming language [C](http
 - `--` → decrement by 1 (**INCDEC** of type *DEC*)
 
 > [!NOTE]
-> The increment (`++`) and decrement (`--`) operators can be applied as prefix or suffix operations, e.g. `a++` or `++a`.
+> The increment (`++`) and decrement (`--`) operators can be applied as prefix or suffix operations, e.g. `++a` or `a++`.
 
 #### Arithmetic Operators
 
@@ -268,9 +268,11 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **var_ref** → variable ;
 
-- **function_call** → ID LPAREN call_params RPAREN | ID LPAREN RPAREN ;
+- **function_call** → ID LPAREN arguments RPAREN | ID LPAREN RPAREN ;
 
-- **call_params** → call_params COMMA expression | expression ;
+- **arguments** → arguments COMMA argument | argument ;
+
+- **argument** → var_ref | constant | ADDOP constant ;
 
 - **tail** → LBRACE statements RBRACE ;
 
@@ -366,6 +368,11 @@ int main() {
 - `double` type → for double precision floating-point numbers
 - `char` type → for characters
 - `void` type → for incomplete types
+
+### Type Kinds
+
+- Basic type → declaration type of a variable or function parameter
+- Function type → data type of the return value of a function
 
 ### Variable Declarations
 
