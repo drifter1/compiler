@@ -1,381 +1,296 @@
 #include "../include/ast.h"
-#include "../include/semantics.h"
-#include <stdlib.h>
 
-/* Tree Traversal */
+/* ---------------------AST TRAVERSAL----------------------- */
 
-void ast_print_node(AST_Node *node) {
-    /* temp nodes */
-    AST_Node_Declarations *temp_declarations;
-    AST_Node_Decl *temp_decl;
-    AST_Node_Const *temp_const;
-    AST_Node_Statements *temp_statements;
-    AST_Node_If *temp_if;
-    AST_Node_For *temp_for;
-    AST_Node_Assign *temp_assign;
-    AST_Node_Simple *temp_simple;
-    AST_Node_Incr *temp_incr;
-    AST_Node_Func_Call *temp_func_call;
-    AST_Node_Call_Params *temp_call_params;
-    AST_Node_Arithm *temp_arithm;
-    AST_Node_Bool *temp_bool;
-    AST_Node_Rel *temp_rel;
-    AST_Node_Equ *temp_equ;
-    AST_Node_Ref *temp_ref;
-    AST_Node_Func_Declarations *temp_func_declarations;
-    AST_Node_Ret_Type *temp_ret_type;
-    AST_Node_Decl_Params *temp_decl_params;
-    AST_Node_Return *temp_return;
+void ast_print_node(ast_node *ast_node) {
+    list_node *head;
+    symtab_entry *entry;
 
-    switch (node->type) {
-    case PROGRAM_NODE:
-        printf("Program Node\n");
+    switch (ast_node->kind) {
+    case PROGRAM:
+        printf("Program Node with %d global variable declarations, %d function "
+               "declaratations\n",
+               list_length(ast_node->as.program.declarations),
+               list_length(ast_node->as.program.functions));
         break;
-    case DECLARATIONS:
-        temp_declarations = (struct AST_Node_Declarations *)node;
-        printf("Declarations Node with %d declarations\n",
-               temp_declarations->declaration_count);
-        break;
-    case DECL_NODE:
-        temp_decl = (struct AST_Node_Decl *)node;
-        printf("Declaration Node of data-type %d for %d names\n",
-               temp_decl->data_type, temp_decl->names_count);
+    case DECLARATION:
+        printf("Declaration Node of data type \'%s\' for %d names\n",
+               data_type_to_string(ast_node->as.declaration.d_type),
+               list_length(ast_node->as.declaration.names));
         printf("Names:\n");
-        list_node *temp_head;
-        list_t *temp_entry;
-        temp_head = temp_decl->names;
-        while (temp_head != NULL) {
-            temp_entry = (list_t *)temp_head->data;
-            printf("%s\n", temp_entry->st_name);
-            temp_head = temp_head->next;
+
+        head = ast_node->as.declaration.names;
+        while (head != NULL) {
+            entry = (symtab_entry *)head->data;
+            printf("%s with init value ", entry->id);
+            switch (entry->as.variable.d_type) {
+            case UNDEF_TYPE:
+                printf("undef\n");
+                break;
+            case INT_TYPE:
+                printf("%d\n", entry->as.variable.val.ival);
+                break;
+            case CHAR_TYPE:
+                printf("\'%c\'\n", entry->as.variable.val.cval);
+                break;
+            case FLOAT_TYPE:
+            case DOUBLE_TYPE:
+                printf("%.2f\n", entry->as.variable.val.fval);
+                break;
+            case VOID_TYPE:
+                printf("void\n");
+            }
+            head = head->next;
         }
         break;
-    case CONST_NODE:
-        temp_const = (struct AST_Node_Const *)node;
-        printf("Constant Node of const-type %d with value ",
-               temp_const->const_type);
-        switch (temp_const->const_type) {
-        case INT_TYPE:
-            printf("%d\n", temp_const->val.ival);
+    case CONSTANT:
+        printf("Constant Node of data type \'%s\' with value ",
+               data_type_to_string(ast_node->as.constant.d_type));
+        switch (ast_node->as.constant.d_type) {
+        case UNDEF_TYPE:
+            printf("undef\n");
             break;
-        case REAL_TYPE:
-            printf("%.2f\n", temp_const->val.fval);
+        case INT_TYPE:
+            printf("%d\n", ast_node->as.constant.val.ival);
             break;
         case CHAR_TYPE:
-            printf("%c\n", temp_const->val.cval);
+            printf("\'%c\'\n", ast_node->as.constant.val.cval);
             break;
-        case STR_TYPE:
-            printf("%s\n", temp_const->val.sval);
+        case FLOAT_TYPE:
+        case DOUBLE_TYPE:
+            printf("%.2f\n", ast_node->as.constant.val.fval);
             break;
+        case VOID_TYPE:
+            printf("void\n");
         }
         break;
-    case STATEMENTS:
-        temp_statements = (struct AST_Node_Statements *)node;
-        printf("Statements Node with %d statements\n",
-               temp_statements->statement_count);
+    case FUNCTION:
+        printf(
+            "Function Node of function \'%s\' with return type \'%s\' and %d "
+            "parameters\n",
+            ast_node->as.function.entry->id,
+            data_type_to_string(
+                ast_node->as.function.entry->as.function.ret_type),
+            list_length(ast_node->as.function.entry->as.function.parameters));
+        if (ast_node->as.function.entry->as.function.parameters != NULL) {
+            printf("Parameters:\n");
+            head = ast_node->as.function.entry->as.function.parameters;
+            while (head != NULL) {
+                entry = (symtab_entry *)head->data;
+                printf("%s of type \'%s\'\n", entry->id,
+                       data_type_to_string(entry->as.parameter.d_type));
+                head = head->next;
+            }
+        }
         break;
-    case IF_NODE:
-        temp_if = (struct AST_Node_If *)node;
-        printf("If Node with %d elseifs and ", temp_if->elseif_count);
-        if (temp_if->else_branch == NULL) {
+    case FUNCTION_TAIL:
+        printf("Function Tail Node of %d declarations and %d statements\n",
+               list_length(ast_node->as.function_tail.declarations),
+               list_length(ast_node->as.function_tail.statements));
+        break;
+    case IF_STATEMENT:
+        printf("If Statement Node with %d elseifs and ",
+               list_length(ast_node->as.if_statement.else_if_branches));
+        if (ast_node->as.if_statement.if_branch == NULL) {
             printf("no else\n");
         } else {
             printf("else\n");
         }
         break;
-    case ELSIF_NODE:
-        printf("Elsif Node\n");
+    case EXPRESSION_BINARY:
+        printf("Expression Binary Node of operator type \'%s\'\n",
+               operator_type_to_string(ast_node->as.expression_binary.op_type));
         break;
-    case FOR_NODE:
-        temp_for = (struct AST_Node_For *)node;
-        printf("For Node with loop counter %s\n", temp_for->counter->st_name);
+    case EXPRESSION_UNARY:
+        printf("Expression Unary Node of operator type \'%s\'\n",
+               operator_type_to_string(ast_node->as.expression_unary.op_type));
         break;
-    case WHILE_NODE:
-        printf("While Node\n");
+    case VARIABLE_REFERENCE:
+        printf("Variable Reference Node of variable \'%s\'\n",
+               ast_node->as.variable_reference.entry->id);
         break;
-    case ASSIGN_NODE:
-        temp_assign = (struct AST_Node_Assign *)node;
-        printf("Assign Node of entry %s\n", temp_assign->entry->st_name);
+    case FUNCTION_CALL:
+        printf("Function Call Node of function \'%s\' and %d arguments\n",
+               ast_node->as.function_call.entry->id,
+               list_length(ast_node->as.function_call.arguments));
         break;
-    case SIMPLE_NODE:
-        temp_simple = (struct AST_Node_Simple *)node;
-        printf("Simple Node of statement %d\n", temp_simple->statement_type);
+    case ELSE_IF:
+        printf("Else If Node\n");
         break;
-    case INCR_NODE:
-        temp_incr = (struct AST_Node_Incr *)node;
-        printf("Increment Node of entry %s being %d %d\n",
-               temp_incr->entry->st_name, temp_incr->incr_type,
-               temp_incr->pf_type);
+    case FOR_LOOP:
+        printf("For Loop Node\n");
         break;
-    case FUNC_CALL:
-        temp_func_call = (struct AST_Node_Func_Call *)node;
-        printf("Function Call Node of %s with %d parameters\n",
-               temp_func_call->entry->st_name, temp_func_call->num_of_pars);
+    case ASSIGNMENT:
+        printf("Assignment Node of variable \'%s\'\n",
+               ast_node->as.assignment.variable_reference->as.variable_reference
+                   .entry->id);
         break;
-    case CALL_PARAMS:
-        temp_call_params = (struct AST_Node_Call_Params *)node;
-        printf("Function Call Parameters Node with %d parameters\n",
-               temp_call_params->num_of_pars);
+    case WHILE_LOOP:
+        printf("While Loop Node\n");
         break;
-    case ARITHM_NODE:
-        temp_arithm = (struct AST_Node_Arithm *)node;
-        printf("Arithmetic Node of operator %d with result type %d\n",
-               temp_arithm->op, temp_arithm->data_type);
+    case JUMP_STATEMENT:
+        printf("Jump Statement Node of type \'%s\'\n",
+               jump_type_to_string(ast_node->as.jump_statement.j_type));
         break;
-    case BOOL_NODE:
-        temp_bool = (struct AST_Node_Bool *)node;
-        printf("Boolean Node of operator %d\n", temp_bool->op);
+    case PRINT_STATEMENT:
+        printf("Print Statement Node of type \'%s\'\n",
+               print_type_to_string(ast_node->as.print_statement.p_type));
         break;
-    case REL_NODE:
-        temp_rel = (struct AST_Node_Rel *)node;
-        printf("Relational Node of operator %d\n", temp_rel->op);
+    case INPUT_STATEMENT:
+        printf("Input Statement Node of variable \'%s\'\n",
+               ast_node->as.input_statement.variable_reference->as
+                   .variable_reference.entry->id);
         break;
-    case EQU_NODE:
-        temp_equ = (struct AST_Node_Equ *)node;
-        printf("Equality Node of operator %d\n", temp_equ->op);
-        break;
-    case REF_NODE:
-        temp_ref = (struct AST_Node_Ref *)node;
-        printf("Reference Node of entry %s\n", temp_ref->entry->st_name);
-        break;
-    case FUNC_DECLS:
-        temp_func_declarations = (struct AST_Node_Func_Declarations *)node;
-        printf("Function Declarations Node with %d function "
-               "declarations\n",
-               temp_func_declarations->func_declaration_count);
-        break;
-    case FUNC_DECL:
-        printf("Function Declaration Node\n");
-        break;
-    case RET_TYPE:
-        temp_ret_type = (struct AST_Node_Ret_Type *)node;
-        printf("Return type %d which is ", temp_ret_type->ret_type);
-        if (temp_ret_type->pointer) {
-            printf("a pointer\n");
-        } else {
-            printf("not a pointer\n");
-        }
-        break;
-    case DECL_PARAMS:
-        temp_decl_params = (struct AST_Node_Decl_Params *)node;
-        printf("Function declaration parameters node of %d parameters\n",
-               temp_decl_params->num_of_pars);
-        break;
-    case RETURN_NODE:
-        temp_return = (struct AST_Node_Return *)node;
-        printf("Return Node of ret_type %d\n", temp_return->ret_type);
-        break;
-    default: /* wrong choice case */
-        fprintf(stderr, "Error in AST node selection!\n");
-        exit(EXIT_FAILURE);
+    case RETURN_STATEMENT:
+        printf("Return Statement Node of return type \'%s\'\n",
+               data_type_to_string(ast_node->as.return_statement.ret_type));
     }
 }
 
-void ast_traversal(AST_Node *node) {
-    int i;
+void ast_list_traversal(list_node *list_head) {
+    list_node *head;
+    head = list_head;
+    while (head != NULL) {
+        ast_traversal((ast_node *)head->data);
+        head = head->next;
+    }
+}
 
+void ast_traversal(ast_node *ast_node) {
     /* check if empty */
-    if (node == NULL) {
+    if (ast_node == NULL) {
         return;
     }
 
-    /* left and right child cases */
-    if (node->type == ARITHM_NODE || node->type == BOOL_NODE ||
-        node->type == REL_NODE || node->type == EQU_NODE) {
-        ast_print_node(node);
-        if (node->left != NULL) {
-            printf("Left child:\n");
-            ast_traversal(node->left);
-        }
-        if (node->right != NULL) {
-            printf("Right child:\n");
-            ast_traversal(node->right);
-        }
-    }
-    /* program case*/
-    else if (node->type == PROGRAM_NODE) {
-        AST_Node_Program *temp_program = (struct AST_Node_Program *)node;
-        ast_print_node(node);
-        ast_traversal(temp_program->declarations);
-        ast_traversal(temp_program->statements);
-        ast_traversal(temp_program->func_declarations);
-    }
-    /* declarations case */
-    else if (node->type == DECLARATIONS) {
-        AST_Node_Declarations *temp_declarations =
-            (struct AST_Node_Declarations *)node;
-        ast_print_node(node);
-        for (i = 0; i < temp_declarations->declaration_count; i++) {
-            ast_traversal(temp_declarations->declarations[i]);
-        }
-    }
-    /* statements case */
-    else if (node->type == STATEMENTS) {
-        AST_Node_Statements *temp_statements =
-            (struct AST_Node_Statements *)node;
-        ast_print_node(node);
-        for (i = 0; i < temp_statements->statement_count; i++) {
-            ast_traversal(temp_statements->statements[i]);
-        }
-    }
-    /* the if case */
-    else if (node->type == IF_NODE) {
-        AST_Node_If *temp_if = (struct AST_Node_If *)node;
-        ast_print_node(node);
+    switch (ast_node->kind) {
+    case PROGRAM:
+        ast_print_node(ast_node);
+        ast_list_traversal(ast_node->as.program.declarations);
+        ast_list_traversal(ast_node->as.program.functions);
+        ast_traversal(ast_node->as.program.main_function);
+        break;
+    case DECLARATION:
+        ast_print_node(ast_node);
+        break;
+    case CONSTANT:
+        ast_print_node(ast_node);
+        break;
+    case FUNCTION:
+        ast_print_node(ast_node);
+        ast_traversal(ast_node->as.function.function_tail);
+        break;
+    case FUNCTION_TAIL:
+        ast_print_node(ast_node);
+        ast_list_traversal(ast_node->as.function_tail.declarations);
+        ast_list_traversal(ast_node->as.function_tail.statements);
+        break;
+    case IF_STATEMENT:
+        ast_print_node(ast_node);
 
         printf("Condition:\n");
-        ast_traversal(temp_if->condition);
+        ast_traversal(ast_node->as.if_statement.condition);
 
         printf("If branch:\n");
-        ast_traversal(temp_if->if_branch);
+        ast_list_traversal(ast_node->as.if_statement.if_branch);
 
-        if (temp_if->elseif_count > 0) {
+        if (ast_node->as.if_statement.else_if_branches != NULL) {
             printf("Else if branches:\n");
-            list_node *temp_head;
-            temp_head = temp_if->elsif_branches;
-            i = 0;
-            while (temp_head != NULL) {
-                printf("Else if branch %d:\n", i);
-                ast_traversal((AST_Node *)temp_head->data);
-                temp_head = temp_head->next;
-                i++;
-            }
+            ast_list_traversal(ast_node->as.if_statement.else_if_branches);
         }
 
-        if (temp_if->else_branch != NULL) {
+        if (ast_node->as.if_statement.else_branch != NULL) {
             printf("Else branch:\n");
-            ast_traversal(temp_if->else_branch);
+            ast_list_traversal(ast_node->as.if_statement.else_branch);
         }
-    }
-    /* the else if case */
-    else if (node->type == ELSIF_NODE) {
-        AST_Node_Elsif *temp_elsif = (struct AST_Node_Elsif *)node;
-        ast_print_node(node);
-        ast_traversal(temp_elsif->condition);
-        ast_traversal(temp_elsif->elsif_branch);
-    }
-    /* for case */
-    else if (node->type == FOR_NODE) {
-        AST_Node_For *temp_for = (struct AST_Node_For *)node;
-        ast_print_node(node);
+        break;
+    case EXPRESSION_BINARY:
+        ast_print_node(ast_node);
+
+        printf("Left child:\n");
+        ast_traversal(ast_node->as.expression_binary.left);
+
+        printf("Right child:\n");
+        ast_traversal(ast_node->as.expression_binary.right);
+        break;
+    case EXPRESSION_UNARY:
+        ast_print_node(ast_node);
+
+        printf("Operand:\n");
+        ast_traversal(ast_node->as.expression_unary.operand);
+        break;
+    case VARIABLE_REFERENCE:
+        ast_print_node(ast_node);
+        break;
+    case FUNCTION_CALL:
+        ast_print_node(ast_node);
+
+        printf("Arguments:\n");
+        ast_list_traversal(ast_node->as.function_call.arguments);
+        break;
+    case ELSE_IF:
+        ast_print_node(ast_node);
+
+        printf("Condition:\n");
+        ast_traversal(ast_node->as.else_if.condition);
+
+        printf("Elseif branch:\n");
+        ast_list_traversal(ast_node->as.else_if.else_if_branch);
+        break;
+    case FOR_LOOP:
+        ast_print_node(ast_node);
+
         printf("Initialize:\n");
-        ast_traversal(temp_for->initialize);
+        ast_traversal(ast_node->as.for_loop.initialize);
+
         printf("Condition:\n");
-        ast_traversal(temp_for->condition);
+        ast_traversal(ast_node->as.for_loop.condition);
+
         printf("Increment:\n");
-        ast_traversal(temp_for->increment);
+        ast_traversal(ast_node->as.for_loop.increment);
+
         printf("For branch:\n");
-        ast_traversal(temp_for->for_branch);
-    }
-    /* while case */
-    else if (node->type == WHILE_NODE) {
-        AST_Node_While *temp_while = (struct AST_Node_While *)node;
-        ast_print_node(node);
-        printf("Condition:\n");
-        ast_traversal(temp_while->condition);
-        printf("While branch:\n");
-        ast_traversal(temp_while->while_branch);
-    }
-    /* assign case */
-    else if (node->type == ASSIGN_NODE) {
-        AST_Node_Assign *temp_assign = (struct AST_Node_Assign *)node;
-        ast_print_node(node);
+        ast_list_traversal(ast_node->as.for_loop.for_branch);
+
+        break;
+    case ASSIGNMENT:
+        ast_print_node(ast_node);
+
         printf("Assigning:\n");
-        ast_traversal(temp_assign->assign_val);
-    }
-    /* function call case */
-    else if (node->type == FUNC_CALL) {
-        AST_Node_Func_Call *temp_func_call = (struct AST_Node_Func_Call *)node;
-        ast_print_node(node);
-        if (temp_func_call->num_of_pars != 0) {
-            printf("Call parameters:\n");
-            for (i = 0; i < temp_func_call->num_of_pars; i++) {
-                ast_traversal(temp_func_call->params[i]);
-            }
-        }
-    } else if (node->type == CALL_PARAMS) {
-        AST_Node_Call_Params *temp_call_params =
-            (struct AST_Node_Call_Params *)node;
-        ast_print_node(node);
-        if (temp_call_params->num_of_pars > 0) {
-            printf("Call Parameters:\n");
-            for (i = 0; i < temp_call_params->num_of_pars; i++) {
-                ast_traversal(temp_call_params->params[i]);
-            }
-        }
-    }
-    /* function declarations case */
-    else if (node->type == FUNC_DECLS) {
-        AST_Node_Func_Declarations *temp_func_declarations =
-            (struct AST_Node_Func_Declarations *)node;
-        ast_print_node(node);
-        for (i = 0; i < temp_func_declarations->func_declaration_count; i++) {
-            ast_traversal(temp_func_declarations->func_declarations[i]);
-        }
-    }
-    /* function declaration case */
-    else if (node->type == FUNC_DECL) {
-        ast_print_node(node);
-        AST_Node_Func_Decl *temp_func_decl = (struct AST_Node_Func_Decl *)node;
-        ast_traversal(temp_func_decl->func_head);
-        ast_traversal(temp_func_decl->func_tail);
-    }
-    /* function head case */
-    else if (node->type == FUNC_DECL_HEAD) {
-        AST_Node_Func_Head *temp_func_head = (struct AST_Node_Func_Head *)node;
+        ast_traversal(ast_node->as.assignment.expression);
+        break;
+    case WHILE_LOOP:
+        ast_print_node(ast_node);
 
-        printf("Function has name %s, ret_type %d and %d "
-               "parameters\n",
-               temp_func_head->entry->st_name, temp_func_head->ret_type,
-               temp_func_head->entry->num_of_pars);
+        printf("Condition:\n");
+        ast_traversal(ast_node->as.while_loop.condition);
 
-        if (temp_func_head->entry->num_of_pars != 0) {
-            printf("Parameters:\n");
-            for (i = 0; i < temp_func_head->entry->num_of_pars; i++) {
-                printf("Parameter %s of type %d\n",
-                       temp_func_head->entry->parameters[i].param_name,
-                       temp_func_head->entry->parameters[i].par_type);
-            }
-        }
-    }
-    /* function tail case */
-    else if (node->type == FUNC_DECL_TAIL) {
-        AST_Node_Func_Tail *temp_func_tail = (struct AST_Node_Func_Tail *)node;
+        printf("While branch:\n");
+        ast_list_traversal(ast_node->as.while_loop.while_branch);
+        break;
+    case JUMP_STATEMENT:
+        ast_print_node(ast_node);
+        break;
+    case PRINT_STATEMENT:
+        ast_print_node(ast_node);
 
-        if (temp_func_tail->declarations != NULL) {
-            printf("Function declarations:\n");
-            ast_traversal(temp_func_tail->declarations);
+        printf("Print value:\n");
+        switch (ast->as.print_statement.p_type) {
+        case STRING:
+            printf("%s\n", ast_node->as.print_statement.print_value.sval);
+            break;
+        case EXPRESSION:
+            ast_traversal(ast_node->as.print_statement.print_value.expression);
         }
-        if (temp_func_tail->statements != NULL) {
-            printf("Function statements:\n");
-            ast_traversal(temp_func_tail->statements);
+        break;
+    case INPUT_STATEMENT:
+        ast_print_node(ast_node);
+        break;
+    case RETURN_STATEMENT:
+        ast_print_node(ast_node);
+
+        if (ast_node->as.return_statement.expression != NULL) {
+            printf("Returning:\n");
+            ast_traversal(ast_node->as.return_statement.expression);
         }
-        if (temp_func_tail->return_node != NULL) {
-            printf("Return node:\n");
-            ast_traversal(temp_func_tail->return_node);
-        }
-    }
-    /* parameter declarations case */
-    else if (node->type == DECL_PARAMS) {
-        AST_Node_Decl_Params *temp_decl_params =
-            (struct AST_Node_Decl_Params *)node;
-        ast_print_node(node);
-        printf("Call parameters:\n");
-        for (i = 0; i < temp_decl_params->num_of_pars; i++) {
-            printf("Parameter %s of type %d\n",
-                   temp_decl_params->parameters[i].param_name,
-                   temp_decl_params->parameters[i].par_type);
-        }
-    }
-    /* return case */
-    else if (node->type == RETURN_NODE) {
-        AST_Node_Return *temp_return = (struct AST_Node_Return *)node;
-        ast_print_node(node);
-        printf("Returning:\n");
-        ast_traversal(temp_return->ret_val);
-    }
-    /* others */
-    else {
-        ast_print_node(node);
     }
 }

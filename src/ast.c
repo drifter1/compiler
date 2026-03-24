@@ -1,544 +1,263 @@
 #include "../include/ast.h"
-#include "../include/semantics.h"
+#include "../include/types.h"
 #include <stdlib.h>
-#include <string.h>
 
 extern int yylineno;
 
-AST_Node *ast;
+/* ---------------------AST STRUCTURE----------------------- */
+
+ast_node *ast;
 
 /* ------------------AST NODE MANAGEMENT-------------------- */
-/* Program */
-AST_Node *new_program_node(AST_Node *declarations, AST_Node *statements,
-                           AST_Node *func_declarations) {
 
-    // allocate memory
-    AST_Node_Program *v = malloc(sizeof(AST_Node_Program));
+ast_node *new_ast_node(void) { return (ast_node *)malloc(sizeof(ast_node)); }
 
-    // set node type
-    v->type = PROGRAM_NODE;
+ast_node *ast_program(list_node *declarations, list_node *functions,
+                      ast_node *main_function) {
+    ast_node *v = new_ast_node();
 
-    // set entries
-    v->declarations = declarations;
-    v->statements = statements;
-    v->func_declarations = func_declarations;
+    v->kind = PROGRAM;
+    v->as.program.declarations = declarations;
+    v->as.program.functions = functions;
+    v->as.program.main_function = main_function;
 
-    // return type-casted result
-    return (struct AST_Node *)v;
+    return v;
 }
 
-/* Declarations */
-AST_Node *new_declarations_node(AST_Node *declarations, AST_Node *declaration) {
+ast_node *ast_declaration(data_type d_type, list_node *names) {
+    ast_node *v = new_ast_node();
 
-    AST_Node_Declarations *v;
+    v->kind = DECLARATION;
 
-    // first declaration
-    if (declarations == NULL) {
-        v = malloc(sizeof(AST_Node_Declarations));
-        v->type = DECLARATIONS;
-        v->declarations = (AST_Node **)malloc(sizeof(AST_Node *));
-        v->declarations[0] = declaration;
-        v->declaration_count = 1;
-    }
-    // add new declaration
-    else {
-        v = (AST_Node_Declarations *)declarations;
-        v->declarations = (AST_Node **)realloc(
-            v->declarations, (v->declaration_count + 1) * sizeof(AST_Node *));
-        v->declarations[v->declaration_count] = declaration;
-        v->declaration_count++;
-    }
+    v->as.declaration.d_type = d_type;
+    v->as.declaration.names = names;
 
-    // return type-casted result
-    return (struct AST_Node *)v;
+    return v;
 }
 
-AST_Node *new_ast_decl_node(int data_type, list_node *names, int names_count) {
-    // allocate memory
-    AST_Node_Decl *v = malloc(sizeof(AST_Node_Decl));
+ast_node *ast_constant(data_type d_type, value val) {
+    ast_node *v = new_ast_node();
 
-    // set entries
-    v->type = DECL_NODE;
-    v->data_type = data_type;
-    v->names = names;
-    v->names_count = names_count;
+    v->kind = CONSTANT;
 
-    // declare types of the names
-    list_node *temp_head;
-    list_t *temp_entry;
+    v->as.constant.d_type = d_type;
+    v->as.constant.val = val;
 
-    temp_head = v->names;
-    while (temp_head != NULL) {
-        temp_entry = (list_t *)temp_head->data;
+    return v;
+}
 
-        // variable
-        if (temp_entry->st_type == UNDEF) {
-            set_type(temp_entry->st_name, data_type, UNDEF);
+ast_node *ast_function(symtab_entry *entry, ast_node *function_tail) {
+    ast_node *v = new_ast_node();
+
+    v->kind = FUNCTION;
+
+    v->as.function.entry = entry;
+    v->as.function.function_tail = function_tail;
+
+    return v;
+}
+
+ast_node *ast_function_tail(list_node *declarations, list_node *statements) {
+    ast_node *v = new_ast_node();
+
+    v->kind = FUNCTION_TAIL;
+
+    v->as.function_tail.declarations = declarations;
+    v->as.function_tail.statements = statements;
+
+    return v;
+}
+
+ast_node *ast_if_statement(ast_node *condition, list_node *if_branch,
+                           list_node *else_if_branches,
+                           list_node *else_branch) {
+    ast_node *v = new_ast_node();
+
+    v->kind = IF_STATEMENT;
+
+    v->as.if_statement.condition = condition;
+    v->as.if_statement.if_branch = if_branch;
+    v->as.if_statement.else_if_branches = else_if_branches;
+    v->as.if_statement.else_branch = else_branch;
+
+    return v;
+}
+
+ast_node *ast_expression_binary(ast_node *left, operator_type op_type,
+                                ast_node *right) {
+    ast_node *v = new_ast_node();
+
+    v->kind = EXPRESSION_BINARY;
+
+    v->as.expression_binary.left = left;
+    v->as.expression_binary.op_type = op_type;
+    v->as.expression_binary.right = right;
+
+    return v;
+}
+
+ast_node *ast_expression_unary(ast_node *operand, operator_type op_type,
+                               fixity_type fixity) {
+    ast_node *v = new_ast_node();
+
+    v->kind = EXPRESSION_UNARY;
+
+    v->as.expression_unary.operand = operand;
+    v->as.expression_unary.op_type =
+        ast_expression_unary_op_type(op_type, fixity);
+
+    return v;
+}
+
+ast_node *ast_variable_reference(symtab_entry *entry) {
+    ast_node *v = new_ast_node();
+
+    v->kind = VARIABLE_REFERENCE;
+
+    v->as.variable_reference.entry = entry;
+
+    return v;
+}
+
+ast_node *ast_function_call(symtab_entry *entry, list_node *arguments) {
+    ast_node *v = new_ast_node();
+
+    v->kind = FUNCTION_CALL;
+
+    v->as.function_call.entry = entry;
+    v->as.function_call.arguments = arguments;
+
+    return v;
+}
+
+ast_node *ast_else_if(ast_node *condition, list_node *else_if_branch) {
+    ast_node *v = new_ast_node();
+
+    v->kind = ELSE_IF;
+
+    v->as.else_if.condition = condition;
+    v->as.else_if.else_if_branch = else_if_branch;
+
+    return v;
+}
+
+ast_node *ast_for_loop(ast_node *initialize, ast_node *condition,
+                       ast_node *increment, list_node *for_branch) {
+    ast_node *v = new_ast_node();
+
+    v->kind = FOR_LOOP;
+
+    v->as.for_loop.initialize = initialize;
+    v->as.for_loop.condition = condition;
+    v->as.for_loop.increment = increment;
+    v->as.for_loop.for_branch = for_branch;
+
+    return v;
+}
+
+ast_node *ast_assignment(ast_node *variable_reference, ast_node *expression) {
+    ast_node *v = new_ast_node();
+
+    v->kind = ASSIGNMENT;
+
+    v->as.assignment.variable_reference = variable_reference;
+    v->as.assignment.expression = expression;
+
+    return v;
+}
+
+ast_node *ast_while_loop(ast_node *condition, list_node *while_branch) {
+    ast_node *v = new_ast_node();
+
+    v->kind = WHILE_LOOP;
+
+    v->as.while_loop.condition = condition;
+    v->as.while_loop.while_branch = while_branch;
+
+    return v;
+}
+
+ast_node *ast_jump_statement(jump_type j_type) {
+    ast_node *v = new_ast_node();
+
+    v->kind = JUMP_STATEMENT;
+
+    v->as.jump_statement.j_type = j_type;
+
+    return v;
+}
+
+ast_node *ast_print_statement(print_type p_type, char *sval,
+                              ast_node *expression) {
+    ast_node *v = new_ast_node();
+
+    v->kind = PRINT_STATEMENT;
+    v->as.print_statement.p_type = p_type;
+
+    switch (p_type) {
+    case EXPRESSION:
+        v->as.print_statement.print_value.expression = expression;
+        break;
+    case STRING:
+        v->as.print_statement.print_value.sval = sval;
+    }
+
+    return v;
+}
+
+ast_node *ast_input_statement(ast_node *variable_reference) {
+    ast_node *v = new_ast_node();
+
+    v->kind = INPUT_STATEMENT;
+
+    v->as.input_statement.variable_reference = variable_reference;
+
+    return v;
+}
+
+ast_node *ast_return_statement(data_type ret_type, ast_node *expression) {
+    ast_node *v = new_ast_node();
+
+    v->kind = RETURN_STATEMENT;
+
+    v->as.return_statement.ret_type = ret_type;
+    v->as.return_statement.expression = expression;
+
+    return v;
+}
+
+/* --------------------AST NODE HELPERS--------------------- */
+
+operator_type ast_expression_unary_op_type(operator_type op_type,
+                                           fixity_type fixity) {
+    switch (op_type) {
+    case INC:
+        switch (fixity) {
+        case PREFIX:
+            return PRE_INC;
+            break;
+        case POSTFIX:
+            return POST_INC;
         }
-        // pointer
-        else if (temp_entry->st_type == POINTER_TYPE) {
-            set_type(temp_entry->st_name, POINTER_TYPE, data_type);
+        break;
+    case DEC:
+        switch (fixity) {
+        case PREFIX:
+            return PRE_DEC;
+            break;
+        case POSTFIX:
+            return POST_DEC;
         }
-        // array
-        else if (temp_entry->st_type == ARRAY_TYPE) {
-            set_type(temp_entry->st_name, ARRAY_TYPE, data_type);
-        }
-
-        temp_head = temp_head->next;
+        break;
+    case ADD:
+        return UNARY_PLUS;
+        break;
+    case SUB:
+        return UNARY_MINUS;
+        break;
+    default:
+        return op_type;
     }
 
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_const_node(int const_type, Value val) {
-    // allocate memory
-    AST_Node_Const *v = malloc(sizeof(AST_Node_Const));
-
-    // set entries
-    v->type = CONST_NODE;
-    v->const_type = const_type;
-    v->val = val;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-/* Statements */
-
-AST_Node *new_statements_node(AST_Node *statements, AST_Node *statement) {
-
-    AST_Node_Statements *v;
-
-    // first statement
-    if (statements == NULL) {
-        v = malloc(sizeof(AST_Node_Statements));
-        v->type = STATEMENTS;
-        v->statements = (AST_Node **)malloc(sizeof(AST_Node *));
-        v->statements[0] = statement;
-        v->statement_count = 1;
-    }
-    // add new statement
-    else {
-        v = (AST_Node_Statements *)statements;
-        v->statements = (AST_Node **)realloc(
-            v->statements, (v->statement_count + 1) * sizeof(AST_Node *));
-        v->statements[v->statement_count] = statement;
-        v->statement_count++;
-    }
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch,
-                          list_node *elsif_branches, int elseif_count,
-                          AST_Node *else_branch) {
-    // allocate memory
-    AST_Node_If *v = malloc(sizeof(AST_Node_If));
-
-    // set entries
-    v->type = IF_NODE;
-    v->condition = condition;
-    v->if_branch = if_branch;
-    v->elsif_branches = elsif_branches;
-    v->elseif_count = elseif_count;
-    v->else_branch = else_branch;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_elsif_node(AST_Node *condition, AST_Node *elsif_branch) {
-    // allocate memory
-    AST_Node_Elsif *v = malloc(sizeof(AST_Node_Elsif));
-
-    // set entries
-    v->type = ELSIF_NODE;
-    v->condition = condition;
-    v->elsif_branch = elsif_branch;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_for_node(AST_Node *initialize, AST_Node *condition,
-                           AST_Node *increment, AST_Node *for_branch) {
-    // allocate memory
-    AST_Node_For *v = malloc(sizeof(AST_Node_For));
-
-    // set entries
-    v->type = FOR_NODE;
-    v->initialize = initialize;
-    v->condition = condition;
-    v->increment = increment;
-    v->for_branch = for_branch;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-void set_loop_counter(AST_Node *node) {
-    /* type-cast to for node */
-    AST_Node_For *for_node = (AST_Node_For *)node;
-
-    /* find the counter */
-    AST_Node_Assign *assign_node = (AST_Node_Assign *)for_node->initialize;
-    for_node->counter = assign_node->entry;
-
-    /* check if the same one occurs in increment! */
-    AST_Node_Incr *incr_node = (AST_Node_Incr *)for_node->increment;
-    if (strcmp(incr_node->entry->st_name, assign_node->entry->st_name)) {
-        fprintf(stderr,
-                "Semantic error at line %d. Variable used in init and incr of "
-                "for are not the same\n",
-                yylineno);
-        exit(EXIT_FAILURE);
-    }
-
-    /* type-cast back to AST_Node */
-    node = (AST_Node *)for_node;
-}
-
-AST_Node *new_ast_while_node(AST_Node *condition, AST_Node *while_branch) {
-    // allocate memory
-    AST_Node_While *v = malloc(sizeof(AST_Node_While));
-
-    // set entries
-    v->type = WHILE_NODE;
-    v->condition = condition;
-    v->while_branch = while_branch;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_assign_node(list_t *entry, int ref, AST_Node *assign_val) {
-    // allocate memory
-    AST_Node_Assign *v = malloc(sizeof(AST_Node_Assign));
-
-    // set entries
-    v->type = ASSIGN_NODE;
-    v->entry = entry;
-    v->ref = ref;
-    v->assign_val = assign_val;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_simple_node(int statement_type) {
-    // allocate memory
-    AST_Node_Simple *v = malloc(sizeof(AST_Node_Simple));
-
-    // set entries
-    v->type = SIMPLE_NODE;
-    v->statement_type = statement_type;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_incr_node(list_t *entry, int incr_type, int pf_type) {
-    // allocate memory
-    AST_Node_Incr *v = malloc(sizeof(AST_Node_Incr));
-
-    // set entries
-    v->type = INCR_NODE;
-    v->entry = entry;
-    v->incr_type = incr_type;
-    v->pf_type = pf_type;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_func_call_node(list_t *entry, AST_Node **params,
-                                 int num_of_pars) {
-    // allocate memory
-    AST_Node_Func_Call *v = malloc(sizeof(AST_Node_Func_Call));
-
-    // set entries
-    v->type = FUNC_CALL;
-    v->entry = entry;
-    v->params = params;
-    v->num_of_pars = num_of_pars;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_call_params_node(AST_Node *params, AST_Node *param) {
-
-    AST_Node_Call_Params *v;
-
-    // first parameter
-    if (params == NULL) {
-        v = malloc(sizeof(AST_Node_Call_Params));
-        v->type = CALL_PARAMS;
-        v->params = (AST_Node **)malloc(sizeof(AST_Node *));
-        v->params[0] = param;
-        v->num_of_pars = 1;
-    }
-    // add new parameter
-    else {
-        v = (AST_Node_Call_Params *)params;
-        v->params = (AST_Node **)realloc(v->params, (v->num_of_pars + 1) *
-                                                        sizeof(AST_Node *));
-        v->params[v->num_of_pars] = param;
-        v->num_of_pars++;
-    }
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-/* Expressions */
-
-AST_Node *new_ast_arithm_node(enum Arithm_op op, AST_Node *left,
-                              AST_Node *right) {
-    // allocate memory
-    AST_Node_Arithm *v = malloc(sizeof(AST_Node_Arithm));
-
-    // set entries
-    v->type = ARITHM_NODE;
-    v->op = op;
-    v->left = left;
-    v->right = right;
-
-    // set data type
-    v->data_type = get_result_type(
-        expression_data_type(left),  /* data type of left expression */
-        expression_data_type(right), /* data type of right expression */
-        ARITHM_OP                    /* operation type */
-    );
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_bool_node(enum Bool_op op, AST_Node *left, AST_Node *right) {
-    // allocate memory
-    AST_Node_Bool *v = malloc(sizeof(AST_Node_Bool));
-
-    // set entries
-    v->type = BOOL_NODE;
-    v->op = op;
-    v->left = left;
-    v->right = right;
-
-    // set data type
-    if (v->op != NOT) { /* AND or OR */
-        v->data_type = get_result_type(
-            expression_data_type(left),  /* data type of left expression */
-            expression_data_type(right), /* data type of right expression */
-            BOOL_OP                      /* operation type */
-        );
-    } else { /* NOT */
-        v->data_type = get_result_type(
-            expression_data_type(left), /* data type of left expression */
-            UNDEF,                      /* there is no right expression */
-            NOT_OP                      /* operation type */
-        );
-    }
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_rel_node(enum Rel_op op, AST_Node *left, AST_Node *right) {
-    // allocate memory
-    AST_Node_Rel *v = malloc(sizeof(AST_Node_Rel));
-
-    // set entries
-    v->type = REL_NODE;
-    v->op = op;
-    v->left = left;
-    v->right = right;
-
-    // set data type
-    v->data_type = get_result_type(
-        expression_data_type(left),  /* data type of left expression  */
-        expression_data_type(right), /* data type of right expression */
-        REL_OP                       /* operation type */
-    );
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_equ_node(enum Equ_op op, AST_Node *left, AST_Node *right) {
-    // allocate memory
-    AST_Node_Equ *v = malloc(sizeof(AST_Node_Equ));
-
-    // set entries
-    v->type = EQU_NODE;
-    v->op = op;
-    v->left = left;
-    v->right = right;
-
-    // set data type
-    v->data_type = get_result_type(
-        expression_data_type(left),  /* data type of left expression  */
-        expression_data_type(right), /* data type of right expression */
-        EQU_OP                       /* operation type */
-    );
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_ref_node(list_t *entry, int ref) {
-    // allocate memory
-    AST_Node_Ref *v = malloc(sizeof(AST_Node_Ref));
-
-    // set entries
-    v->type = REF_NODE;
-    v->entry = entry;
-    v->ref = ref;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-/* Functions */
-AST_Node *new_func_declarations_node(AST_Node *func_declarations,
-                                     AST_Node *func_declaration) {
-
-    AST_Node_Func_Declarations *v;
-
-    // first function declaration
-    if (func_declarations == NULL) {
-        v = malloc(sizeof(AST_Node_Func_Declarations));
-        v->type = FUNC_DECLS;
-        v->func_declarations = (AST_Node **)malloc(sizeof(AST_Node *));
-        v->func_declarations[0] = func_declaration;
-        v->func_declaration_count = 1;
-    }
-    // add new function declaration
-    else {
-        v = (AST_Node_Func_Declarations *)func_declarations;
-        v->func_declarations = (AST_Node **)realloc(
-            v->func_declarations,
-            (v->func_declaration_count + 1) * sizeof(AST_Node *));
-        v->func_declarations[v->func_declaration_count] = func_declaration;
-        v->func_declaration_count++;
-    }
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_func_decl_node(AST_Node *func_head, AST_Node *func_tail) {
-
-    // allocate memory
-    AST_Node_Func_Decl *v = malloc(sizeof(AST_Node_Func_Decl));
-
-    // set entries
-    v->type = FUNC_DECL;
-    v->func_head = func_head;
-    v->func_tail = func_tail;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_func_head_node(AST_Node *ret_type, list_t *entry,
-                                 AST_Node *decl_params) {
-    // allocate memory
-    AST_Node_Func_Head *v = malloc(sizeof(AST_Node_Func_Head));
-
-    // set entries
-    v->type = FUNC_DECL_HEAD;
-    AST_Node_Ret_Type *temp_ret_type = (AST_Node_Ret_Type *)ret_type;
-    v->ret_type = temp_ret_type->ret_type;
-    v->pointer = temp_ret_type->pointer;
-    v->entry = entry;
-
-    v->entry->st_type = FUNCTION_TYPE;
-    v->entry->inf_type = v->ret_type;
-
-    if (decl_params != NULL) {
-        AST_Node_Decl_Params *temp_decl_params =
-            (AST_Node_Decl_Params *)decl_params;
-        v->entry->parameters = temp_decl_params->parameters;
-        v->entry->num_of_pars = temp_decl_params->num_of_pars;
-    } else {
-        v->entry->parameters = NULL;
-        v->entry->num_of_pars = 0;
-    }
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-AST_Node *new_ast_func_tail_node(AST_Node *declarations, AST_Node *statements,
-                                 AST_Node *return_node) {
-
-    // allocate memory
-    AST_Node_Func_Tail *v = malloc(sizeof(AST_Node_Func_Tail));
-
-    // set entries
-    v->type = FUNC_DECL_TAIL;
-    v->declarations = declarations;
-    v->statements = statements;
-    v->return_node = return_node;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_ret_type_node(int ret_type, int pointer) {
-    // allocate memory
-    AST_Node_Ret_Type *v = malloc(sizeof(AST_Node_Ret_Type));
-
-    // set entries
-    v->type = RET_TYPE;
-    v->ret_type = ret_type;
-    v->pointer = pointer;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_decl_params_node(Param *parameters, int num_of_pars,
-                                   Param param) {
-    // allocate memory
-    AST_Node_Decl_Params *v = malloc(sizeof(AST_Node_Decl_Params));
-
-    // set node type
-    v->type = DECL_PARAMS;
-
-    // first declaration
-    if (parameters == NULL) {
-        parameters = (Param *)malloc(sizeof(Param));
-        parameters[0] = param;
-        num_of_pars = 1;
-    }
-    // add new declaration
-    else {
-        parameters =
-            (Param *)realloc(parameters, (num_of_pars + 1) * sizeof(Param));
-        parameters[num_of_pars] = param;
-        num_of_pars++;
-    }
-
-    // set entries
-    v->parameters = parameters;
-    v->num_of_pars = num_of_pars;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
-}
-
-AST_Node *new_ast_return_node(AST_Node *ret_val) {
-    // allocate memory
-    AST_Node_Return *v = malloc(sizeof(AST_Node_Return));
-
-    // set entries
-    v->type = RETURN_NODE;
-    v->ret_type = expression_data_type(ret_val);
-    v->ret_val = ret_val;
-
-    // return type-casted result
-    return (struct AST_Node *)v;
+    return op_type;
 }

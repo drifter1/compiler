@@ -1,425 +1,161 @@
-#include "list.h"
-#include "symtab.h"
-
 #ifndef AST_H
 #define AST_H
 
-/* ---------------------NODE TYPES-------------------------- */
-
-typedef enum Node_Type {
-    PROGRAM_NODE, // program
-    // declarations
-    DECLARATIONS, // declarations
-    DECL_NODE,    // declaration
-    CONST_NODE,   // constant
-    // statements
-    STATEMENTS,  // statements
-    IF_NODE,     // if statement
-    ELSIF_NODE,  // else if branch
-    FOR_NODE,    // for statement
-    WHILE_NODE,  // while statement
-    ASSIGN_NODE, // assigment
-    SIMPLE_NODE, // continue or break statement
-    INCR_NODE,   // increment statement (non-expression one)
-    FUNC_CALL,   // function call
-    CALL_PARAMS, // function call parameters
-    // expressions
-    ARITHM_NODE, // arithmetic expression
-    BOOL_NODE,   // boolean expression
-    REL_NODE,    // relational expression
-    EQU_NODE,    // equality expression
-    REF_NODE,    // identifier in expression
-    // functions
-    FUNC_DECLS,     // function declarations
-    FUNC_DECL,      // function declaration
-    FUNC_DECL_HEAD, // function head
-    FUNC_DECL_TAIL, // function tail
-    RET_TYPE,       // function return type
-    DECL_PARAMS,    // function parameters
-    RETURN_NODE     // return statement of functions
-} Node_Type;
-
-/* --------------------OPERATOR TYPES----------------------- */
-
-typedef enum Arithm_op {
-    ADD, // + operator
-    SUB, // - operator
-    MUL, // * operator
-    DIV, // / operator
-    INC, // ++ operator
-    DEC  // -- operator
-} Arithm_op;
-
-typedef enum Bool_op {
-    OR,  // || operator
-    AND, // && operator
-    NOT  // ! operator
-} Bool_op;
-
-typedef enum Rel_op {
-    GREATER,       // > operator
-    LESS,          // < operator
-    GREATER_EQUAL, // >= operator
-    LESS_EQUAL     // <= operator
-} Rel_op;
-
-typedef enum Equ_op {
-    EQUAL,    // == operator
-    NOT_EQUAL // != operator
-} Equ_op;
-
-/* -----------------------AST NODES------------------------- */
-
-/* The basic node */
-typedef struct AST_Node {
-    enum Node_Type type;    // node type
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
-} AST_Node;
-
-/* Program */
-typedef struct AST_Node_Program {
-    enum Node_Type type; // node type
-
-    struct AST_Node *declarations;
-    struct AST_Node *statements;
-    struct AST_Node *func_declarations;
-} AST_Node_Program;
-
-/* Declarations */
-typedef struct AST_Node_Declarations {
-    enum Node_Type type; // node type
-
-    // declarations
-    struct AST_Node **declarations;
-    int declaration_count;
-} AST_Node_Declarations;
-
-typedef struct AST_Node_Decl {
-    enum Node_Type type; // node type
-
-    // data type
-    int data_type;
-
-    // symbol table entries of the variables
-    list_node *names;
-    int names_count;
-} AST_Node_Decl;
-
-typedef struct AST_Node_Const {
-    enum Node_Type type; // node type
-
-    // data type
-    int const_type;
-
-    // constant value
-    Value val;
-} AST_Node_Const;
-
-/* Statements */
-typedef struct AST_Node_Statements {
-    enum Node_Type type; // node type
-
-    // statements
-    struct AST_Node **statements;
-    int statement_count;
-} AST_Node_Statements;
-
-typedef struct AST_Node_If {
-    enum Node_Type type; // node type
-
-    // condition
-    struct AST_Node *condition;
-
-    // if branch
-    struct AST_Node *if_branch;
-
-    // else if branches
-    struct list_node *elsif_branches;
-    int elseif_count;
-
-    // else branch
-    struct AST_Node *else_branch;
-} AST_Node_If;
-
-typedef struct AST_Node_Elsif {
-    enum Node_Type type; // node type
-
-    // condition
-    struct AST_Node *condition;
-
-    // branch
-    struct AST_Node *elsif_branch;
-} AST_Node_Elsif;
-
-typedef struct AST_Node_For {
-    enum Node_Type type; // node type
-
-    // initialization
-    struct AST_Node *initialize;
-
-    // condition
-    struct AST_Node *condition;
-
-    // incrementation
-    struct AST_Node *increment;
-
-    // branch
-    struct AST_Node *for_branch;
-
-    // loop counter
-    list_t *counter;
-} AST_Node_For;
-
-typedef struct AST_Node_While {
-    enum Node_Type type; // node type
-
-    // condition
-    struct AST_Node *condition;
-
-    // branch
-    struct AST_Node *while_branch;
-} AST_Node_While;
-
-typedef struct AST_Node_Assign {
-    enum Node_Type type; // node type
-
-    // symbol table entry
-    list_t *entry;
-
-    // reference or not
-    int ref; // 0: not reference, 1: reference
-
-    // assignment value
-    struct AST_Node *assign_val;
-} AST_Node_Assign;
-
-typedef struct AST_Node_Simple {
-    enum Node_Type type; // node type
-
-    // continue: '0', break: '1'
-    int statement_type;
-} AST_Node_Simple;
-
-typedef struct AST_Node_Incr {
-    enum Node_Type type; // node type
-
-    // identifier
-    list_t *entry;
-
-    // increment or decrement
-    int incr_type; // 0: increment, 1: decrement
-
-    // post- or prefix
-    int pf_type; // 0: postfix, 1: prefix
-} AST_Node_Incr;
-
-typedef struct AST_Node_Func_Call {
-    enum Node_Type type; // node type
-
-    // function identifier
-    list_t *entry;
-
-    // call parameters
-    AST_Node **params;
-    int num_of_pars;
-} AST_Node_Func_Call;
-
-typedef struct AST_Node_Call_Params {
-    enum Node_Type type; // node type
-
-    // call parameters
-    AST_Node **params;
-    int num_of_pars;
-} AST_Node_Call_Params;
-
-/* Expressions */
-typedef struct AST_Node_Arithm {
-    enum Node_Type type; // node type
-
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
-
-    // data type of result
-    int data_type;
-
-    // operator
-    enum Arithm_op op;
-} AST_Node_Arithm;
-
-typedef struct AST_Node_Bool {
-    enum Node_Type type; // node type
-
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
-
-    // data type of result
-    int data_type;
-
-    // operator
-    enum Bool_op op;
-} AST_Node_Bool;
-
-typedef struct AST_Node_Rel {
-    enum Node_Type type; // node type
-
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
-
-    // data type of result
-    int data_type;
-
-    // operator
-    enum Rel_op op;
-} AST_Node_Rel;
-
-typedef struct AST_Node_Equ {
-    enum Node_Type type; // node type
-
-    struct AST_Node *left;  // left child
-    struct AST_Node *right; // right child
-
-    // data type of result
-    int data_type;
-
-    // operator
-    enum Equ_op op;
-} AST_Node_Equ;
-
-typedef struct AST_Node_Ref {
-    enum Node_Type type; // node type
-
-    // symbol table entry
-    list_t *entry;
-
-    // reference or not
-    int ref; // 0: not reference, 1: reference
-} AST_Node_Ref;
-
-/* Functions */
-typedef struct AST_Node_Func_Declarations {
-    enum Node_Type type; // node type
-
-    // declarations
-    struct AST_Node **func_declarations;
-    int func_declaration_count;
-} AST_Node_Func_Declarations;
-
-typedef struct AST_Node_Func_Decl {
-    enum Node_Type type; // node type
-
-    struct AST_Node *func_head;
-    struct AST_Node *func_tail;
-} AST_Node_Func_Decl;
-
-typedef struct AST_Node_Func_Head {
-    enum Node_Type type; // node type
-
-    // return type
-    int ret_type;
-
-    // is pointer or not
-    int pointer; // 0: not pointer, 1: pointer
-
-    // symbol table entry
-    list_t *entry;
-} AST_Node_Func_Head;
-
-typedef struct AST_Node_Func_Tail {
-    enum Node_Type type; // node type
-
-    // declarations, statements and return
-    struct AST_Node *declarations;
-    struct AST_Node *statements;
-    struct AST_Node *return_node;
-} AST_Node_Func_Tail;
-
-typedef struct AST_Node_Ret_Type {
-    enum Node_Type type; // node type
-
-    // return type
-    int ret_type;
-
-    // is pointer or not
-    int pointer; // 0: not pointer, 1: pointer
-} AST_Node_Ret_Type;
-
-typedef struct AST_Node_Decl_Params {
-    enum Node_Type type; // node type
-
-    // parameters
-    Param *parameters;
-    int num_of_pars;
-} AST_Node_Decl_Params;
-
-typedef struct AST_Node_Return {
-    enum Node_Type type; // node type
-
-    // return type
-    int ret_type;
-
-    // return value
-    struct AST_Node *ret_val;
-} AST_Node_Return;
+#include "list.h"
+#include "symtab.h"
+#include "types.h"
+
+/* ----------------------AST NODE KINDS--------------------- */
+
+typedef enum {
+    PROGRAM,
+    DECLARATION,
+    CONSTANT,
+    FUNCTION,
+    FUNCTION_TAIL,
+    IF_STATEMENT,
+    EXPRESSION_BINARY,
+    EXPRESSION_UNARY,
+    VARIABLE_REFERENCE,
+    FUNCTION_CALL,
+    ELSE_IF,
+    FOR_LOOP,
+    ASSIGNMENT,
+    WHILE_LOOP,
+    JUMP_STATEMENT,
+    PRINT_STATEMENT,
+    INPUT_STATEMENT,
+    RETURN_STATEMENT
+} ast_node_kind;
+
+/* ------------------------AST NODES------------------------ */
+
+typedef struct ast_node {
+    ast_node_kind kind;
+
+    union {
+        struct {
+            list_node *declarations;
+            list_node *functions;
+            struct ast_node *main_function;
+        } program;
+        struct {
+            data_type d_type;
+            list_node *names;
+        } declaration;
+        struct {
+            data_type d_type;
+            value val;
+        } constant;
+        struct {
+            symtab_entry *entry;
+            struct ast_node *function_tail;
+        } function;
+        struct {
+            list_node *declarations;
+            list_node *statements;
+        } function_tail;
+        struct {
+            struct ast_node *condition;
+            list_node *if_branch;
+            list_node *else_if_branches;
+            list_node *else_branch;
+        } if_statement;
+        struct {
+            struct ast_node *left;
+            operator_type op_type;
+            struct ast_node *right;
+        } expression_binary;
+        struct {
+            struct ast_node *operand;
+            operator_type op_type;
+        } expression_unary;
+        struct {
+            symtab_entry *entry;
+        } variable_reference;
+        struct {
+            symtab_entry *entry;
+            list_node *arguments;
+        } function_call;
+        struct {
+            struct ast_node *condition;
+            list_node *else_if_branch;
+        } else_if;
+        struct {
+            struct ast_node *initialize;
+            struct ast_node *condition;
+            struct ast_node *increment;
+            list_node *for_branch;
+        } for_loop;
+        struct {
+            struct ast_node *variable_reference;
+            struct ast_node *expression;
+        } assignment;
+        struct {
+            struct ast_node *condition;
+            list_node *while_branch;
+        } while_loop;
+        struct {
+            jump_type j_type;
+        } jump_statement;
+        struct {
+            print_type p_type;
+            union {
+                char *sval;
+                struct ast_node *expression;
+            } print_value;
+        } print_statement;
+        struct {
+            struct ast_node *variable_reference;
+        } input_statement;
+        struct {
+            data_type ret_type;
+            struct ast_node *expression;
+        } return_statement;
+    } as;
+} ast_node;
 
 /* ---------------------AST STRUCTURE----------------------- */
 
-extern AST_Node *ast;
+extern ast_node *ast;
 
 /* ------------------AST NODE MANAGEMENT-------------------- */
 
-/* Program */
-AST_Node *new_program_node(AST_Node *declarations, AST_Node *statements,
-                           AST_Node *func_declarations);
+ast_node *new_ast_node(void);
+ast_node *ast_program(list_node *declarations, list_node *functions,
+                      ast_node *main_function);
+ast_node *ast_declaration(data_type d_type, list_node *names);
+ast_node *ast_constant(data_type d_type, value val);
+ast_node *ast_function(symtab_entry *entry, ast_node *function_tail);
+ast_node *ast_function_tail(list_node *declarations, list_node *statements);
+ast_node *ast_if_statement(ast_node *condition, list_node *if_branch,
+                           list_node *else_if_branches, list_node *else_branch);
+ast_node *ast_expression_binary(ast_node *left, operator_type op_type,
+                                ast_node *right);
+ast_node *ast_expression_unary(ast_node *operand, operator_type op_type,
+                               fixity_type fixity);
+ast_node *ast_variable_reference(symtab_entry *entry);
+ast_node *ast_function_call(symtab_entry *entry, list_node *arguments);
+ast_node *ast_else_if(ast_node *condition, list_node *else_if_branch);
+ast_node *ast_for_loop(ast_node *initialize, ast_node *condition,
+                       ast_node *increment, list_node *for_branch);
+ast_node *ast_assignment(ast_node *variable_reference, ast_node *expression);
+ast_node *ast_while_loop(ast_node *condition, list_node *while_branch);
+ast_node *ast_jump_statement(jump_type j_type);
+ast_node *ast_print_statement(print_type p_type, char *sval,
+                              ast_node *expression);
+ast_node *ast_input_statement(ast_node *variable_reference);
+ast_node *ast_return_statement(data_type ret_type, ast_node *expression);
 
-/* Declarations */
-AST_Node *new_declarations_node(AST_Node *declarations, AST_Node *declaration);
-AST_Node *new_ast_decl_node(int data_type, list_node *names,
-                            int names_count);            // declaration
-AST_Node *new_ast_const_node(int const_type, Value val); // constant
+/* --------------------AST NODE HELPERS--------------------- */
 
-/* Statements */
-AST_Node *new_statements_node(AST_Node *statements, AST_Node *statement);
-AST_Node *new_ast_if_node(AST_Node *condition, AST_Node *if_branch,
-                          list_node *elsif_branches, int elseif_count,
-                          AST_Node *else_branch);
-AST_Node *new_ast_elsif_node(AST_Node *condition, AST_Node *elsif_branch);
-AST_Node *new_ast_for_node(AST_Node *initialize, AST_Node *condition,
-                           AST_Node *increment, AST_Node *for_branch);
-void set_loop_counter(AST_Node *node);
-AST_Node *new_ast_while_node(AST_Node *condition, AST_Node *while_branch);
-AST_Node *new_ast_assign_node(list_t *entry, int ref, AST_Node *assign_val);
-AST_Node *new_ast_simple_node(int statement_type); // continue or break
-AST_Node *new_ast_incr_node(list_t *entry, int incr_type,
-                            int pf_type); // increment decrement
-AST_Node *new_ast_func_call_node(list_t *entry, AST_Node **params,
-                                 int num_of_pars); // function call
-AST_Node *new_ast_call_params_node(AST_Node *params, AST_Node *param);
+operator_type ast_expression_unary_op_type(operator_type op_type,
+                                           fixity_type fixity);
 
-/* Expressions */
-AST_Node *new_ast_arithm_node(enum Arithm_op op, AST_Node *left,
-                              AST_Node *right);
-AST_Node *new_ast_bool_node(enum Bool_op op, AST_Node *left, AST_Node *right);
-AST_Node *new_ast_rel_node(enum Rel_op op, AST_Node *left, AST_Node *right);
-AST_Node *new_ast_equ_node(enum Equ_op op, AST_Node *left, AST_Node *right);
-AST_Node *new_ast_ref_node(list_t *entry, int ref);
+/* ---------------------AST TRAVERSAL----------------------- */
 
-/* Functions */
-AST_Node *new_func_declarations_node(AST_Node *func_declarations,
-                                     AST_Node *func_declaration);
-AST_Node *new_ast_func_decl_node(AST_Node *func_head, AST_Node *func_tail);
-AST_Node *new_ast_func_head_node(AST_Node *ret_type, list_t *entry,
-                                 AST_Node *decl_params);
-AST_Node *new_ast_func_tail_node(AST_Node *declarations, AST_Node *statements,
-                                 AST_Node *return_node);
-AST_Node *new_ast_ret_type_node(int ret_type,
-                                int pointer); // function return type
-AST_Node *new_ast_decl_params_node(Param *parameters, int num_of_pars,
-                                   Param param);
-AST_Node *new_ast_return_node(AST_Node *ret_val); // function return
-
-/* Tree Traversal */
-void ast_print_node(AST_Node *node); // print information of node
-void ast_traversal(AST_Node *node);  // tree traversal (for testing right now)
+void ast_print_node(ast_node *node);
+void ast_list_traversal(list_node *list_head);
+void ast_traversal(ast_node *node);
 
 #endif /* AST_H */
