@@ -16,11 +16,10 @@ int main(int argc, char *argv[]) {
         }
 
         // initialize symbol table
-        init_hash_table();
+        init_symbol_table();
 
-        /* declare function type of "print" */
-        insert("print", 5, UNDEF, -1);
-        func_declare("print", VOID_TYPE, 1, NULL);
+        // initialize scope
+        init_scope();
 
         // parsing
         yyparse();
@@ -29,6 +28,9 @@ int main(int argc, char *argv[]) {
         if (DEBUG)
             printf("Parsing finished!\n");
 
+        // semantic analysis
+        semantic_analysis(ast);
+
         // AST traversal
         if (DEBUG)
             ast_traversal(ast);
@@ -36,7 +38,7 @@ int main(int argc, char *argv[]) {
         // symbol table dump
         if (DEBUG) {
             yyout = fopen("symtab_dump.out", "w");
-            symtab_dump(yyout);
+            dump_symbol_table(yyout);
             fclose(yyout);
         }
 
