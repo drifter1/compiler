@@ -1,0 +1,35 @@
+#ifndef SCOPE_H
+#define SCOPE_H
+
+/* -----------------------SCOPE KINDS---------------------- */
+
+typedef enum { GLOBAL, LOCAL } scope_kind;
+
+/* --------------------VISIBILITY KINDS-------------------- */
+
+typedef enum { VISIBLE, HIDDEN } visibility_kind;
+
+/* ---------------------SCOPE STRUCTURE-------------------- */
+
+typedef struct scope {
+    struct scope *parent;
+    scope_kind kind;
+    char *id;
+    visibility_kind visibility;
+} scope;
+
+/* ----------------------CURRENT SCOPE--------------------- */
+
+extern scope *cur_scope;
+
+/* --------------------SCOPE MANAGEMENT-------------------- */
+
+void init_scope();
+void hide_scope(char *id);
+void hide_current_scope();
+scope *new_scope(scope_kind kind, char *id);
+scope *new_global_scope();
+scope *new_local_scope(char *id);
+void enter_local_scope(char *id);
+
+#endif /* SCOPE_H */
