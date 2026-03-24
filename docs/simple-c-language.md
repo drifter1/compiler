@@ -1,6 +1,6 @@
 # Simple C Language
 
-The language Simple C is similar to the high-level programming language [C](https://www.c-language.org/) and is described in as much detail as possible in this document. It is a simplified version of C, designed purely for educational purposes. The functionality and keyword coverage are both very limited. There are no preprocessor directives. Only basic types are supported. A program in this language begins with optional global variable declarations, followed by optional function declarations and finally the declaration of the main function. Contrary to C, the special identifier `main` of the main function is reserved as a keyword. The body of functions has a strict order. The body starts with optional variable declarations, followed by statements. Built-in `print` and `input` statements (with reserved keyword) make it possible to interact with standard output and input, respectively. This enables the output of strings and expression values, as well as the capture of user input into variables.
+The language Simple C is similar to the high-level programming language [C](https://www.c-language.org/) and is described in as much detail as possible in this document. It is a simplified version of C, designed purely for educational purposes. The functionality and keyword coverage are both very limited. There are no preprocessor directives. Only basic types are supported. A program in this language begins with optional global variable declarations, followed by optional function declarations and finally the declaration of the main function. Contrary to C, the special identifier `main` of the main function is reserved as a keyword. The body of functions has a strict order. The body starts with optional variable declarations, followed by statements There are only two types of scopes. Global variables and function declarations are in the global scope, while function parameters and variables declared within a function are only local to that function. Built-in `print` and `input` statements (with reserved keyword) make it possible to interact with standard output and input, respectively. This enables the output of strings and expression values, as well as the capture of user input into variables.
 
 > [!IMPORTANT]
 > Please bear in mind that this documentation is still a work in progress. The language described is also not identical to the current implementation.
@@ -250,11 +250,13 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **function** → function_head function_tail ;
 
-- **function_head** → type T_ID T_LPAREN parameters T_RPAREN | type T_ID T_LPAREN T_RPAREN ;
+- **function_head** → function_head_start parameters T_RPAREN | function_head_start T_RPAREN ;
+
+- **function_head_start** → type T_ID T_LPAREN ;
 
 - **parameters** → parameters T_COMMA parameter | parameter ;
 
-- **parameter** → type variable ;
+- **parameter** → type T_ID ;
 
 - **function_tail** → T_LBRACE declarations statements T_RBRACE | T_LBRACE statements T_RBRACE;
 
@@ -268,7 +270,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **var_ref** → variable ;
 
-- **function_call** → T_ID T_LPAREN arguments T_RPAREN | T_ID T_LPAREN T_RPAREN ;
+- **function_call** → variable T_LPAREN arguments T_RPAREN | variable T_LPAREN T_RPAREN ;
 
 - **arguments** → arguments T_COMMA argument | argument ;
 
@@ -369,11 +371,6 @@ int main() {
 - `char` type → for characters
 - `void` type → for incomplete types
 
-### Type Kinds
-
-- Basic type → declaration type of a variable or function parameter
-- Function type → data type of the return value of a function
-
 ### Variable Declarations
 
 Variables are declared with a specific type and an identifier (ID) that represents them. It is possible to declare multiple variables of the same type within a single declaration, provided that the identifiers are separated by commas.
@@ -419,6 +416,11 @@ void foo() {
 ```
 
 </details>
+
+### Scope Types
+
+- `GLOBAL` scope → for global variables and function declarations
+- `LOCAL` scope → for parameters and variables declared within functions
 
 ### Expressions
 

@@ -1,7 +1,9 @@
-int i;
-double val = 2.5;
-for(i = 0; i < 10; i++){
-	val = val*i + i;
+int main() {
+    int i;
+    double val = 2.5;
+    for (i = 0; i < 10; i++) {
+        val = val * i + i;
+    }
+    print val;
+    return 0;
 }
-print(val);
-return;
