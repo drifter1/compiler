@@ -127,7 +127,6 @@ The programming language is being explained [here](/docs/simple-c-language.md).
 
 # Status
 
-- Separate syntax and semantic analysis stages (issue [#6](https://github.com/drifter1/compiler/issues/6))
-- Update and simplification of language grammar (issue [#11](https://github.com/drifter1/compiler/issues/11))
+- Semantic analysis on the generated AST (issue [#13](https://github.com/drifter1/compiler/issues/13))
 - Further optimizations and enhancements in the compiler's source code
 - Machine code generation (Originally targeted MIPS Assembly. Might switch to RISC-V instead).
