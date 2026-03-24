@@ -1,8 +1,12 @@
-#include "list.h"
-#include <stdio.h>
-
 #ifndef SYMTAB_H
 #define SYMTAB_H
+
+#include "list.h"
+#include "scope.h"
+#include "types.h"
+#include <stdio.h>
+
+/* ---------------SYMBOL TABLE CONFIGURATION--------------- */
 
 /* maximum size of hash table */
 #define SIZE 211
@@ -10,99 +14,60 @@
 /* maximum size of tokens-identifiers */
 #define MAXTOKENLEN 40
 
-/* how parameter is passed */
-#define BY_VALUE 1
-#define BY_REFER 2
+/* ----------------SYMBOL TABLE ENTRY KINDS---------------- */
 
-/* current scope */
-extern int cur_scope;
+typedef enum {
+    VARIABLE_ENTRY,
+    PARAMETER_ENTRY,
+    FUNCTION_ENTRY
+} symtab_entry_kind;
 
-/* flag variable for declaring variables */
-extern int declare; // 1: declaring variable, 0: not
+/* ------------------SYMBOL TABLE ENTRIES------------------ */
 
-/* flag variable for function declaring */
-extern int function_decl; // 1: declaring function, 0: not
+typedef struct symtab_entry {
+    symtab_entry_kind kind;
+    char id[MAXTOKENLEN];
+    int len;
+    scope *scope;
+    list_node *lines;
+    struct symtab_entry *next;
 
-/* Types of values that we can have */
-typedef union Value {
-    int ival;
-    double fval;
-    char cval;
-    char *sval;
-} Value;
+    union {
+        struct {
+            data_type d_type;
+            value val;
+        } variable;
+        struct {
+            data_type d_type;
+        } parameter;
+        struct {
+            data_type ret_type;
+            list_node *parameters;
+        } function;
+    } as;
+} symtab_entry;
 
-/* parameter struct */
-typedef struct Param {
-    int par_type;
-    char param_name[MAXTOKENLEN];
+/* -----------------SYMBOL TABLE STRUCTURE----------------- */
 
-    // to store value
-    Value val;
+extern symtab_entry **symbol_table;
 
-    int passing; // value or reference
-} Param;
+/* ----------------SYMBOL TABLE MANAGEMENT----------------- */
 
-/* a linked list of references (lineno's) for each variable */
-typedef struct RefList {
-    int lineno;
-    struct RefList *next;
-} RefList;
+void init_symbol_table();
+unsigned int hash(char *key);
+symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id, int lineno);
+symtab_entry *lookup_symtab_entry(char *id);
+void dump_symbol_table(FILE *of);
 
-// struct that represents a list node
-typedef struct list_t {
-    // name, size of name, scope and occurrences (lines)
-    char st_name[MAXTOKENLEN];
-    int st_size;
-    int scope;
-    RefList *lines;
+/* --------------------HELPER FUNCTIONS-------------------- */
 
-    // to store value
-    Value val;
-
-    // type
-    int st_type;
-
-    // for arrays (info type), for pointers (pointing type)
-    // and for functions (return type)
-    int inf_type;
-
-    // array stuff
-    list_node *vals;
-    int array_size;
-
-    // function parameters
-    Param *parameters;
-    int num_of_pars;
-
-    // pointer to next item in the list
-    struct list_t *next;
-} list_t;
-
-/* structure */
-extern list_t **hash_table;
-
-// Symbol Table Functions
-void init_hash_table();                                 // initialize hash table
-unsigned int hash(char *key);                           // hash function
-void insert(char *name, int len, int type, int lineno); // insert entry
-list_t *lookup(char *name);                             // search for entry
-void symtab_dump(FILE *of);                             // dump file
-
-// Type Functions
-void set_type(char *name, int st_type,
-              int inf_type); // set the type of an entry (declaration)
-int get_type(char *name);    // get the type of an entry
-
-// Scope Management Functions
-void hide_scope(); // hide the current scope
-void incr_scope(); // go to next scope
-
-// Function Declaration and Parameters
-Param def_param(int par_type, char *param_name,
-                int passing); // define parameter
-int func_declare(char *name, int ret_type, int num_of_pars,
-                 Param *parameters); // declare function
-int func_param_check(char *name, int num_of_calls, int **par_types,
-                     int *num_of_pars); // check parameters
+symtab_entry *insert_variable_entry(char *id, int lineno, data_type d_type);
+symtab_entry *insert_parameter_entry(char *id, int lineno, data_type d_type);
+symtab_entry *insert_function_entry(char *id, int lineno, data_type ret_type);
+symtab_entry *set_variable_init_value(symtab_entry *entry, value val);
+symtab_entry *set_function_parameters(symtab_entry *entry,
+                                      list_node *parameters);
+data_type get_data_type(char *id);
+char *symtab_entry_kind_to_string(symtab_entry_kind kind);
 
 #endif /* SYMTAB_H */

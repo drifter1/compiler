@@ -3,25 +3,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* current scope */
-int cur_scope = 0;
+/* -----------------SYMBOL TABLE STRUCTURE----------------- */
 
-/* flag variable for declaring */
-int declare = 0; // 1: declaring variable, 0: not
+symtab_entry **symbol_table = NULL;
 
-/* flag variable for function declaring */
-int function_decl = 0; // 1: declaring function, 0: not
+/* ----------------SYMBOL TABLE MANAGEMENT----------------- */
 
-// structure
-list_t **hash_table = NULL;
-
-// Symbol Table Functions
-
-void init_hash_table() {
+void init_symbol_table() {
     int i;
-    hash_table = malloc(SIZE * sizeof(list_t *));
+    symbol_table = malloc(SIZE * sizeof(symtab_entry *));
     for (i = 0; i < SIZE; i++)
-        hash_table[i] = NULL;
+        symbol_table[i] = NULL;
 }
 
 unsigned int hash(char *key) {
@@ -32,248 +24,194 @@ unsigned int hash(char *key) {
     return hashval % SIZE;
 }
 
-void insert(char *name, int len, int type, int lineno) {
-    unsigned int hashval = hash(name);
-    list_t *l = hash_table[hashval];
+symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id,
+                                  int lineno) {
+    unsigned int hashval = hash(id);
 
-    while ((l != NULL) && (strcmp(name, l->st_name) != 0))
-        l = l->next;
+    symtab_entry *e = lookup_symtab_entry(id);
 
     /* variable not yet in table */
-    if (l == NULL) {
-        /* check if we are declaring */
-        if (declare == 1) {
-            /* set up entry */
-            l = (list_t *)malloc(sizeof(list_t));
-            strncpy(l->st_name, name, len);
-            l->st_size = len;
-            l->st_type = type;
-            l->scope = cur_scope;
-            l->lines = (RefList *)malloc(sizeof(RefList));
-            l->lines->lineno = lineno;
-            l->lines->next = NULL;
+    if (e == NULL) {
+        e = (symtab_entry *)malloc(sizeof(symtab_entry));
+        e->kind = kind;
+        strncpy(e->id, id, strlen(id));
+        e->len = strlen(id);
+        e->scope = cur_scope;
+        e->lines = (list_node *)malloc(sizeof(list_node));
+        int *p = (int *)malloc(sizeof(int));
+        *p = lineno;
+        e->lines->data = (void *)p;
+        e->lines->next = NULL;
 
-            /* add to hashtable */
-            l->next = hash_table[hashval];
-            hash_table[hashval] = l;
+        /* add to hashtable */
+        e->next = symbol_table[hashval];
+        symbol_table[hashval] = e;
 
-            if (DEBUG)
-                printf("Inserted %s for the first time with linenumber %d!\n",
-                       name, lineno);
-        } else {
-            /* add it to check it again later */
-            l = (list_t *)malloc(sizeof(list_t));
-            strncpy(l->st_name, name, len);
-            l->st_size = len;
-            l->st_type = type;
-            l->scope = cur_scope;
-            l->lines = (RefList *)malloc(sizeof(RefList));
-            l->lines->lineno = lineno;
-            l->lines->next = NULL;
-            l->next = hash_table[hashval];
-            hash_table[hashval] = l;
-            printf("Inserted %s at line %d to check it again later!\n", name,
+        if (DEBUG)
+            printf("Inserted %s for the first time with linenumber %d!\n", id,
                    lineno);
-        }
     }
     /* found in table */
     else {
-        // just add line number
-        if (declare == 0) {
-            /* find last reference */
-            RefList *t = l->lines;
+        /* entry in same scope or from global scope */
+        if ((strcmp(e->scope->id, cur_scope->id) == 0) ||
+            (e->scope->kind == GLOBAL)) {
+            list_node *t = e->lines;
             while (t->next != NULL)
                 t = t->next;
 
             /* add linenumber to reference list */
-            t->next = (RefList *)malloc(sizeof(RefList));
-            t->next->lineno = lineno;
+            t->next = (list_node *)malloc(sizeof(list_node));
+
+            int *p = (int *)malloc(sizeof(int));
+            *p = lineno;
+            t->next->data = (void *)p;
             t->next->next = NULL;
 
             if (DEBUG)
-                printf("Found %s again at line %d!\n", name, lineno);
+                printf("Found %s again at line %d!\n", id, lineno);
         }
-        /* new entry */
+        /* new scope */
         else {
-            /* same scope - multiple declaration error! */
-            if (l->scope == cur_scope) {
-                fprintf(stderr,
-                        "A multiple declaration of variable %s at line %d\n",
-                        name, lineno);
-                exit(1);
-            }
-            /* other scope - but function declaration */
-            else if (function_decl == 1) {
-                /* find last reference */
-                RefList *t = l->lines;
-                while (t->next != NULL)
-                    t = t->next;
+            e = (symtab_entry *)malloc(sizeof(symtab_entry));
+            e->kind = kind;
+            strncpy(e->id, id, strlen(id));
+            e->len = strlen(id);
+            e->scope = cur_scope;
+            e->lines = (list_node *)malloc(sizeof(list_node));
+            int *p = (int *)malloc(sizeof(int));
+            *p = lineno;
+            e->lines->data = (void *)p;
+            e->lines->next = NULL;
 
-                /* add linenumber to reference list */
-                t->next = (RefList *)malloc(sizeof(RefList));
-                t->next->lineno = lineno;
-                t->next->next = NULL;
-            }
-            /* other scope - create new entry */
-            else {
-                /* set up entry */
-                l = (list_t *)malloc(sizeof(list_t));
-                strncpy(l->st_name, name, len);
-                l->st_size = len;
-                l->st_type = type;
-                l->scope = cur_scope;
-                l->lines = (RefList *)malloc(sizeof(RefList));
-                l->lines->lineno = lineno;
-                l->lines->next = NULL;
+            /* add to hashtable */
+            e->next = symbol_table[hashval];
+            symbol_table[hashval] = e;
 
-                /* add to hashtable */
-                l->next = hash_table[hashval];
-                hash_table[hashval] = l;
-
-                if (DEBUG)
-                    printf("Inserted %s for a new scope with linenumber %d!\n",
-                           name, lineno);
-            }
+            if (DEBUG)
+                printf("Inserted %s for a new scope with linenumber %d!\n", id,
+                       lineno);
         }
     }
+
+    return e;
 }
 
-list_t *lookup(char *name) { /* return symbol if found or NULL if not found */
-    unsigned int hashval = hash(name);
-    list_t *l = hash_table[hashval];
-    while ((l != NULL) && (strcmp(name, l->st_name) != 0))
-        l = l->next;
-    return l;
+symtab_entry *lookup_symtab_entry(char *id) {
+    unsigned int hashval = hash(id);
+
+    symtab_entry *e = symbol_table[hashval];
+
+    while ((e != NULL) && (strcmp(id, e->id) != 0))
+        e = e->next;
+
+    return e;
 }
 
-// Type Functions
-
-void set_type(char *name, int st_type,
-              int inf_type) { // set the type of an entry (declaration)
-    /* lookup entry */
-    list_t *l = lookup(name);
-
-    /* set as "main" type */
-    l->st_type = st_type;
-
-    /* if array, pointer or function */
-    if (inf_type != UNDEF) {
-        l->inf_type = inf_type;
-    }
-}
-
-int get_type(char *name) { // get the type of an entry
-    /* lookup entry */
-    list_t *l = lookup(name);
-
-    /* if "simple" type */
-    if (l->st_type == INT_TYPE || l->st_type == REAL_TYPE ||
-        l->st_type == CHAR_TYPE) {
-        return l->st_type;
-    }
-    /* if array, pointer or function */
-    else {
-        return l->inf_type;
-    }
-}
-
-// Scope Management Functions
-
-void hide_scope() { /* hide the current scope */
-    list_t *l;
+void dump_symbol_table(FILE *of) { /* dump file */
     int i;
-    if (DEBUG)
-        printf("Hiding scope \'%d\':\n", cur_scope);
-    /* for all the lists */
-    for (i = 0; i < SIZE; i++) {
-        if (hash_table[i] != NULL) {
-            l = hash_table[i];
-            /* Find the first item that is from another scope */
-            while (l != NULL && l->scope == cur_scope) {
-                if (DEBUG)
-                    printf("Hiding %s..\n", l->st_name);
-                l = l->next;
+    fprintf(of, "------------ -------------- -------------- ------------ "
+                "------------\n");
+    fprintf(of, "Name         Kind           Type           Scope        Line "
+                "Numbers\n");
+    fprintf(of, "------------ -------------- -------------- ------------ "
+                "------------\n");
+    for (i = 0; i < SIZE; ++i) {
+        if (symbol_table[i] != NULL) {
+            symtab_entry *e = symbol_table[i];
+            while (e != NULL) {
+                fprintf(of, "%-13s", e->id);
+                fprintf(of, "%-15s", symtab_entry_kind_to_string(e->kind));
+                fprintf(of, "%-15s", data_type_to_string(get_data_type(e->id)));
+                fprintf(of, "%-13s", e->scope->id);
+                list_node *t = e->lines;
+                int *lineno;
+                while (t != NULL) {
+                    lineno = t->data;
+                    fprintf(of, "%4d ", *lineno);
+                    t = t->next;
+                }
+                fprintf(of, "\n");
+                e = e->next;
             }
-            /* Set the list equal to that item */
-            hash_table[i] = l;
-        }
-    }
-    cur_scope--;
-}
-
-void incr_scope() { /* go to next scope */ cur_scope++; }
-
-// Function Declaration and Parameters
-
-Param def_param(int par_type, char *param_name,
-                int passing) { // define parameter
-    Param param;               /* Parameter struct */
-
-    /* set the information */
-    param.par_type = par_type;
-    strcpy(param.param_name, param_name);
-    param.passing = passing;
-
-    /* return the structure */
-    return param;
-}
-
-int func_declare(char *name, int ret_type, int num_of_pars,
-                 Param *parameters) { // declare function
-    /* lookup entry */
-    list_t *l = lookup(name);
-
-    if (l != NULL) {
-        /* if type is not defined yet */
-        if (l->st_type == UNDEF) {
-            /* entry is of function type */
-            l->st_type = FUNCTION_TYPE;
-
-            /* return type is ret_type */
-            l->inf_type = ret_type;
-
-            /* parameter stuff */
-            l->num_of_pars = num_of_pars;
-            l->parameters = parameters;
-
-            return 0; /* success */
-        }
-        /* already declared error */
-        else {
-            fprintf(stderr, "Function %s already declared!\n", name);
-            exit(1);
         }
     }
 }
 
-int func_param_check(char *name, int num_of_calls, int **par_types,
-                     int *num_of_pars) { // check parameters
-    int i, j, type_1, type_2;
+/* --------------------HELPER FUNCTIONS-------------------- */
 
-    /* lookup entry */
-    list_t *l = lookup(name);
+symtab_entry *insert_variable_entry(char *id, int lineno, data_type d_type) {
+    symtab_entry *e;
 
-    /* for all function calls */
-    for (i = 0; i < num_of_calls; i++) {
-        /* check number of parameters */
-        if (l->num_of_pars != num_of_pars[i]) {
-            fprintf(stderr,
-                    "Function call of %s has wrong num of parameters!\n", name);
-            exit(1);
-        }
-        /* check if parameters are compatible */
-        for (j = 0; j < num_of_pars[i]; j++) {
-            /* type of parameter in function declaration */
-            type_1 = l->parameters[j].par_type;
+    e = insert_symtab_entry(VARIABLE_ENTRY, id, lineno);
 
-            /* type of parameter in function call*/
-            type_2 = par_types[i][j];
+    if (e->kind == VARIABLE_ENTRY)
+        e->as.variable.d_type = d_type;
 
-            /* check compatibility for function call */
-            get_result_type(type_1, type_2, NONE);
-            /* error occurs automatically in the function */
+    return e;
+}
+
+symtab_entry *insert_parameter_entry(char *id, int lineno, data_type d_type) {
+    symtab_entry *e;
+
+    e = insert_symtab_entry(PARAMETER_ENTRY, id, lineno);
+
+    e->as.parameter.d_type = d_type;
+
+    return e;
+}
+
+symtab_entry *insert_function_entry(char *id, int lineno, data_type ret_type) {
+    symtab_entry *e;
+
+    e = insert_symtab_entry(FUNCTION_ENTRY, id, lineno);
+
+    e->as.function.ret_type = ret_type;
+    e->as.function.parameters = NULL;
+
+    return e;
+}
+
+symtab_entry *set_variable_init_value(symtab_entry *entry, value val) {
+    entry->as.variable.val = val;
+    return entry;
+}
+
+symtab_entry *set_function_parameters(symtab_entry *entry,
+                                      list_node *parameters) {
+    entry->as.function.parameters = parameters;
+    return entry;
+}
+
+data_type get_data_type(char *id) {
+    symtab_entry *e = lookup_symtab_entry(id);
+
+    if (e != NULL) {
+        switch (e->kind) {
+        case VARIABLE_ENTRY:
+            return e->as.variable.d_type;
+            break;
+        case PARAMETER_ENTRY:
+            return e->as.parameter.d_type;
+            break;
+        case FUNCTION_ENTRY:
+            return e->as.function.ret_type;
+            break;
         }
     }
+    return UNDEF_TYPE;
+}
 
-    return 0; /* success */
+char *symtab_entry_kind_to_string(symtab_entry_kind kind) {
+    switch (kind) {
+    case VARIABLE_ENTRY:
+        return "variable";
+        break;
+    case PARAMETER_ENTRY:
+        return "parameter";
+        break;
+    case FUNCTION_ENTRY:
+        return "function";
+    }
+    return "_error";
 }
