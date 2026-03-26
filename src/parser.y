@@ -55,8 +55,8 @@
 %token 					T_COMMA				","
 %token 					T_SEMI				";"
 %token <sval>			T_ID				"identifier"
-%token <val> 			T_ICONST			"integer constant"
-%token <val> 			T_FCONST			"floating-point constant"
+%token <val> 			T_ICONST			"unsigned integer constant"
+%token <val> 			T_FCONST			"unsigned floating-point constant"
 %token <val> 			T_CCONST			"character constant"
 %token <sval> 			T_STRING			"string"
 

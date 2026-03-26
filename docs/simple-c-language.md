@@ -3,13 +3,19 @@
 The language Simple C is similar to the high-level programming language [C](https://www.c-language.org/) and is described in as much detail as possible in this document. It is a simplified version of C, designed purely for educational purposes. The functionality and keyword coverage are both very limited. There are no preprocessor directives. Only basic types are supported. A program in this language begins with optional global variable declarations, followed by optional function declarations and finally the declaration of the main function. Contrary to C, the special identifier `main` of the main function is reserved as a keyword. The body of functions has a strict order. The body starts with optional variable declarations, followed by statements There are only two types of scopes. Global variables and function declarations are in the global scope, while function parameters and variables declared within a function are only local to that function. Built-in `print` and `input` statements (with reserved keyword) make it possible to interact with standard output and input, respectively. This enables the output of strings and expression values, as well as the capture of user input into variables.
 
 > [!IMPORTANT]
-> Please bear in mind that this documentation is still a work in progress. The language described is also not identical to the current implementation.
+> Please bear in mind that this documentation is still a work in progress.
 
 ## Terminal Symbols (or Lexical Units)
 
+The lexical units that also serve as terminal symbols in the Simple C grammar are described below. The corresponding tokens begin with 'T_' and are presented either in a separate table column or within parentheses. Along with the lexical units, there is also a description of Simple C comments. It should be noted that comments are not part of the language’s grammar. Finally, be aware that Simple C is case-sensitive, meaning it distinguishes between uppercase and lowercase letters regardless of whether they form part of a character constant or string.
+
 ### Keywords
 
+The words in the tables below are reserved keywords in Simple C and, as they form an integral component of the grammar, cannot be used as identifier names. These are independent lexical units, just like the operators and other terminal symbols.
+
 #### C Keywords
+
+The following keywords are adopted from the C programming language that the Simple C language is based on.
 
 |  Keyword   |               Usage                |      Token     |
 | :--------: | :--------------------------------: | :------------: |
@@ -28,6 +34,8 @@ The language Simple C is similar to the high-level programming language [C](http
 
 #### Supplementary Keywords
 
+The Simple C language also has some keywords that are not borrowed from C. These are used as helpers to simplify the language. 
+
 |  Keyword |             Usage              |    Token    |
 | :------: | :----------------------------: | :---------: |
 | `input`  | Declaration of input statement | **T_INPUT** |
@@ -35,6 +43,8 @@ The language Simple C is similar to the high-level programming language [C](http
 | `print`  | Declaration of print statement | **T_PRINT** |
 
 ### Operators
+
+The Simple C language supports a subset of the operations supported by the C programming language. These include assignment, incrementation, decrementation and arithmetic, logical and relational operations.
 
 #### Assignment Operator
 
@@ -76,6 +86,8 @@ The language Simple C is similar to the high-level programming language [C](http
 
 ### Other Tokens
 
+The following are other characters that are treated as independent lexical units. Depending on the grammar and semantics of the Simple C language, they may sometimes behave like operators. 
+
 - `(` → left parenthesis (**T_LPAREN**)
 - `)` → right parenthesis (**T_RPAREN**)
 - `{` → left curly brace (**T_LBRACE**)
@@ -83,6 +95,9 @@ The language Simple C is similar to the high-level programming language [C](http
 - `,` → comma (**T_COMMA**)
 - `;` → semicolon (**T_SEMI**)
 - `<<EOF>>` → end of file
+
+> [!NOTE]
+> The lexical unit `<<EOF>>` is a special character that is treated in a unique way by each system. It is not part of the grammar, but it must be returned by the lexical analyser (usually with the value 0) to indicate the end of syntax analysis.
 
 ### Identifiers
 
@@ -116,9 +131,12 @@ return      → is a reserved keyword
 
 ### Constants
 
-#### Integer constant
+#### Unsigned integer constant
 
-An integer constant (**T_ICONST**) is either the literal 0 or a sequence of digits that does not begin with 0. Only digits are permitted. Integer constants must not contain letters or special characters.
+An unsigned integer constant (**T_ICONST**) is either the literal 0 or a sequence of digits that does not begin with 0. Only digits are permitted. Unsigned integer constants must not contain letters or special characters.
+
+> [!NOTE]
+> Of course, the language supports negative values. These values are obtained by applying a unary minus operation.
 
 <details>
     <summary><b>Valid examples</b></summary>
@@ -142,9 +160,12 @@ An integer constant (**T_ICONST**) is either the literal 0 or a sequence of digi
 
 </details>
 
-#### Floating-point constant
+#### Unsigned floating-point constant
 
-A floating-point constant (**T_FCONST**) contains a decimal point, with digits either before and after it, or only before or after it. Before the decimal point, there can be either the literal 0 or a sequence of digits that does not start with 0.
+An unsigned floating-point constant (**T_FCONST**) contains a decimal point, with digits either before and after it, or only before or after it. Before the decimal point, there can be either the literal 0 or a sequence of digits that does not start with 0.
+
+> [!NOTE]
+> Of course, the language supports negative values. These values are obtained by applying a unary minus operation.
 
 <details>
     <summary><b>Valid examples</b></summary>
@@ -200,6 +221,9 @@ c           → printable ASCII character but not enclosed in single quotes
 
 A string (**T_STRING**) is a sequence of zero or more printable ASCII characters enclosed within double quotes `"`.
 
+> [!NOTE]
+> For the time being, the language only supports single-line strings, so there is no way to signal that a string continues on to the next line.
+
 <details>
     <summary><b>Valid examples</b></summary>
 
@@ -222,11 +246,11 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 ### Comments
 
-- `//` → single-line comment
-- Text between `/*` and `*/` → multi-line comment
-
+Comments in Simple C work in much the same way as in C. The language ignores everything written after the `//` character until the end of the current line. Multi-line comments are enclosed in `/*` and `*/`.
 
 ## Grammar
+
+The grammar of the C programming language is described by the subsequent set of rules.
 
 - **program** → declarations functions main_function | declarations main_function | functions main_function | main_function ;
 
@@ -242,7 +266,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **variable** → T_ID ;
 
-- **init** →  T_ASSIGN constant | /* empty */ ;
+- **init** →  T_ASSIGN constant | ε ;
 
 - **constant** → T_ICONST | T_FCONST | T_CCONST ;
 
@@ -280,7 +304,7 @@ pi          → printable ASCII characters but not enclosed in double quotes
 
 - **else_if** → else_if T_ELSE T_IF T_LPAREN expression T_RPAREN tail | T_ELSE T_IF T_LPAREN expression T_RPAREN tail ;
 
-- **optional_else** → T_ELSE tail	| /* empty */ ;
+- **optional_else** → T_ELSE tail | ε;
 
 - **for_statement** → T_FOR T_LPAREN assignment T_SEMI expression T_SEMI var_ref T_INCDEC T_RPAREN tail ;
 
@@ -297,6 +321,13 @@ pi          → printable ASCII characters but not enclosed in double quotes
 - **main_function** → main_head function_tail ;
 
 - **main_head** → T_INT T_MAIN T_LPAREN T_RPAREN ;
+
+> [!NOTE]
+> The `|` symbol separates the right-hand sides of the rules, and `ε` is the empty string.
+
+The grammar is ambiguous, but with appropriate transformations or auxiliary descriptions of operator precedence and associativity, it can be made unambiguous.
+
+The start symbol of the grammar is `program`.
 
 <details>
     <summary><b>Example program</b></summary>
@@ -362,6 +393,8 @@ int main() {
 </details>
 
 ## Semantics
+
+The semantics of the Simple C programming language are determined by a set of rules governing the structure of a valid program. Some of these rules are likely covered by the language’s syntax itself, or by auxiliary descriptions that make it unambiguous. All remaining rules must be incorporated into the compiler itself using semantic functions that are executed during the conversion of a program into intermediate code (an abstract syntax tree).
 
 ### Data Types
 
