@@ -190,13 +190,10 @@ data_type get_data_type(char *id) {
         switch (e->kind) {
         case VARIABLE_ENTRY:
             return e->as.variable.d_type;
-            break;
         case PARAMETER_ENTRY:
             return e->as.parameter.d_type;
-            break;
         case FUNCTION_ENTRY:
             return e->as.function.ret_type;
-            break;
         }
     }
     return UNDEF_TYPE;
@@ -206,10 +203,8 @@ char *symtab_entry_kind_to_string(symtab_entry_kind kind) {
     switch (kind) {
     case VARIABLE_ENTRY:
         return "variable";
-        break;
     case PARAMETER_ENTRY:
         return "parameter";
-        break;
     case FUNCTION_ENTRY:
         return "function";
     }

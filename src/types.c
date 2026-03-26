@@ -1,24 +1,129 @@
 #include "../include/types.h"
+#include <stdbool.h>
 
-/* -----------------HELPER FUNCTIONS----------------- */
+/* ------------------TYPE PROMOTION------------------ */
+
+const data_type type_promotion_matrix[6][6] = {
+    /* UNDEF_TYPE */
+    {UNDEF_TYPE, UNDEF_TYPE, UNDEF_TYPE, UNDEF_TYPE, UNDEF_TYPE, UNDEF_TYPE},
+    /* INT_TYPE */
+    {UNDEF_TYPE, INT_TYPE, INT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, UNDEF_TYPE},
+    /* CHAR_TYPE */
+    {UNDEF_TYPE, INT_TYPE, INT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, UNDEF_TYPE},
+    /* FLOAT_TYPE */
+    {UNDEF_TYPE, FLOAT_TYPE, FLOAT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, UNDEF_TYPE},
+    /* DOUBLE_TYPE */
+    {UNDEF_TYPE, DOUBLE_TYPE, DOUBLE_TYPE, DOUBLE_TYPE, DOUBLE_TYPE,
+     UNDEF_TYPE},
+    /* VOID_TYPE */
+    {UNDEF_TYPE, UNDEF_TYPE, UNDEF_TYPE, UNDEF_TYPE, UNDEF_TYPE, UNDEF_TYPE}};
+
+data_type promote_data_type(data_type origin_type, data_type target_type) {
+    /* Guard against invalid type indices */
+    if (origin_type < UNDEF_TYPE || origin_type > VOID_TYPE ||
+        target_type < UNDEF_TYPE || target_type > VOID_TYPE) {
+        return UNDEF_TYPE;
+    }
+    return type_promotion_matrix[origin_type][target_type];
+}
+
+/* ------------------OPERATOR RESULT----------------- */
+
+op_result get_op_result_type(operator_type op_type, data_type left_type,
+                             data_type right_type) {
+
+    // right_type is left unused for increment/decrement and unary operations
+    // both left_type and right_type are left unused for NO_OP, assignment,
+    // logical and relational operations
+
+    op_result result;
+
+    switch (op_type) {
+    /* ------------- No Operation ------------ */
+    case NO_OP:
+        result.d_type = UNDEF_TYPE;
+        result.needs_truthy = false;
+        result.produce_bool = false;
+        break;
+    /* -------------- Assignment ------------- */
+    case ASSIGN:
+        /* The value returned by an assignment is the left-hand side */
+        result.d_type = left_type;
+        result.needs_truthy = false;
+        result.produce_bool = false;
+        break;
+    /* -------- Increment / Decrement -------- */
+    case INC:
+    case DEC:
+    case PRE_INC:
+    case PRE_DEC:
+    case POST_INC:
+    case POST_DEC:
+        result.d_type = left_type;
+        result.needs_truthy = false;
+        result.produce_bool = false;
+        break;
+    /* -------------- Arithmetic ------------- */
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case REM:
+        result.d_type = promote_data_type(left_type, right_type);
+        result.needs_truthy = false;
+        result.produce_bool = false;
+        break;
+    /* ---------------- Unary ---------------- */
+    case UNARY_PLUS:
+    case UNARY_MINUS:
+        result.d_type = left_type;
+        result.needs_truthy = false;
+        result.produce_bool = false;
+        break;
+    /* --------------- Logical --------------- */
+    case OR:
+    case AND:
+    case NOT:
+        result.d_type = INT_TYPE;
+        result.needs_truthy = true;
+        result.produce_bool = true;
+        break;
+    /* -------------- Relational ------------- */
+    case EQUAL:
+    case NOT_EQUAL:
+    case GREATER:
+    case LESS:
+    case GREATER_EQUAL:
+    case LESS_EQUAL:
+        result.d_type = INT_TYPE;
+        result.needs_truthy = false;
+        result.produce_bool = true;
+        break;
+    default:
+        /* Guard against invalid operator type value */
+        result.d_type = UNDEF_TYPE;
+        result.needs_truthy = false;
+        result.produce_bool = false;
+        break;
+    }
+
+    return result;
+}
+
+/* -----------------DISPLAY FUNCTIONS---------------- */
 
 char *data_type_to_string(data_type d_type) {
     switch (d_type) {
     case UNDEF_TYPE:
         return "undef";
-        break;
     case INT_TYPE:
         return "int";
-        break;
     case CHAR_TYPE:
         return "char";
-        break;
     case FLOAT_TYPE:
         return "float";
-        break;
     case DOUBLE_TYPE:
         return "double";
-        break;
     case VOID_TYPE:
         return "void";
     }
@@ -29,73 +134,50 @@ char *operator_type_to_string(operator_type op_type) {
     switch (op_type) {
     case NO_OP:
         return "no_op";
-        break;
     case ASSIGN:
         return "assign (=)";
-        break;
     case INC:
         return "inc (++)";
-        break;
     case DEC:
         return "dec (--)";
-        break;
     case PRE_INC:
         return "pre_inc (++a)";
-        break;
     case PRE_DEC:
         return "pre_dec (--a)";
-        break;
     case POST_INC:
         return "post_inc (a++)";
-        break;
     case POST_DEC:
         return "post_dec (a--)";
-        break;
     case ADD:
         return "add (+)";
-        break;
     case SUB:
         return "sub (-)";
-        break;
     case MUL:
         return "mul (*)";
-        break;
     case DIV:
         return "div (/)";
-        break;
     case REM:
         return "rem (%%)";
-        break;
     case UNARY_PLUS:
         return "unary_plus (+a)";
-        break;
     case UNARY_MINUS:
         return "unary_minus (-a)";
-        break;
     case OR:
         return "or (||)";
-        break;
     case AND:
         return "and (&&)";
-        break;
     case NOT:
         return "not (!)";
-        break;
     case EQUAL:
         return "equal (==)";
-        break;
     case NOT_EQUAL:
         return "not_equal (!=)";
-        break;
     case GREATER:
         return "greater (>)";
-        break;
     case LESS:
         return "less (<)";
-        break;
     case GREATER_EQUAL:
         return "greater_equal (>=)";
-        break;
     case LESS_EQUAL:
         return "less_equal (<=)";
     }
@@ -106,7 +188,6 @@ char *jump_type_to_string(jump_type j_type) {
     switch (j_type) {
     case CONTINUE:
         return "continue";
-        break;
     case BREAK:
         return "break";
     }
@@ -117,7 +198,6 @@ char *print_type_to_string(print_type p_type) {
     switch (p_type) {
     case EXPRESSION:
         return "expression";
-        break;
     case STRING:
         return "string";
     }
