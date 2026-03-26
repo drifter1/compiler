@@ -102,8 +102,20 @@ symtab_entry *lookup_symtab_entry(char *id) {
 
     symtab_entry *e = symbol_table[hashval];
 
-    while ((e != NULL) && (strcmp(id, e->id) != 0))
+    while (e != NULL) {
+
+        // same identifier
+        if (strcmp(id, e->id) == 0) {
+
+            // same scope or global scope
+            if ((strcmp(cur_scope->id, e->scope->id) == 0) ||
+                (e->scope->kind == GLOBAL)) {
+                break;
+            }
+        }
+
         e = e->next;
+    }
 
     return e;
 }
@@ -120,6 +132,9 @@ void dump_symbol_table(FILE *of) { /* dump file */
         if (symbol_table[i] != NULL) {
             symtab_entry *e = symbol_table[i];
             while (e != NULL) {
+                if (strcmp(cur_scope->id, e->scope->id) != 0) {
+                    enter_local_scope(e->scope->id);
+                }
                 fprintf(of, "%-13s", e->id);
                 fprintf(of, "%-15s", symtab_entry_kind_to_string(e->kind));
                 fprintf(of, "%-15s", data_type_to_string(get_data_type(e->id)));

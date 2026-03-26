@@ -92,9 +92,12 @@ void semantic_analysis_constant(ast_node *ast_node) {
            data_type_to_string(ast_node->as.constant.d_type));
 }
 
-void semantic_analysis_function(ast_node *ast_node) {
+void semantic_analysis_function(ast_node *ast) {
     printf("Semantic analysis of Function Node\n");
-    semantic_analysis(ast_node->as.function.function_tail);
+    symtab_entry *entry = ast->as.function.entry;
+    enter_local_scope(entry->id);
+    semantic_analysis(ast->as.function.function_tail);
+    hide_current_scope();
 }
 
 void semantic_analysis_function_tail(ast_node *ast_node) {
