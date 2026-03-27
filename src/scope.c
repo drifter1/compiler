@@ -38,3 +38,25 @@ void enter_local_scope(char *id) {
         printf("Entering scope \'%s\'\n", id);
     cur_scope = new_local_scope(id);
 }
+
+/* --------------------HELPER FUNCTIONS-------------------- */
+
+char *scope_kind_to_string(scope_kind kind) {
+    switch (kind) {
+    case GLOBAL:
+        return "global";
+    case LOCAL:
+        return "local";
+    }
+    return "_error";
+}
+
+char *visibility_kind_to_string(visibility_kind kind) {
+    switch (kind) {
+    case VISIBLE:
+        return "visible";
+    case HIDDEN:
+        return "hidden";
+    }
+    return "_error";
+}

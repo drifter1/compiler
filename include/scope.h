@@ -32,4 +32,9 @@ scope *new_global_scope();
 scope *new_local_scope(char *id);
 void enter_local_scope(char *id);
 
+/* --------------------HELPER FUNCTIONS-------------------- */
+
+char *scope_kind_to_string(scope_kind kind);
+char *visibility_kind_to_string(visibility_kind kind);
+
 #endif /* SCOPE_H */

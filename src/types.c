@@ -105,51 +105,51 @@ char *operator_type_to_string(operator_type op_type) {
     case NO_OP:
         return "no_op";
     case ASSIGN:
-        return "assign (=)";
+        return "assign";
     case INC:
-        return "inc (++)";
+        return "inc";
     case DEC:
-        return "dec (--)";
+        return "dec";
     case PRE_INC:
-        return "pre_inc (++a)";
+        return "pre_inc";
     case PRE_DEC:
-        return "pre_dec (--a)";
+        return "pre_dec";
     case POST_INC:
-        return "post_inc (a++)";
+        return "post_inc";
     case POST_DEC:
-        return "post_dec (a--)";
+        return "post_dec";
     case ADD:
-        return "add (+)";
+        return "add";
     case SUB:
-        return "sub (-)";
+        return "sub";
     case MUL:
-        return "mul (*)";
+        return "mul";
     case DIV:
-        return "div (/)";
+        return "div";
     case REM:
-        return "rem (%%)";
+        return "rem";
     case UNARY_PLUS:
-        return "unary_plus (+a)";
+        return "unary_plus";
     case UNARY_MINUS:
-        return "unary_minus (-a)";
+        return "unary_minus";
     case OR:
-        return "or (||)";
+        return "or";
     case AND:
-        return "and (&&)";
+        return "and";
     case NOT:
-        return "not (!)";
+        return "not";
     case EQUAL:
-        return "equal (==)";
+        return "equal";
     case NOT_EQUAL:
-        return "not_equal (!=)";
+        return "not_equal";
     case GREATER:
-        return "greater (>)";
+        return "greater";
     case LESS:
-        return "less (<)";
+        return "less";
     case GREATER_EQUAL:
-        return "greater_equal (>=)";
+        return "greater_equal";
     case LESS_EQUAL:
-        return "less_equal (<=)";
+        return "less_equal";
     }
     return "_error";
 }
