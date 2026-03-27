@@ -2,6 +2,7 @@
 #define COMPILER_H
 
 #include "../include/ast.h"
+#include "../include/json.h"
 #include "../include/list.h"
 #include "../include/scope.h"
 #include "../include/semantics.h"
