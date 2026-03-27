@@ -1,7 +1,4 @@
 #include "../include/compiler.h"
-#include <jansson.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 char *filename;
 

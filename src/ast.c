@@ -1,5 +1,4 @@
 #include "../include/compiler.h"
-#include <stdlib.h>
 
 /* ---------------------AST STRUCTURE----------------------- */
 
