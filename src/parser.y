@@ -133,7 +133,7 @@ names:				 	  names T_COMMA var_init								{ $$ = list_add($1, $3); }
 						;
 var_init:			 	  variable init											{ $$ = set_variable_init_value($1, $2); }
 						;
-variable:				  T_ID													{ $$ = insert_variable_entry($1, yylineno, UNDEF_TYPE);	}
+variable:				  T_ID													{ $$ = insert_variable_entry($1, UNDEF_TYPE);	}
 						;
 init:				 	  T_ASSIGN constant										{ $$ = $2->as.constant.val; }
 						| /* empty */											{ $$.ival = 0; }
@@ -150,13 +150,13 @@ function:			 	  function_head function_tail							{ $$ = ast_function($1, $2); }
 function_head:		 	  function_head_start parameters T_RPAREN				{ $$ = set_function_parameters($1, $2); }
 						| function_head_start T_RPAREN							{ $$ = $1; /* parameters already NULL */ }							
 						;
-function_head_start: 	  basic_type T_ID T_LPAREN								{ $$ = insert_function_entry($2, yylineno, $1); 		enter_local_scope($2); }
-						| T_VOID T_ID T_LPAREN									{ $$ = insert_function_entry($2, yylineno, VOID_TYPE);	enter_local_scope($2); }
+function_head_start: 	  basic_type T_ID T_LPAREN								{ $$ = insert_function_entry($2, $1); 			enter_local_scope($2); }
+						| T_VOID T_ID T_LPAREN									{ $$ = insert_function_entry($2, VOID_TYPE);	enter_local_scope($2); }
 						;
 parameters:			 	  parameters T_COMMA parameter							{ $$ = list_add($1, $3); }
 						| parameter												{ $$ = list_add(NULL, $1); }
 						;
-parameter:				  basic_type T_ID										{ $$ = insert_parameter_entry($2, yylineno, $1); }
+parameter:				  basic_type T_ID										{ $$ = insert_parameter_entry($2, $1); }
 						;
 function_tail:			  T_LBRACE declarations statements T_RBRACE				{ hide_current_scope(); $$ = ast_function_tail($2, $3);  }
 						| T_LBRACE statements T_RBRACE							{ hide_current_scope(); $$ = ast_function_tail(NULL, $2); }
@@ -237,7 +237,7 @@ return_statement:		  T_RETURN expression T_SEMI							{ $$ = ast_return_statemen
 						;
 main_function:		 	  main_head function_tail								{ $$ = ast_function($1, $2); }
 						;
-main_head:				  T_INT T_MAIN T_LPAREN T_RPAREN						{ $$ = insert_function_entry("main", yylineno, INT_TYPE); enter_local_scope("main"); }							
+main_head:				  T_INT T_MAIN T_LPAREN T_RPAREN						{ $$ = insert_function_entry("main", INT_TYPE); enter_local_scope("main"); }							
 						;
 
 %%

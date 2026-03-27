@@ -55,15 +55,15 @@ extern symtab_entry **symbol_table;
 
 void init_symbol_table();
 unsigned int hash(char *key);
-symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id, int lineno);
+symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id);
 symtab_entry *lookup_symtab_entry(char *id);
 void dump_symbol_table(FILE *of);
 
 /* --------------------HELPER FUNCTIONS-------------------- */
 
-symtab_entry *insert_variable_entry(char *id, int lineno, data_type d_type);
-symtab_entry *insert_parameter_entry(char *id, int lineno, data_type d_type);
-symtab_entry *insert_function_entry(char *id, int lineno, data_type ret_type);
+symtab_entry *insert_variable_entry(char *id, data_type d_type);
+symtab_entry *insert_parameter_entry(char *id, data_type d_type);
+symtab_entry *insert_function_entry(char *id, data_type ret_type);
 symtab_entry *set_variable_init_value(symtab_entry *entry, value val);
 symtab_entry *set_function_parameters(symtab_entry *entry,
                                       list_node *parameters);

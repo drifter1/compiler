@@ -24,8 +24,7 @@ unsigned int hash(char *key) {
     return hashval % SIZE;
 }
 
-symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id,
-                                  int lineno) {
+symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id) {
     unsigned int hashval = hash(id);
 
     symtab_entry *e = lookup_symtab_entry(id);
@@ -39,7 +38,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id,
         e->scope = cur_scope;
         e->lines = (list_node *)malloc(sizeof(list_node));
         int *p = (int *)malloc(sizeof(int));
-        *p = lineno;
+        *p = yylineno;
         e->lines->data = (void *)p;
         e->lines->next = NULL;
 
@@ -49,7 +48,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id,
 
         if (DEBUG)
             printf("Inserted %s for the first time with linenumber %d!\n", id,
-                   lineno);
+                   yylineno);
     }
     /* found in table */
     else {
@@ -64,12 +63,12 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id,
             t->next = (list_node *)malloc(sizeof(list_node));
 
             int *p = (int *)malloc(sizeof(int));
-            *p = lineno;
+            *p = yylineno;
             t->next->data = (void *)p;
             t->next->next = NULL;
 
             if (DEBUG)
-                printf("Found %s again at line %d!\n", id, lineno);
+                printf("Found %s again at line %d!\n", id, yylineno);
         }
         /* new scope */
         else {
@@ -80,7 +79,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id,
             e->scope = cur_scope;
             e->lines = (list_node *)malloc(sizeof(list_node));
             int *p = (int *)malloc(sizeof(int));
-            *p = lineno;
+            *p = yylineno;
             e->lines->data = (void *)p;
             e->lines->next = NULL;
 
@@ -90,7 +89,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id,
 
             if (DEBUG)
                 printf("Inserted %s for a new scope with linenumber %d!\n", id,
-                       lineno);
+                       yylineno);
         }
     }
 
@@ -155,10 +154,10 @@ void dump_symbol_table(FILE *of) { /* dump file */
 
 /* --------------------HELPER FUNCTIONS-------------------- */
 
-symtab_entry *insert_variable_entry(char *id, int lineno, data_type d_type) {
+symtab_entry *insert_variable_entry(char *id, data_type d_type) {
     symtab_entry *e;
 
-    e = insert_symtab_entry(VARIABLE_ENTRY, id, lineno);
+    e = insert_symtab_entry(VARIABLE_ENTRY, id);
 
     if (e->kind == VARIABLE_ENTRY)
         e->as.variable.d_type = d_type;
@@ -166,20 +165,20 @@ symtab_entry *insert_variable_entry(char *id, int lineno, data_type d_type) {
     return e;
 }
 
-symtab_entry *insert_parameter_entry(char *id, int lineno, data_type d_type) {
+symtab_entry *insert_parameter_entry(char *id, data_type d_type) {
     symtab_entry *e;
 
-    e = insert_symtab_entry(PARAMETER_ENTRY, id, lineno);
+    e = insert_symtab_entry(PARAMETER_ENTRY, id);
 
     e->as.parameter.d_type = d_type;
 
     return e;
 }
 
-symtab_entry *insert_function_entry(char *id, int lineno, data_type ret_type) {
+symtab_entry *insert_function_entry(char *id, data_type ret_type) {
     symtab_entry *e;
 
-    e = insert_symtab_entry(FUNCTION_ENTRY, id, lineno);
+    e = insert_symtab_entry(FUNCTION_ENTRY, id);
 
     e->as.function.ret_type = ret_type;
     e->as.function.parameters = NULL;

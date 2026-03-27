@@ -32,6 +32,7 @@ typedef enum {
 
 typedef struct ast_node {
     ast_node_kind kind;
+    int lineno;
 
     union {
         struct {
