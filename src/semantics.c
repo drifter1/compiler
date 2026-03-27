@@ -64,11 +64,11 @@ void semantic_analysis(ast_node *node) {
 
 void semantic_analysis_list(list_node *list_head) {
     list_node *head;
-    ast_node *ast_node;
+    ast_node *node;
     head = list_head;
     while (head != NULL) {
-        ast_node = (struct ast_node *)head->data;
-        semantic_analysis(ast_node);
+        node = (struct ast_node *)head->data;
+        semantic_analysis(node);
         head = head->next;
     }
 }
