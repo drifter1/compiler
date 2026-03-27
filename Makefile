@@ -1,6 +1,7 @@
 # compiler and flags
 CC = gcc
 CFLAGS = -g -Wall -Wextra -std=c99
+LDFLAGS = -ljansson
 
 # lexer and flags
 LEX = flex
@@ -40,7 +41,7 @@ EXAMPLE = $(EXAMPLES_DIR)/example1.c
 all: $(TARGET)
 
 $(TARGET): $(YACC_OUT) $(LEX_OUT) | $(BIN_DIR)
-	@$(CC) $(CFLAGS) -o $@ $(YACC_OUT) $(LEX_OUT) $(C_SRC)
+	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(YACC_OUT) $(LEX_OUT) $(C_SRC)
 
 $(LEX_OUT): $(LEX_SRC) | $(OBJ_DIR)
 	@$(LEX) $(LFLAGS) -o $@ $<
@@ -64,4 +65,4 @@ run:
 
 # Clean run files
 clean-run:
-	@rm *.out
+	@rm *.out *.json

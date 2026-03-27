@@ -11,6 +11,7 @@ This repository contains the code for a compiler implementation written in the C
 - Make
 - Flex (derivative of Lex)
 - Bison (derivative of Yacc)
+- Jansson library (for debugging purposes)
 - MIPS32 Simulator (for original implementation)
 
 
@@ -69,6 +70,12 @@ xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install flex bison
 ```
+
+## Jansson library
+
+Most Linux distributions should provide a Jansson package.
+
+Alternatively, you can find the latest installation instructions in the Jansson repository: [https://github.com/akheron/jansson](https://github.com/akheron/jansson).
 
 
 # Getting Started
