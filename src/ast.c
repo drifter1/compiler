@@ -278,3 +278,45 @@ operator_type ast_expression_unary_op_type(operator_type op_type,
 
     return op_type;
 }
+
+char *ast_node_kind_to_string(ast_node_kind kind) {
+    switch (kind) {
+    case PROGRAM:
+        return "program";
+    case DECLARATION:
+        return "declaration";
+    case CONSTANT:
+        return "constant";
+    case FUNCTION:
+        return "function";
+    case FUNCTION_TAIL:
+        return "function_tail";
+    case IF_STATEMENT:
+        return "if_statement";
+    case EXPRESSION_BINARY:
+        return "expression_binary";
+    case EXPRESSION_UNARY:
+        return "expression_unary";
+    case VARIABLE_REFERENCE:
+        return "variable_reference";
+    case FUNCTION_CALL:
+        return "function_call";
+    case ELSE_IF:
+        return "else_if";
+    case FOR_LOOP:
+        return "for_loop";
+    case ASSIGNMENT:
+        return "assignment";
+    case WHILE_LOOP:
+        return "while_loop";
+    case JUMP_STATEMENT:
+        return "jump_statement";
+    case PRINT_STATEMENT:
+        return "print_statement";
+    case INPUT_STATEMENT:
+        return "input_statement";
+    case RETURN_STATEMENT:
+        return "return_statement";
+    }
+    return "_error";
+}

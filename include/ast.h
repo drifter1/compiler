@@ -152,11 +152,6 @@ ast_node *ast_return_statement(data_type ret_type, ast_node *expression);
 
 operator_type ast_expression_unary_op_type(operator_type op_type,
                                            fixity_type fixity);
-
-/* ---------------------AST TRAVERSAL----------------------- */
-
-void ast_print_node(ast_node *node);
-void ast_list_traversal(list_node *list_head);
-void ast_traversal(ast_node *node);
+char *ast_node_kind_to_string(ast_node_kind kind);
 
 #endif /* AST_H */
