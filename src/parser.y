@@ -76,7 +76,7 @@
 %type <ast_node> 		program
 %type <list_node> 		declarations
 %type <ast_node> 		declaration
-%type <d_type>	 		type
+%type <d_type>	 		basic_type
 %type <list_node> 		names
 %type <symtab_entry>	var_init
 %type <symtab_entry> 	variable
@@ -121,13 +121,12 @@ program:			  	  declarations functions main_function					{ ast = $$ = ast_progra
 declarations:			  declarations declaration								{ $$ = list_add($1, $2); }
 						| declaration											{ $$ = list_add(NULL, $1); }
 						;
-declaration:		  	  type names T_SEMI										{ $$ = ast_declaration($1, $2); }
+declaration:		  	  basic_type names T_SEMI								{ $$ = ast_declaration($1, $2); }
 						;
-type:				 	  T_INT													{ $$ = INT_TYPE;	}
+basic_type:				  T_INT													{ $$ = INT_TYPE;	}
 						| T_CHAR												{ $$ = CHAR_TYPE;	}
 						| T_FLOAT												{ $$ = FLOAT_TYPE;	}
 						| T_DOUBLE												{ $$ = DOUBLE_TYPE; }
-						| T_VOID												{ $$ = VOID_TYPE;	}
 						;
 names:				 	  names T_COMMA var_init								{ $$ = list_add($1, $3); }
 						| var_init												{ $$ = list_add(NULL, $1); }
@@ -151,12 +150,13 @@ function:			 	  function_head function_tail							{ $$ = ast_function($1, $2); }
 function_head:		 	  function_head_start parameters T_RPAREN				{ $$ = set_function_parameters($1, $2); }
 						| function_head_start T_RPAREN							{ $$ = $1; /* parameters already NULL */ }							
 						;
-function_head_start: 	  type T_ID T_LPAREN									{ $$ = insert_function_entry($2, yylineno, $1); enter_local_scope($2); }
+function_head_start: 	  basic_type T_ID T_LPAREN								{ $$ = insert_function_entry($2, yylineno, $1); 		enter_local_scope($2); }
+						| T_VOID T_ID T_LPAREN									{ $$ = insert_function_entry($2, yylineno, VOID_TYPE);	enter_local_scope($2); }
 						;
 parameters:			 	  parameters T_COMMA parameter							{ $$ = list_add($1, $3); }
 						| parameter												{ $$ = list_add(NULL, $1); }
 						;
-parameter:				  type T_ID												{ $$ = insert_parameter_entry($2, yylineno, $1); }
+parameter:				  basic_type T_ID										{ $$ = insert_parameter_entry($2, yylineno, $1); }
 						;
 function_tail:			  T_LBRACE declarations statements T_RBRACE				{ hide_current_scope(); $$ = ast_function_tail($2, $3);  }
 						| T_LBRACE statements T_RBRACE							{ hide_current_scope(); $$ = ast_function_tail(NULL, $2); }

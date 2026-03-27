@@ -256,9 +256,9 @@ The grammar of the C programming language is described by the subsequent set of 
 
 - **declarations** → declarations declaration | declaration ;
 
-- **declaration** → type names T_SEMI ;
+- **declaration** → basic_type names T_SEMI ;
 
-- **type** → T_INT | T_CHAR | T_FLOAT | T_DOUBLE | T_VOID ;
+- **basic_type** → T_INT | T_CHAR | T_FLOAT | T_DOUBLE ;
 
 - **names** → names T_COMMA var_init | var_init ;
 
@@ -276,11 +276,11 @@ The grammar of the C programming language is described by the subsequent set of 
 
 - **function_head** → function_head_start parameters T_RPAREN | function_head_start T_RPAREN ;
 
-- **function_head_start** → type T_ID T_LPAREN ;
+- **function_head_start** → basic_type T_ID T_LPAREN | T_VOID T_ID T_LPAREN ;
 
 - **parameters** → parameters T_COMMA parameter | parameter ;
 
-- **parameter** → type T_ID ;
+- **parameter** → basic_type T_ID ;
 
 - **function_tail** → T_LBRACE declarations statements T_RBRACE | T_LBRACE statements T_RBRACE;
 
@@ -398,15 +398,48 @@ The semantics of the Simple C programming language are determined by a set of ru
 
 ### Data Types
 
+Simple C supports four basic data types:
+
 - `int` type → for integer numbers
 - `float` type → for single precision floating-point numbers
 - `double` type → for double precision floating-point numbers
-- `char` type → for characters
-- `void` type → for incomplete types
+- `char` type → for character types
+
+#### Type size
+
+The size and representation of the arithmetic data types (`int`, `float`, `double`) is dependent on the target architecture. Conversely, the character type (`char`), takes up a single byte and is represented in ASCII encoding.
+
+#### Incomplete `void` type
+
+The language also includes the special type `void`, which is used for incomplete types. This type is intended solely for use with function return values when a function does not return anything.
+
+#### Strings
+
+Although the language includes strings (**T_STRING**), these are only used within the `print` statement. As such, there is no separate string type.
+
+#### Derived Types
+
+The language is simplified to the extent that it does not include arrays, structures, unions, pointers or enumerations.
+
+> [!NOTE]
+> It is possible that the language may be extended in the future.
+
+#### Type compatibility
+
+|   Type   |                 Type Promotion                | 
+| :------: | :-------------------------------------------: |
+| `int`    | Can be promoted to `float` or `double`        |
+| `float`  | Can be promoted to `double`                   |
+| `double` | Stays as `double`                             | 
+| `char`   | Can be promoted to `int`, `float` or `double` | 
+| `void`   | Cannot be promoted                            | 
 
 ### Variable Declarations
 
-Variables are declared with a specific type and an identifier (ID) that represents them. It is possible to declare multiple variables of the same type within a single declaration, provided that the identifiers are separated by commas.
+Variables are declared with a specific type and an identifier (ID) that represents them. It is possible to declare multiple variables of the same type within a single declaration, provided that the identifiers are separated by commas. 
+
+> [!IMPORTANT]
+> A variable or function parameter cannot be of type `void`.
 
 <details>
     <summary><b>Examples</b></summary>
@@ -420,7 +453,10 @@ float b, c;
 
 ### Variable Initializations
 
-Variables may be initialised during declaration by assigning a constant value to them. If a declaration contains more than one variable, it is possible to assign an initial value to only some of them, with the remainder receiving a default value.
+Variables may be initialized when they are declared by assigning a constant value to them. If a declaration contains more than one variable, it is possible to assign an initial value to some of them and leave the rest with the default value.
+
+> [!IMPORTANT]
+> The initialization value must be of the same or a compatible type.
 
 <details>
     <summary><b>Examples</b></summary>
@@ -434,7 +470,7 @@ char c1, c2 = 'u', c3;
 
 ### Function Declarations
 
-Functions are declared with a specific return type and an identifier (ID) that represents the function. Optional parameters can be included in the parentheses. A parameter is a pair consisting of a type and an identifier, and parameters are separated by commas. The variable declarations and statements are enclosed in curly braces.
+Functions are declared with a specific return type and an identifier (ID) that represents the function. The return type may be one of the basic types, or it be `void` if the function doesn't return anything. Optional parameters can be included in parentheses. A parameter is a pair consisting of a type and an identifier, separated by commas. Variable declarations and statements are enclosed in curly braces.
 
 <details>
     <summary><b>Examples</b></summary>
