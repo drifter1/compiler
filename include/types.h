@@ -1,8 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <stdbool.h>
-
 /* --------------------DATA TYPES-------------------- */
 
 typedef enum {
@@ -71,13 +69,7 @@ data_type promote_data_type(data_type origin_type, data_type target_type);
 
 /* ------------------OPERATOR RESULT----------------- */
 
-typedef struct op_result {
-    data_type d_type;
-    bool needs_truthy;
-    bool produce_bool;
-} op_result;
-
-op_result get_op_result_type(operator_type op_type, data_type left_type,
+data_type get_op_result_type(operator_type op_type, data_type left_type,
                              data_type right_type);
 
 /* -----------------DISPLAY FUNCTIONS---------------- */

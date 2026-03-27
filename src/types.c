@@ -1,5 +1,4 @@
 #include "../include/types.h"
-#include <stdbool.h>
 
 /* ------------------TYPE PROMOTION------------------ */
 
@@ -29,29 +28,21 @@ data_type promote_data_type(data_type origin_type, data_type target_type) {
 
 /* ------------------OPERATOR RESULT----------------- */
 
-op_result get_op_result_type(operator_type op_type, data_type left_type,
+data_type get_op_result_type(operator_type op_type, data_type left_type,
                              data_type right_type) {
 
     // right_type is left unused for increment/decrement and unary operations
     // both left_type and right_type are left unused for NO_OP, assignment,
     // logical and relational operations
 
-    op_result result;
-
     switch (op_type) {
     /* ------------- No Operation ------------ */
     case NO_OP:
-        result.d_type = UNDEF_TYPE;
-        result.needs_truthy = false;
-        result.produce_bool = false;
-        break;
+        return UNDEF_TYPE;
     /* -------------- Assignment ------------- */
     case ASSIGN:
         /* The value returned by an assignment is the left-hand side */
-        result.d_type = left_type;
-        result.needs_truthy = false;
-        result.produce_bool = false;
-        break;
+        return left_type;
     /* -------- Increment / Decrement -------- */
     case INC:
     case DEC:
@@ -59,35 +50,23 @@ op_result get_op_result_type(operator_type op_type, data_type left_type,
     case PRE_DEC:
     case POST_INC:
     case POST_DEC:
-        result.d_type = left_type;
-        result.needs_truthy = false;
-        result.produce_bool = false;
-        break;
+        return left_type;
     /* -------------- Arithmetic ------------- */
     case ADD:
     case SUB:
     case MUL:
     case DIV:
     case REM:
-        result.d_type = promote_data_type(left_type, right_type);
-        result.needs_truthy = false;
-        result.produce_bool = false;
-        break;
+        return promote_data_type(left_type, right_type);
     /* ---------------- Unary ---------------- */
     case UNARY_PLUS:
     case UNARY_MINUS:
-        result.d_type = left_type;
-        result.needs_truthy = false;
-        result.produce_bool = false;
-        break;
+        return left_type;
     /* --------------- Logical --------------- */
     case OR:
     case AND:
     case NOT:
-        result.d_type = INT_TYPE;
-        result.needs_truthy = true;
-        result.produce_bool = true;
-        break;
+        return INT_TYPE;
     /* -------------- Relational ------------- */
     case EQUAL:
     case NOT_EQUAL:
@@ -95,19 +74,10 @@ op_result get_op_result_type(operator_type op_type, data_type left_type,
     case LESS:
     case GREATER_EQUAL:
     case LESS_EQUAL:
-        result.d_type = INT_TYPE;
-        result.needs_truthy = false;
-        result.produce_bool = true;
-        break;
-    default:
-        /* Guard against invalid operator type value */
-        result.d_type = UNDEF_TYPE;
-        result.needs_truthy = false;
-        result.produce_bool = false;
-        break;
+        return INT_TYPE;
     }
 
-    return result;
+    return UNDEF_TYPE;
 }
 
 /* -----------------DISPLAY FUNCTIONS---------------- */

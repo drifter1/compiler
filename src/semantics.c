@@ -239,29 +239,29 @@ void set_declaration_names_type(data_type d_type, list_node *names) {
 }
 
 void set_return_statement_ret_type(ast_node *node) {
-    node->as.return_statement.ret_type =
-        expression_data_type(node->as.return_statement.expression);
+    ast_node *expression = node->as.return_statement.expression;
+    if (expression != NULL) {
+        node->as.return_statement.ret_type = expression_data_type(expression);
+    }
+    /* Else not required. Type is void in that case. */
 }
 
 data_type expression_data_type(ast_node *node) {
     operator_type op_type;
     data_type left_type;
     data_type right_type;
-    op_result result;
 
     switch (node->kind) {
     case EXPRESSION_BINARY:
         op_type = node->as.expression_binary.op_type;
         left_type = expression_data_type(node->as.expression_binary.left);
         right_type = expression_data_type(node->as.expression_binary.right);
-        result = get_op_result_type(op_type, left_type, right_type);
-        return result.d_type;
+        return get_op_result_type(op_type, left_type, right_type);
     case EXPRESSION_UNARY:
         op_type = node->as.expression_unary.op_type;
         left_type = expression_data_type(node->as.expression_unary.operand);
         right_type = UNDEF_TYPE;
-        result = get_op_result_type(op_type, left_type, right_type);
-        return result.d_type;
+        return get_op_result_type(op_type, left_type, right_type);
     case VARIABLE_REFERENCE:
         return get_data_type(node->as.variable_reference.entry->id);
     case CONSTANT:
