@@ -57,6 +57,9 @@ void init_symbol_table();
 unsigned int hash(char *key);
 symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id);
 symtab_entry *lookup_symtab_entry(char *id);
+
+/* -----------------SYMBOL TABLE DUMP FILE----------------- */
+
 void dump_symbol_table(FILE *of);
 
 /* --------------------HELPER FUNCTIONS-------------------- */

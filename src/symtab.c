@@ -119,7 +119,9 @@ symtab_entry *lookup_symtab_entry(char *id) {
     return e;
 }
 
-void dump_symbol_table(FILE *of) { /* dump file */
+/* -----------------SYMBOL TABLE DUMP FILE----------------- */
+
+void dump_symbol_table(FILE *of) {
     int i;
     fprintf(of, "------------ -------------- -------------- ------------ "
                 "------------\n");
