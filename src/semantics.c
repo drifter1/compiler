@@ -85,6 +85,7 @@ void semantic_analysis_program(ast_node *node) {
 
 void semantic_analysis_declaration(ast_node *node) {
     printf("Semantic analysis of Declaration Node\n");
+    verify_no_redeclaration_of_names(node->as.declaration.names, node->lineno);
     set_declaration_names_type(node->as.declaration.d_type,
                                node->as.declaration.names);
     verify_declaration_names_init_value(node->as.declaration.names);
@@ -238,10 +239,31 @@ void semantic_analysis_return_statement(ast_node *node) {
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
 
+void verify_no_redeclaration_of_names(list_node *names,
+                                      int declaration_lineno) {
+    list_node *head = names;
+    symtab_entry *entry;
+    int first_lineno;
+
+    while (head != NULL) {
+        entry = (symtab_entry *)head->data;
+
+        first_lineno = *((int *)entry->lines->data);
+
+        if (declaration_lineno != first_lineno) {
+            printf("Variable \'%s\' get redeclared in line no. %d\n", entry->id,
+                   declaration_lineno);
+        }
+
+        head = head->next;
+    }
+}
+
 void set_declaration_names_type(data_type d_type, list_node *names) {
     list_node *head = names;
+    symtab_entry *entry;
     while (head != NULL) {
-        symtab_entry *entry = (symtab_entry *)head->data;
+        entry = (symtab_entry *)head->data;
         entry->as.variable.d_type = d_type;
         head = head->next;
     }
