@@ -2,8 +2,6 @@
 #define SEMANTICS_H
 
 #include "ast.h"
-#include "symtab.h"
-#include "types.h"
 
 /* ----------------------MAIN FUNCTIONS--------------------- */
 
