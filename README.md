@@ -22,7 +22,7 @@ This repository contains the code for a compiler implementation written in the C
 For Arch-based distributions:
 ```sh
 sudo pacman -Syu
-sudo pacman -S --needed base-devel
+sudo pacman -S --needed base-devel jansson
 ```
 
 > [!NOTE]
@@ -32,7 +32,7 @@ sudo pacman -S --needed base-devel
 For Debian-based distributions:
 ```sh
 sudo apt update
-sudo apt install build-essential flex bison
+sudo apt install build-essential flex bison libjansson-dev
 ```
 
 > [!NOTE]
@@ -42,7 +42,7 @@ For Fedora-based distributions:
 ```sh
 sudo dnf makecache
 sudo dnf group install development-tools
-sudo dnf install flex flex-devel bison bison-devel
+sudo dnf install flex flex-devel bison bison-devel jansson jansson-devel
 ```
 
 > [!NOTE]
@@ -63,19 +63,13 @@ Options include:
 
 I am not very familiar with Macintosh systems.
 However, it seems that you first need to install Apple's command-line developer tools, which will provide you with `make`, `clang` and `gcc` (via clang), as well as other development tools.
-Next, install a package manager such as Homebrew (`brew`), through which you can then install `flex` and `bison`.
+Next, install a package manager such as Homebrew (`brew`), through which you can then install `flex`, `bison` and `jansson`.
 
 ```sh
 xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install flex bison
+brew install flex bison jansson
 ```
-
-## Jansson library
-
-Most Linux distributions should provide a Jansson package.
-
-Alternatively, you can find the latest installation instructions in the Jansson repository: [https://github.com/akheron/jansson](https://github.com/akheron/jansson).
 
 
 # Getting Started
