@@ -299,13 +299,13 @@ json_t *json_construct_lines(list_node *lines) {
     json_t *json_lines = json_array();
 
     list_node *head;
-    int *lineno;
+    int lineno;
 
     head = lines;
     while (head != NULL) {
-        lineno = head->data;
+        lineno = *((int *)head->data);
 
-        json_array_append(json_lines, json_integer(*lineno));
+        json_array_append(json_lines, json_integer(lineno));
 
         head = head->next;
     }

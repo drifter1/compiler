@@ -139,10 +139,10 @@ void dump_symbol_table(FILE *of) {
                 fprintf(of, "%-15s", data_type_to_string(get_data_type(e->id)));
                 fprintf(of, "%-13s", e->scope->id);
                 list_node *t = e->lines;
-                int *lineno;
+                int lineno;
                 while (t != NULL) {
-                    lineno = t->data;
-                    fprintf(of, "%4d ", *lineno);
+                    lineno = *((int *)t->data);
+                    fprintf(of, "%4d ", lineno);
                     t = t->next;
                 }
                 fprintf(of, "\n");
