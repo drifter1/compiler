@@ -436,7 +436,7 @@ The language is simplified to the extent that it does not include arrays, struct
 
 ### Variable Declarations
 
-Variables are declared with a specific type and an identifier (ID) that represents them. It is possible to declare multiple variables of the same type within a single declaration, provided that the identifiers are separated by commas. 
+Variables are declared with a specific type and an identifier (ID) that represents them. It is possible to declare multiple variables of the same type within a single declaration, provided that the identifiers are separated by commas.
 
 > [!IMPORTANT]
 > A variable or function parameter cannot be of type `void`.
@@ -450,6 +450,50 @@ float b, c;
 ```
 
 </details>
+
+#### Scope Types
+
+- `GLOBAL` scope → for global variables and function identifiers which are universally accessible throughout the program.
+- `LOCAL` scope → for parameters and variables that are declared within functions and are only accessible within the functions in which they are declared.
+
+#### Variable redeclarations
+
+Unlike in C, the Simple C language does not allow variables to be redeclared within a nested scope. Therefore, if an identifier name has already been used for a global variable, it cannot be used again for a variable or parameter declaration within a function scope. This doesn't mean that redeclaration is entirely prohibited in this language. The only case in which redeclaration is allowed is for identifiers with the same name declared in distinct scopes. In the context of Simple C, this means that only different functions can have variables or parameters with the same identifier.
+
+<details>
+    <summary><b>Valid Example</b></summary>
+
+```c
+void foo1(){
+    int i;      /* local variable declaration */
+}
+void foo2(){
+    int i;      /* local variable declaration */
+}
+int main(){
+    int i;      /* local variable declaration */
+    ... 
+}
+```
+
+</details>
+
+<details>
+    <summary><b>Invalid Example</b></summary>
+
+```c
+int i;          /* global variable declaration */
+int main(){
+    int i;      /* redeclaration of global variable prohibited in Simple C */
+    ... 
+}
+```
+
+</details>
+
+#### Undeclared variables
+
+The Simple C language strictly prohibits the use of a variable that has not been declared beforehand.
 
 ### Variable Initializations
 
@@ -485,11 +529,6 @@ void foo() {
 ```
 
 </details>
-
-### Scope Types
-
-- `GLOBAL` scope → for global variables and function declarations
-- `LOCAL` scope → for parameters and variables declared within functions
 
 ### Expressions
 
