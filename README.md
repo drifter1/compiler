@@ -98,7 +98,7 @@ By default, typing `make run` will compile *example1.c* from the *simple_c_examp
 ./bin/compiler examples/simple_c_examples/example1.c
 ```
 
-The execution of the compiler prints out parsing debugging information in the terminal console and also creates debugging files (with *.out* extension).
+The execution of the compiler prints out parsing debugging information in the terminal console and also creates debugging files (with *.out* and *.json* extensions).
 
 
 ## Cleaning up the build files and binaries
@@ -108,7 +108,7 @@ To clean the build files and binary executable, you just have to type `make clea
 
 ## Cleaning up the run files
 
-To clean the debugging files (with *.out* extension) after usage of the compiler with `make run` you just have to type `make clean-run`.
+To clean the debugging files when using the compiler in `DEBUG` mode (the default setting), simply type `make clean-run` after `make run`.
 
 
 # Articles
