@@ -35,7 +35,10 @@ typedef struct symtab_entry {
     union {
         struct {
             data_type d_type;
-            value val;
+            struct {
+                data_type d_type;
+                value val;
+            } init_value;
         } variable;
         struct {
             data_type d_type;
@@ -67,7 +70,8 @@ void dump_symbol_table(FILE *of);
 symtab_entry *insert_variable_entry(char *id, data_type d_type);
 symtab_entry *insert_parameter_entry(char *id, data_type d_type);
 symtab_entry *insert_function_entry(char *id, data_type ret_type);
-symtab_entry *set_variable_init_value(symtab_entry *entry, value val);
+symtab_entry *set_variable_init_value(symtab_entry *entry, data_type d_type,
+                                      value val);
 symtab_entry *set_function_parameters(symtab_entry *entry,
                                       list_node *parameters);
 data_type get_data_type(char *id);

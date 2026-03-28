@@ -10,6 +10,7 @@ json_t *json_construct_names(list_node *names);
 json_t *json_construct_symtab_entry(symtab_entry *entry);
 json_t *json_construct_scope(scope *scope);
 json_t *json_construct_lines(list_node *lines);
+json_t *json_construct_init_value(data_type d_type, value val);
 json_t *json_construct_parameters(list_node *parameters);
 
 #endif /* JSON_H */

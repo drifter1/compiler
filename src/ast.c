@@ -244,6 +244,12 @@ ast_node *ast_return_statement(data_type ret_type, ast_node *expression) {
 
 /* --------------------AST NODE HELPERS--------------------- */
 
+ast_node *ast_constant_undef() {
+    value val;
+    val.ival = 0;
+    return ast_constant(UNDEF_TYPE, val);
+}
+
 operator_type ast_expression_unary_op_type(operator_type op_type,
                                            fixity_type fixity) {
     switch (op_type) {

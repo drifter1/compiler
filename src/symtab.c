@@ -186,8 +186,10 @@ symtab_entry *insert_function_entry(char *id, data_type ret_type) {
     return e;
 }
 
-symtab_entry *set_variable_init_value(symtab_entry *entry, value val) {
-    entry->as.variable.val = val;
+symtab_entry *set_variable_init_value(symtab_entry *entry, data_type d_type,
+                                      value val) {
+    entry->as.variable.init_value.d_type = d_type;
+    entry->as.variable.init_value.val = val;
     return entry;
 }
 

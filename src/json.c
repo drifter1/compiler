@@ -1,4 +1,5 @@
 #include "../include/json.h"
+#include <jansson.h>
 
 json_t *json_construct_ast_node(ast_node *node) {
     json_t *json_ast_node = json_object();
@@ -248,32 +249,15 @@ json_t *json_construct_symtab_entry(symtab_entry *entry) {
                         json_construct_symtab_entry(entry->next));
     }
 
-    char cval[1];
     switch (entry->kind) {
     case VARIABLE_ENTRY:
         json_object_set(
             json_symtab_entry, "d_type",
             json_string(data_type_to_string(entry->as.variable.d_type)));
-        switch (entry->as.variable.d_type) {
-        case UNDEF_TYPE:
-            json_object_set(json_symtab_entry, "val", json_null());
-            break;
-        case INT_TYPE:
-            json_object_set(json_symtab_entry, "val",
-                            json_integer(entry->as.variable.val.ival));
-            break;
-        case CHAR_TYPE:
-            cval[0] = entry->as.variable.val.cval;
-            json_object_set(json_symtab_entry, "val", json_string(cval));
-            break;
-        case FLOAT_TYPE:
-        case DOUBLE_TYPE:
-            json_object_set(json_symtab_entry, "val",
-                            json_real(entry->as.variable.val.fval));
-            break;
-        case VOID_TYPE:
-            json_object_set(json_symtab_entry, "val", json_null());
-        }
+        json_object_set(
+            json_symtab_entry, "init_value",
+            json_construct_init_value(entry->as.variable.init_value.d_type,
+                                      entry->as.variable.init_value.val));
         break;
     case PARAMETER_ENTRY:
         json_object_set(
@@ -327,6 +311,35 @@ json_t *json_construct_lines(list_node *lines) {
     }
 
     return json_lines;
+}
+
+json_t *json_construct_init_value(data_type d_type, value val) {
+    json_t *json_init_value = json_object();
+
+    json_object_set(json_init_value, "d_type",
+                    json_string(data_type_to_string(d_type)));
+
+    char cval[1];
+    switch (d_type) {
+    case UNDEF_TYPE:
+        json_object_set(json_init_value, "val", json_null());
+        break;
+    case INT_TYPE:
+        json_object_set(json_init_value, "val", json_integer(val.ival));
+        break;
+    case CHAR_TYPE:
+        cval[0] = val.cval;
+        json_object_set(json_init_value, "val", json_string(cval));
+        break;
+    case FLOAT_TYPE:
+    case DOUBLE_TYPE:
+        json_object_set(json_init_value, "val", json_real(val.fval));
+        break;
+    case VOID_TYPE:
+        json_object_set(json_init_value, "val", json_null());
+    }
+
+    return json_init_value;
 }
 
 json_t *json_construct_parameters(list_node *parameters) {

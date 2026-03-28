@@ -77,7 +77,7 @@
 %type <list_node> 		names
 %type <symtab_entry>	var_init
 %type <symtab_entry> 	variable
-%type <val> 			init
+%type <ast_node> 		init
 %type <ast_node>		constant
 %type <list_node> 		functions
 %type <ast_node> 		function
@@ -128,12 +128,12 @@ basic_type:				  T_INT													{ $$ = INT_TYPE;	}
 names:				 	  names T_COMMA var_init								{ $$ = list_add($1, $3); }
 						| var_init												{ $$ = list_add(NULL, $1); }
 						;
-var_init:			 	  variable init											{ $$ = set_variable_init_value($1, $2); }
+var_init:			 	  variable init											{ $$ = set_variable_init_value($1, $2->as.constant.d_type, $2->as.constant.val); }
 						;
 variable:				  T_ID													{ $$ = insert_variable_entry($1, UNDEF_TYPE);	}
 						;
-init:				 	  T_ASSIGN constant										{ $$ = $2->as.constant.val; }
-						| /* empty */											{ $$.ival = 0; }
+init:				 	  T_ASSIGN constant										{ $$ = $2; }
+						| /* empty */											{ $$ = ast_constant_undef(); }
 						;
 constant:			 	  T_ICONST												{ $$ = ast_constant(   INT_TYPE, $1); }
 						| T_FCONST												{ $$ = ast_constant(DOUBLE_TYPE, $1); }

@@ -4,6 +4,9 @@
 
 void semantic_analysis(ast_node *node) {
 
+    if (node == NULL)
+        return;
+
     switch (node->kind) {
     case PROGRAM:
         semantic_analysis_program(node);
@@ -203,6 +206,7 @@ void semantic_analysis_print_statement(ast_node *node) {
 
     switch (node->as.print_statement.p_type) {
     case EXPRESSION:
+        semantic_analysis(node->as.print_statement.print_value.expression);
         d_type = expression_data_type(
             node->as.print_statement.print_value.expression);
         printf("The data type of the output value is: \'%s\'\n",
@@ -215,6 +219,7 @@ void semantic_analysis_print_statement(ast_node *node) {
 
 void semantic_analysis_input_statement(ast_node *node) {
     printf("Semantic analysis of Input Statement Node\n");
+    semantic_analysis(node->as.input_statement.variable_reference);
     data_type d_type =
         get_data_type(node->as.input_statement.variable_reference->as
                           .variable_reference.entry->id);
@@ -225,6 +230,7 @@ void semantic_analysis_input_statement(ast_node *node) {
 void semantic_analysis_return_statement(ast_node *node) {
     printf("Semantic analysis of Return Statement Node\n");
     set_return_statement_ret_type(node);
+    semantic_analysis(node->as.return_statement.expression);
 }
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
