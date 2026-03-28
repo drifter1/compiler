@@ -30,6 +30,7 @@ void semantic_analysis_return_statement(ast_node *node);
 /* ---------------------HELPER FUNCTIONS-------------------- */
 
 void set_declaration_names_type(data_type d_type, list_node *names);
+void verify_declaration_names_init_value(list_node *names);
 void set_return_statement_ret_type(ast_node *node);
 data_type expression_data_type(ast_node *node);
 

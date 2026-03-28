@@ -70,7 +70,7 @@ void semantic_analysis_list(list_node *list_head) {
     ast_node *node;
     head = list_head;
     while (head != NULL) {
-        node = (struct ast_node *)head->data;
+        node = (ast_node *)head->data;
         semantic_analysis(node);
         head = head->next;
     }
@@ -87,6 +87,7 @@ void semantic_analysis_declaration(ast_node *node) {
     printf("Semantic analysis of Declaration Node\n");
     set_declaration_names_type(node->as.declaration.d_type,
                                node->as.declaration.names);
+    verify_declaration_names_init_value(node->as.declaration.names);
 }
 
 void semantic_analysis_constant(ast_node *node) {
@@ -240,6 +241,63 @@ void set_declaration_names_type(data_type d_type, list_node *names) {
     while (head != NULL) {
         symtab_entry *entry = (symtab_entry *)head->data;
         entry->as.variable.d_type = d_type;
+        head = head->next;
+    }
+}
+
+void verify_declaration_names_init_value(list_node *names) {
+    list_node *head;
+    symtab_entry *entry;
+
+    data_type var_type;
+    data_type init_type;
+    data_type prom_type;
+
+    head = names;
+    while (head != NULL) {
+        entry = (symtab_entry *)head->data;
+
+        var_type = entry->as.variable.d_type;
+        init_type = entry->as.variable.init_value.d_type;
+
+        /* initialization type is UNDEF_TYPE -> there is no init value */
+        if (init_type == UNDEF_TYPE) {
+            printf("Declaration of variable \'%s\' of type \'%s\' has no "
+                   "initialization value\n",
+                   entry->id, data_type_to_string(var_type));
+        }
+        /* types the same */
+        else if (var_type == init_type) {
+            printf("Declaration of variable \'%s\' of type \'%s\' has "
+                   "initialization value of same type\n",
+                   entry->id, data_type_to_string(var_type));
+        }
+        /* special case - T_FCONST is always double - float is compatible */
+        else if (init_type == DOUBLE_TYPE && var_type == FLOAT_TYPE) {
+            printf("Declaration of variable \'%s\' of type \'%s\' has "
+                   "initialization value of same type\n",
+                   entry->id, data_type_to_string(var_type));
+        }
+        /* types NOT the same */
+        else {
+            prom_type = promote_data_type(init_type, var_type);
+
+            /* type promotion possible */
+            if (prom_type == var_type) {
+                printf("Declaration of variable \'%s\' of type \'%s\' has "
+                       "initialization value of compatible type \'%s\'\n",
+                       entry->id, data_type_to_string(var_type),
+                       data_type_to_string(init_type));
+            }
+            /* type promotion not possible */
+            else {
+                printf("Declaration of variable \'%s\' of type \'%s\' has "
+                       "initialization value of incompatible type \'%s\'\n",
+                       entry->id, data_type_to_string(var_type),
+                       data_type_to_string(init_type));
+            }
+        }
+
         head = head->next;
     }
 }
