@@ -146,6 +146,8 @@ void semantic_analysis_variable_reference(ast_node *node) {
 
     printf("Reference of variable \'%s\' in scope \'%s\'\n", entry->id,
            entry->scope->id);
+
+    verify_variable_declaration_before_use(entry, node->lineno);
 }
 
 void semantic_analysis_function_call(ast_node *node) {
@@ -299,6 +301,16 @@ void verify_declaration_names_init_value(list_node *names) {
         }
 
         head = head->next;
+    }
+}
+
+void verify_variable_declaration_before_use(symtab_entry *entry,
+                                            int use_lineno) {
+    int first_lineno = *((int *)entry->lines->data);
+
+    if (use_lineno == first_lineno) {
+        printf("Undeclared variable \'%s\' is used in line no. %d\n", entry->id,
+               use_lineno);
     }
 }
 

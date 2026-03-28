@@ -2,6 +2,7 @@
 #define SEMANTICS_H
 
 #include "ast.h"
+#include "symtab.h"
 #include "types.h"
 
 /* ----------------------MAIN FUNCTIONS--------------------- */
@@ -31,6 +32,8 @@ void semantic_analysis_return_statement(ast_node *node);
 
 void set_declaration_names_type(data_type d_type, list_node *names);
 void verify_declaration_names_init_value(list_node *names);
+void verify_variable_declaration_before_use(symtab_entry *entry,
+                                            int use_lineno);
 void set_return_statement_ret_type(ast_node *node);
 data_type expression_data_type(ast_node *node);
 
