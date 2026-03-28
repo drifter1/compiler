@@ -445,8 +445,8 @@ Variables are declared with a specific type and an identifier (ID) that represen
     <summary><b>Examples</b></summary>
 
 ```c
-int a;
-float b, c;
+int a;          /* declaration of one variable */
+float b, c;     /* declaration of two variables of same type */
 ```
 
 </details>
@@ -506,8 +506,9 @@ Variables may be initialized when they are declared by assigning a constant valu
     <summary><b>Examples</b></summary>
 
 ```c
-int i = 0;
-char c1, c2 = 'u', c3;
+int i = 0;                  /* initialization of same type */
+char c1, c2 = 'u', c3;      /* Initialization is only done for one of them, and its value is of the same type */
+float f = 0;                /* initialization of compatible type */
 ```
 
 </details>
@@ -520,10 +521,10 @@ Functions are declared with a specific return type and an identifier (ID) that r
     <summary><b>Examples</b></summary>
 
 ```c
-int add(int a, int b) {
+int add(int a, int b) {     /* function with two parameters */
     ...
 }
-void foo() {
+void foo() {                /* function without parameters */
 
 }
 ```
@@ -532,20 +533,21 @@ void foo() {
 
 ### Expressions
 
-An expression may contain binary operations (arithmetic, logical, relational), unary operations (increment/decrement, logical NOT, unary minus on constants), parenthesised sub‑expressions, variable references, constants, and non-void function calls.
+An expression may contain binary operations (arithmetic, logical, equality, relational), unary operations (increment/decrement, logical NOT, unary minus on constants), parenthesised sub‑expressions, variable references, constants, and non-void function calls.
 
 <details>
     <summary><b>Examples</b></summary>
 
 ```c
-5 * a + 1
-c == d
-i < 10
-i++
-!(a && b)
--5
-3.14
-add(a, 3)
+a               /* variable reference */
+5 * a + 1       /* arithmetic expression */
+c == d          /* equality expression */
+i < 10          /* relational expression */
+i++             /* unary operation */
+!(a && b)       /* logical expresssion */
+-5              /* unary operation */
+3.14            /* constant */
+add(a, 3)       /* function call */
 ```
 
 </details>
@@ -576,31 +578,31 @@ add(a, 3)
     <summary><b>Examples</b></summary>
 
 ```c
-if (i < 5) { 
+if (i < 5) {                /* if statement */
     ...
 }
-else {
+else {                      /* else branch */
     ...
 }
-for (i = 0; i < 5; i++) {
+for (i = 0; i < 5; i++) {   /* for loop */
     ...
-    if (i == 3) {
-        continue;
+    if (i == 3) {           /* if statement */
+        continue;           /* continue statement */
     }
 }
-while (i > 0) {
+while (i > 0) {             /* while loop */
     ...
-    if (i == 8) {
-        break;
+    if (i == 8) {           /* if statement */
+        break;              /* break statement */
     }
     ...
 }
-k = 5 * func1(p) - a;
-i++:
-print "Message";
-print i + 1;
-input var;
-return 0;
+k = 5 * func1(p) - a;       /* assignment */
+i++:                        /* increment operation */
+print "Message";            /* print statement */
+print i + 1;                /* print statement */
+input var;                  /* input statement */
+return 0;                   /* return statement */
 ```
 
 </details>
