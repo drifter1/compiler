@@ -130,6 +130,7 @@ The programming language is being explained [here](/docs/simple-c-language.md).
 
 - Semantic analysis on the generated AST (issue [#13](https://github.com/drifter1/compiler/issues/13))
 
+
 # Next Steps
 
 - Intermediate code generation (Since the language contains control flow elements, we will most likely need to traverse the AST again to create a linear representation of the program)
