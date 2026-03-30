@@ -77,14 +77,13 @@ void semantic_analysis_list(list_node *list_head) {
 }
 
 void semantic_analysis_program(ast_node *node) {
-    printf("Semantic analysis of Program Node\n");
+    printf("Starting semantic analysis of program...\n");
     semantic_analysis_list(node->as.program.declarations);
     semantic_analysis_list(node->as.program.functions);
     semantic_analysis(node->as.program.main_function);
 }
 
 void semantic_analysis_declaration(ast_node *node) {
-    printf("Semantic analysis of Declaration Node\n");
     verify_no_redeclaration_of_names(node->as.declaration.names, node->lineno);
     set_declaration_names_type(node->as.declaration.d_type,
                                node->as.declaration.names);
@@ -92,13 +91,11 @@ void semantic_analysis_declaration(ast_node *node) {
 }
 
 void semantic_analysis_constant(ast_node *node) {
-    printf("Semantic analysis of Constant Node\n");
-    printf("Constant Node of data type \'%s\'\n",
-           data_type_to_string(node->as.constant.d_type));
+    printf("Constant Node of data type \'%s\' used in line no. %d\n",
+           data_type_to_string(node->as.constant.d_type), node->lineno);
 }
 
 void semantic_analysis_function(ast_node *node) {
-    printf("Semantic analysis of Function Node\n");
     symtab_entry *entry = node->as.function.entry;
     verify_no_redeclaration_of_names(entry->as.function.parameters,
                                      node->lineno);
@@ -108,13 +105,11 @@ void semantic_analysis_function(ast_node *node) {
 }
 
 void semantic_analysis_function_tail(ast_node *node) {
-    printf("Semantic analysis of Function Tail Node\n");
     semantic_analysis_list(node->as.function_tail.declarations);
     semantic_analysis_list(node->as.function_tail.statements);
 }
 
 void semantic_analysis_if_statement(ast_node *node) {
-    printf("Semantic analysis of If Statement Node\n");
     semantic_analysis(node->as.if_statement.condition);
     semantic_analysis_list(node->as.if_statement.if_branch);
     semantic_analysis_list(node->as.if_statement.else_if_branches);
@@ -122,51 +117,43 @@ void semantic_analysis_if_statement(ast_node *node) {
 }
 
 void semantic_analysis_expresssion_binary(ast_node *node) {
-    printf("Semantic analysis of Binary Expression Node\n");
-
     semantic_analysis(node->as.expression_binary.left);
     semantic_analysis(node->as.expression_binary.right);
 
     data_type d_type = expression_data_type(node);
 
-    printf("Result data type is \'%s\'\n", data_type_to_string(d_type));
+    printf("Result data type of binary expression in line no. %d is \'%s\'\n",
+           node->lineno, data_type_to_string(d_type));
 }
 
 void semantic_analysis_expresssion_unary(ast_node *node) {
-    printf("Semantic analysis of Unary Expression Node\n");
-
     semantic_analysis(node->as.expression_unary.operand);
 
     data_type d_type = expression_data_type(node);
 
-    printf("Result data type is \'%s\'\n", data_type_to_string(d_type));
+    printf("Result data type unary expression in line no. %d is \'%s\'\n",
+           node->lineno, data_type_to_string(d_type));
 }
 
 void semantic_analysis_variable_reference(ast_node *node) {
-    printf("Semantic analysis of Variable Reference Node\n");
-
     symtab_entry *entry = node->as.variable_reference.entry;
 
-    printf("Reference of variable \'%s\' in scope \'%s\'\n", entry->id,
-           entry->scope->id);
+    printf("Reference of variable \'%s\' in line no. %d is in scope \'%s\'\n",
+           entry->id, node->lineno, entry->scope->id);
 
     verify_variable_declaration_before_use(entry, node->lineno);
 }
 
 void semantic_analysis_function_call(ast_node *node) {
-    printf("Semantic analysis of Function Call Node\n");
-
     semantic_analysis_list(node->as.function_call.arguments);
 }
 
 void semantic_analysis_else_if(ast_node *node) {
-    printf("Semantic analysis of Else If Node\n");
     semantic_analysis(node->as.else_if.condition);
     semantic_analysis_list(node->as.else_if.else_if_branch);
 }
 
 void semantic_analysis_for_loop(ast_node *node) {
-    printf("Semantic analysis of For Loop Node\n");
     semantic_analysis(node->as.for_loop.initialize);
     semantic_analysis(node->as.for_loop.condition);
     semantic_analysis(node->as.for_loop.increment);
@@ -174,7 +161,8 @@ void semantic_analysis_for_loop(ast_node *node) {
 }
 
 void semantic_analysis_assignment(ast_node *node) {
-    printf("Semantic analysis of Assignment Node\n");
+    printf("Semantic analysis of assignment node in line no. %d\n",
+           node->lineno);
 
     semantic_analysis(node->as.assignment.variable_reference);
     semantic_analysis(node->as.assignment.expression);
@@ -194,20 +182,16 @@ void semantic_analysis_assignment(ast_node *node) {
 }
 
 void semantic_analysis_while_loop(ast_node *node) {
-    printf("Semantic analysis of While Loop Node\n");
     semantic_analysis(node->as.while_loop.condition);
     semantic_analysis_list(node->as.while_loop.while_branch);
 }
 
 void semantic_analysis_jump_statement(ast_node *node) {
-    printf("Semantic analysis of Jump Statement Node\n");
     printf("Jump Statement Node of type \'%s\'\n",
            jump_type_to_string(node->as.jump_statement.j_type));
 }
 
 void semantic_analysis_print_statement(ast_node *node) {
-    printf("Semantic analysis of Print Statement Node\n");
-
     data_type d_type;
 
     switch (node->as.print_statement.p_type) {
@@ -224,7 +208,6 @@ void semantic_analysis_print_statement(ast_node *node) {
 }
 
 void semantic_analysis_input_statement(ast_node *node) {
-    printf("Semantic analysis of Input Statement Node\n");
     semantic_analysis(node->as.input_statement.variable_reference);
     data_type d_type =
         get_data_type(node->as.input_statement.variable_reference->as
@@ -234,7 +217,6 @@ void semantic_analysis_input_statement(ast_node *node) {
 }
 
 void semantic_analysis_return_statement(ast_node *node) {
-    printf("Semantic analysis of Return Statement Node\n");
     set_return_statement_ret_type(node);
     semantic_analysis(node->as.return_statement.expression);
 }
@@ -247,6 +229,11 @@ void verify_no_redeclaration_of_names(list_node *names,
     symtab_entry *entry;
     int first_lineno;
 
+    /* function without parameters case */
+    if (head == NULL) {
+        return;
+    }
+
     while (head != NULL) {
         entry = (symtab_entry *)head->data;
 
@@ -255,10 +242,14 @@ void verify_no_redeclaration_of_names(list_node *names,
         if (declaration_lineno != first_lineno) {
             printf("Variable \'%s\' gets redeclared in line no. %d\n",
                    entry->id, declaration_lineno);
+            return;
         }
 
         head = head->next;
     }
+
+    printf("No redeclaration of variable \'%s\' in line no. %d\n", entry->id,
+           declaration_lineno);
 }
 
 void set_declaration_names_type(data_type d_type, list_node *names) {
@@ -266,6 +257,8 @@ void set_declaration_names_type(data_type d_type, list_node *names) {
     symtab_entry *entry;
     while (head != NULL) {
         entry = (symtab_entry *)head->data;
+        printf("Set type of variable \'%s\' to \'%s\'\n", entry->id,
+               data_type_to_string(d_type));
         entry->as.variable.d_type = d_type;
         head = head->next;
     }
@@ -335,13 +328,20 @@ void verify_variable_declaration_before_use(symtab_entry *entry,
     if (use_lineno == first_lineno) {
         printf("Undeclared variable \'%s\' is used in line no. %d\n", entry->id,
                use_lineno);
+    } else {
+        printf("Variable \'%s\' declared in line no. %d is correctly used in "
+               "line no. %d\n",
+               entry->id, first_lineno, use_lineno);
     }
 }
 
 void set_return_statement_ret_type(ast_node *node) {
     ast_node *expression = node->as.return_statement.expression;
     if (expression != NULL) {
-        node->as.return_statement.ret_type = expression_data_type(expression);
+        data_type ret_type = expression_data_type(expression);
+        node->as.return_statement.ret_type = ret_type;
+        printf("Set return type of return statement in line no. %d to \'%s\'\n",
+               node->lineno, data_type_to_string(ret_type));
     }
     /* Else not required. Type is void in that case. */
 }
