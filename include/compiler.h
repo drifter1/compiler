@@ -11,6 +11,8 @@
 
 /* ------------------COMPILER SETTINGS----------------------- */
 #define DEBUG 1
+#define SYMTAB_DUMP_FILE_NAME "symtab_dump.out"
+#define AST_JSON_DUMP_FILE_NAME "ast.json"
 
 /* --------------FLEX / BISON REQUIREMENTS------------------- */
 

@@ -31,15 +31,16 @@ int main(int argc, char *argv[]) {
 
         // symbol table dump
         if (DEBUG) {
-            yyout = fopen("symtab_dump.out", "w");
+            printf("Dumping symbol table to file...\n");
+            yyout = fopen(SYMTAB_DUMP_FILE_NAME, "w");
             dump_symbol_table(yyout);
             fclose(yyout);
         }
 
         // abstract syntax tree json dump file
         if (DEBUG) {
-            json_dump_file(json_construct_ast_node(ast), "ast.json",
-                           JSON_INDENT(4));
+            printf("Dumping abstract syntax tree to JSON file...\n");
+            json_dump_abstract_syntax_tree(AST_JSON_DUMP_FILE_NAME);
         }
 
         exit(EXIT_SUCCESS);
