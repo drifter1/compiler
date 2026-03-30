@@ -100,6 +100,8 @@ void semantic_analysis_constant(ast_node *node) {
 void semantic_analysis_function(ast_node *node) {
     printf("Semantic analysis of Function Node\n");
     symtab_entry *entry = node->as.function.entry;
+    verify_no_redeclaration_of_names(entry->as.function.parameters,
+                                     node->lineno);
     enter_local_scope(entry->id);
     semantic_analysis(node->as.function.function_tail);
     hide_current_scope();
@@ -251,8 +253,8 @@ void verify_no_redeclaration_of_names(list_node *names,
         first_lineno = *((int *)entry->lines->data);
 
         if (declaration_lineno != first_lineno) {
-            printf("Variable \'%s\' get redeclared in line no. %d\n", entry->id,
-                   declaration_lineno);
+            printf("Variable \'%s\' gets redeclared in line no. %d\n",
+                   entry->id, declaration_lineno);
         }
 
         head = head->next;
