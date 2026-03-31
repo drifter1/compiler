@@ -1,4 +1,5 @@
 #include "../include/compiler.h"
+#include <stdio.h>
 
 char *filename;
 
@@ -19,9 +20,17 @@ int main(int argc, char *argv[]) {
         // initialize scope
         init_scope();
 
+        // open lexer dump file
+        if (DEBUG)
+            yyout = fopen(LEXER_DUMP_FILE_NAME, "w");
+
         // parsing
         yyparse();
         fclose(yyin);
+
+        // close lexer dump file
+        if (DEBUG)
+            fclose(yyout);
 
         if (DEBUG)
             printf("Parsing finished!\n");

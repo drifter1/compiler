@@ -5,6 +5,7 @@
 	char *to_id(char *str_in, int len);
 	char to_char(char *str);
 	char *to_string(char *str_in, int len);
+	void print_token(char *token);
 %}
 
 %option yylineno noyywrap noinput nounput never-interactive
@@ -48,67 +49,67 @@ WHITESPACE			[ \t\n\r\f]+
 
 
  /* Keywords */
-"break"				{ return T_BREAK; }
-"char"      		{ return T_CHAR; }
-"continue"			{ return T_CONTINUE; }
-"double"			{ return T_DOUBLE; }
-"else"				{ return T_ELSE; }
-"float"				{ return T_FLOAT; }
-"for"				{ return T_FOR; }
-"if"				{ return T_IF; }
-"int"				{ return T_INT; }
-"return"			{ return T_RETURN; }
-"void"				{ return T_VOID; }
-"while"				{ return T_WHILE; }
+"break"				{ print_token("T_BREAK");		return T_BREAK;		}
+"char"      		{ print_token("T_CHAR");		return T_CHAR;		}
+"continue"			{ print_token("T_CONTINUE");	return T_CONTINUE;	}
+"double"			{ print_token("T_DOUBLE");		return T_DOUBLE;	}
+"else"				{ print_token("T_ELSE");		return T_ELSE;		}
+"float"				{ print_token("T_FLOAT");		return T_FLOAT;		}
+"for"				{ print_token("T_FOR");			return T_FOR;		}
+"if"				{ print_token("T_IF");			return T_IF;		}
+"int"				{ print_token("T_INT");			return T_INT;		}
+"return"			{ print_token("T_RETURN");		return T_RETURN;	}
+"void"				{ print_token("T_VOID");		return T_VOID;		}
+"while"				{ print_token("T_WHILE");		return T_WHILE;		}
 
-"input"				{ return T_INPUT; }
-"main"				{ return T_MAIN; }
-"print"				{ return T_PRINT; }
+"input"				{ print_token("T_INPUT");		return T_INPUT;		}
+"main"				{ print_token("T_MAIN");		return T_MAIN;		}
+"print"				{ print_token("T_PRINT");		return T_PRINT;		}
 
 
  /* Operators */
-"="					{ yylval.op_type = ASSIGN; 			return T_ASSIGN; }
+"="					{ print_token("T_ASSIGN");	yylval.op_type = ASSIGN; 			return T_ASSIGN; }
 
-"++"				{ yylval.op_type = INC; 			return T_INCDEC; }
-"--"				{ yylval.op_type = DEC; 			return T_INCDEC; }
+"++"				{ print_token("T_INCDEC");	yylval.op_type = INC; 				return T_INCDEC; }
+"--"				{ print_token("T_INCDEC");	yylval.op_type = DEC; 				return T_INCDEC; }
 
-"+"					{ yylval.op_type = ADD; 			return T_ADDOP; }
-"-"					{ yylval.op_type = SUB; 			return T_ADDOP; }
-"*"					{ yylval.op_type = MUL; 			return T_MULOP; }
-"/"					{ yylval.op_type = DIV; 			return T_MULOP; }
-"%"					{ yylval.op_type = REM; 			return T_MULOP; }
+"+"					{ print_token("T_ADDOP"); 	yylval.op_type = ADD; 				return T_ADDOP;  }
+"-"					{ print_token("T_ADDOP");	yylval.op_type = SUB; 				return T_ADDOP;  }
+"*"					{ print_token("T_ADDOP"); 	yylval.op_type = MUL; 				return T_MULOP;  }
+"/"					{ print_token("T_MULOP"); 	yylval.op_type = DIV; 				return T_MULOP;  }
+"%"					{ print_token("T_MULOP"); 	yylval.op_type = REM; 				return T_MULOP;  }
 
-"||"				{ yylval.op_type = OR; 				return T_OROP; }
-"&&"				{ yylval.op_type = AND; 			return T_ANDOP; }
-"!"					{ yylval.op_type = NOT; 			return T_NOTOP; }
+"||"				{ print_token("T_OROP");	yylval.op_type = OR; 				return T_OROP;   }
+"&&"				{ print_token("T_ANDOP"); 	yylval.op_type = AND; 				return T_ANDOP;  }
+"!"					{ print_token("T_NOTOP"); 	yylval.op_type = NOT; 				return T_NOTOP;  } 
 
-"=="				{ yylval.op_type = EQUAL; 			return T_EQUOP; }
-"!="				{ yylval.op_type = NOT_EQUAL; 		return T_EQUOP; }
-">"					{ yylval.op_type = GREATER; 		return T_RELOP; }
-"<"					{ yylval.op_type = LESS; 			return T_RELOP; }
-">="				{ yylval.op_type = GREATER_EQUAL; 	return T_RELOP; }
-"<="				{ yylval.op_type = LESS_EQUAL; 		return T_RELOP; }
+"=="				{ print_token("T_EQUOP");	yylval.op_type = EQUAL; 			return T_EQUOP;  }
+"!="				{ print_token("T_EQUOP");	yylval.op_type = NOT_EQUAL; 		return T_EQUOP;  }
+">"					{ print_token("T_RELOP");	yylval.op_type = GREATER; 			return T_RELOP;  }
+"<"					{ print_token("T_RELOP");	yylval.op_type = LESS; 				return T_RELOP;  }
+">="				{ print_token("T_RELOP");	yylval.op_type = GREATER_EQUAL;		return T_RELOP;  }
+"<="				{ print_token("T_RELOP");	yylval.op_type = LESS_EQUAL; 		return T_RELOP;  }
 
 
  /* Other tokens */
-"("					{ return T_LPAREN; }
-")"					{ return T_RPAREN; }
-"{"					{ return T_LBRACE; }
-"}"					{ return T_RBRACE; }
-","					{ return T_COMMA; }
-";"					{ return T_SEMI; }
+"("					{ print_token(" T_LPAREN");	return T_LPAREN; }
+")"					{ print_token(" T_RPAREN");	return T_RPAREN; }
+"{"					{ print_token("T_LBRACE");	return T_LBRACE; }
+"}"					{ print_token("T_RBRACE");	return T_RBRACE; }
+","					{ print_token("T_COMMA");	return T_COMMA;  }
+";"					{ print_token(" T_SEMI");	return T_SEMI;   }
 
 
  /* Identifiers, Constants, Strings */
-{ID} 				{ yylval.sval = to_id(yytext, yyleng);			return T_ID;	 }
-{ICONST} 			{ yylval.val.ival = atoi(yytext); 				return T_ICONST; }
-{FCONST} 			{ yylval.val.fval = atof(yytext); 				return T_FCONST; }
-{CCONST} 			{ yylval.val.cval = to_char(yytext); 			return T_CCONST; }
-{STRING} 			{ yylval.sval = to_string(yytext, yyleng);		return T_STRING; }
+{ID} 				{ print_token("T_ID");		yylval.sval = to_id(yytext, yyleng);		return T_ID;	 }
+{ICONST} 			{ print_token("T_ICONST");	yylval.val.ival = atoi(yytext); 			return T_ICONST; }
+{FCONST} 			{ print_token("T_FCONST");	yylval.val.fval = atof(yytext); 			return T_FCONST; }
+{CCONST} 			{ print_token("T_CCONST");	yylval.val.cval = to_char(yytext); 			return T_CCONST; }
+{STRING} 			{ print_token("T_STRING");	yylval.sval = to_string(yytext, yyleng);	return T_STRING; }
 
 
  /* Whitespace */
-{WHITESPACE}		{ /* ignore */ }
+{WHITESPACE}		{ print_token(yytext); }
 
 
  /* Unrecognized tokens - Error */
@@ -164,4 +165,9 @@ char *to_string(char *str_in, int len) {
     strncpy(str_out, &str_in[1], len - 2);
 
     return str_out;
+}
+
+void print_token(char *token){
+	if(DEBUG)
+		fprintf(yyout, "%s", token);
 }
