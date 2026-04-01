@@ -14,7 +14,7 @@ typedef enum { VISIBLE, HIDDEN } visibility_kind;
 typedef struct scope {
     struct scope *parent;
     scope_kind kind;
-    char *id;
+    const char *id;
     visibility_kind visibility;
 } scope;
 
@@ -25,12 +25,12 @@ extern scope *cur_scope;
 /* --------------------SCOPE MANAGEMENT-------------------- */
 
 void init_scope();
-void hide_scope(char *id);
+void hide_scope(const char *id);
 void hide_current_scope();
-scope *new_scope(scope_kind kind, char *id);
+scope *new_scope(scope_kind kind, const char *id);
 scope *new_global_scope();
-scope *new_local_scope(char *id);
-void enter_local_scope(char *id);
+scope *new_local_scope(const char *id);
+void enter_local_scope(const char *id);
 
 /* --------------------HELPER FUNCTIONS-------------------- */
 

@@ -14,7 +14,7 @@ void init_symbol_table() {
         symbol_table[i] = NULL;
 }
 
-unsigned int hash(char *key) {
+unsigned int hash(const char *key) {
     unsigned int hashval = 0;
     for (; *key != '\0'; key++)
         hashval += *key;
@@ -22,7 +22,7 @@ unsigned int hash(char *key) {
     return hashval % SIZE;
 }
 
-symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id) {
+symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
     unsigned int hashval = hash(id);
 
     symtab_entry *e = lookup_symtab_entry(id);
@@ -31,7 +31,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id) {
     if (e == NULL) {
         e = (symtab_entry *)malloc(sizeof(symtab_entry));
         e->kind = kind;
-        strncpy(e->id, id, strlen(id));
+        e->id = id;
         e->len = strlen(id);
         e->scope = cur_scope;
         e->lines = (list_node *)malloc(sizeof(list_node));
@@ -72,7 +72,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id) {
         else {
             e = (symtab_entry *)malloc(sizeof(symtab_entry));
             e->kind = kind;
-            strncpy(e->id, id, strlen(id));
+            e->id = id;
             e->len = strlen(id);
             e->scope = cur_scope;
             e->lines = (list_node *)malloc(sizeof(list_node));
@@ -94,7 +94,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, char *id) {
     return e;
 }
 
-symtab_entry *lookup_symtab_entry(char *id) {
+symtab_entry *lookup_symtab_entry(const char *id) {
     unsigned int hashval = hash(id);
 
     symtab_entry *e = symbol_table[hashval];
@@ -154,7 +154,7 @@ void dump_symbol_table(FILE *of) {
 
 /* --------------------HELPER FUNCTIONS-------------------- */
 
-symtab_entry *insert_variable_entry(char *id, data_type d_type) {
+symtab_entry *insert_variable_entry(const char *id, data_type d_type) {
     symtab_entry *e;
 
     e = insert_symtab_entry(VARIABLE_ENTRY, id);
@@ -165,7 +165,7 @@ symtab_entry *insert_variable_entry(char *id, data_type d_type) {
     return e;
 }
 
-symtab_entry *insert_parameter_entry(char *id, data_type d_type) {
+symtab_entry *insert_parameter_entry(const char *id, data_type d_type) {
     symtab_entry *e;
 
     e = insert_symtab_entry(PARAMETER_ENTRY, id);
@@ -175,7 +175,7 @@ symtab_entry *insert_parameter_entry(char *id, data_type d_type) {
     return e;
 }
 
-symtab_entry *insert_function_entry(char *id, data_type ret_type) {
+symtab_entry *insert_function_entry(const char *id, data_type ret_type) {
     symtab_entry *e;
 
     e = insert_symtab_entry(FUNCTION_ENTRY, id);
@@ -199,7 +199,7 @@ symtab_entry *set_function_parameters(symtab_entry *entry,
     return entry;
 }
 
-data_type get_data_type(char *id) {
+data_type get_data_type(const char *id) {
     symtab_entry *e = lookup_symtab_entry(id);
 
     if (e != NULL) {

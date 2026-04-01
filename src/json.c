@@ -361,7 +361,7 @@ json_t *json_construct_parameters(list_node *parameters) {
     return json_parameters;
 }
 
-void json_dump_abstract_syntax_tree(char *filename) {
+void json_dump_abstract_syntax_tree(const char *filename) {
     json_t *json_ast_node = json_construct_ast_node(ast);
     json_dump_file(json_ast_node, filename, JSON_INDENT(4));
 }

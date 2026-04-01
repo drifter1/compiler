@@ -2,10 +2,10 @@
 	#include "../include/compiler.h"
 	#include "../build/parser.tab.h"
 
-	char *to_id(char *str_in, int len);
-	char to_char(char *str);
-	char *to_string(char *str_in, int len);
-	void print_token(char *token);
+	char *to_id(const char *str_in, int len);
+	char to_char(const char *str);
+	char *to_string(const char *str_in, int len);
+	void print_token(const char *token);
 %}
 
 %option yylineno noyywrap noinput nounput never-interactive
@@ -121,7 +121,7 @@ WHITESPACE			[ \t\n\r\f]+
 
 %%
 
-char *to_id(char *str_in, int len) {
+char *to_id(const char *str_in, int len) {
     char *str_out;
 
     str_out = (char *)malloc((len + 1) * sizeof(char));
@@ -131,7 +131,7 @@ char *to_id(char *str_in, int len) {
     return str_out;
 }
 
-char to_char(char *str) {
+char to_char(const char *str) {
     /* Known escape sequence */
     if (str[1] == '\\') {
         switch (str[2]) {
@@ -157,7 +157,7 @@ char to_char(char *str) {
     return str[1];
 }
 
-char *to_string(char *str_in, int len) {
+char *to_string(const char *str_in, int len) {
     char *str_out;
 
     str_out = (char *)malloc((len - 1) * sizeof(char));
@@ -167,7 +167,7 @@ char *to_string(char *str_in, int len) {
     return str_out;
 }
 
-void print_token(char *token){
+void print_token(const char *token){
 	if(DEBUG)
 		fprintf(yyout, "%s", token);
 }

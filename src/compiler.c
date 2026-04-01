@@ -1,7 +1,7 @@
 #include "../include/compiler.h"
 #include <stdio.h>
 
-char *filename;
+const char *filename;
 
 int main(int argc, char *argv[]) {
 

@@ -199,7 +199,7 @@ ast_node *ast_jump_statement(jump_type j_type) {
     return v;
 }
 
-ast_node *ast_print_statement(print_type p_type, char *sval,
+ast_node *ast_print_statement(print_type p_type, const char *sval,
                               ast_node *expression) {
     ast_node *v = new_ast_node();
 

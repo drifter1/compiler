@@ -102,7 +102,7 @@ typedef struct ast_node {
         struct {
             print_type p_type;
             union {
-                char *sval;
+                const char *sval;
                 struct ast_node *expression;
             } print_value;
         } print_statement;
@@ -143,7 +143,7 @@ ast_node *ast_for_loop(ast_node *initialize, ast_node *condition,
 ast_node *ast_assignment(ast_node *variable_reference, ast_node *expression);
 ast_node *ast_while_loop(ast_node *condition, list_node *while_branch);
 ast_node *ast_jump_statement(jump_type j_type);
-ast_node *ast_print_statement(print_type p_type, char *sval,
+ast_node *ast_print_statement(print_type p_type, const char *sval,
                               ast_node *expression);
 ast_node *ast_input_statement(ast_node *variable_reference);
 ast_node *ast_return_statement(data_type ret_type, ast_node *expression);

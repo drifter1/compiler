@@ -13,6 +13,6 @@ json_t *json_construct_lines(list_node *lines);
 json_t *json_construct_init_value(data_type d_type, value val);
 json_t *json_construct_parameters(list_node *parameters);
 
-void json_dump_abstract_syntax_tree(char *filename);
+void json_dump_abstract_syntax_tree(const char *filename);
 
 #endif /* JSON_H */
