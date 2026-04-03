@@ -182,9 +182,19 @@ void semantic_analysis_assignment(ast_node *node) {
     printf("LHS data type is \'%s\'\n", data_type_to_string(lhs_dtype));
     printf("RHS data type is \'%s\'\n", data_type_to_string(rhs_dtype));
 
-    if (promote_data_type(lhs_dtype, rhs_dtype) == UNDEF_TYPE) {
+    switch (verify_assignment_dtype_compatible(
+        lhs_dtype, rhs_dtype,
+        node->as.assignment.expression->kind == CONSTANT)) {
+    /* not compatible*/
+    case 0:
         printf("Incompatible Types!\n");
-    } else {
+        break;
+    /* same type */
+    case 1:
+        printf("Types are the same!\n");
+        break;
+    /* compatible type */
+    case 2:
         printf("Compatible Types!\n");
     }
 }
@@ -238,6 +248,7 @@ void semantic_analysis_input_statement(ast_node *node) {
 void semantic_analysis_return_statement(ast_node *node) {
     set_return_statement_ret_type(node);
     semantic_analysis(node->as.return_statement.expression);
+    verify_return_statement_ret_type(node);
 }
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
@@ -283,13 +294,52 @@ void set_declaration_names_type(data_type d_type, list_node *names) {
     }
 }
 
+int verify_assignment_dtype_compatible(data_type lhs_dtype, data_type rhs_dtype,
+                                       int rhs_is_constant) {
+    /*
+     * return value meaning
+     * 0: not compatible
+     * 1: same type
+     * 2: compatible type
+     */
+
+    /* types the same */
+    if (lhs_dtype == rhs_dtype) {
+        return 1;
+    }
+    /* special case - T_FCONST is always double - float is compatible */
+    else if (rhs_dtype == DOUBLE_TYPE && lhs_dtype == FLOAT_TYPE) {
+        /* if expression is constant node */
+        if (rhs_is_constant) {
+            return 1;
+        }
+        /* if expression is not a constant node */
+        else {
+            return 0;
+        }
+
+    }
+    /* types NOT the same */
+    else {
+        data_type prom_type = promote_data_type(rhs_dtype, lhs_dtype);
+
+        /* type promotion possible */
+        if (prom_type == lhs_dtype) {
+            return 2;
+        }
+        /* type promotion not possible */
+        else {
+            return 0;
+        }
+    }
+}
+
 void verify_declaration_names_init_value(list_node *names) {
     list_node *head;
     symtab_entry *entry;
 
     data_type var_type;
     data_type init_type;
-    data_type prom_type;
 
     head = names;
     while (head != NULL) {
@@ -303,34 +353,26 @@ void verify_declaration_names_init_value(list_node *names) {
             printf("Declaration of variable \'%s\' of type \'%s\' has no "
                    "initialization value\n",
                    entry->id, data_type_to_string(var_type));
-        }
-        /* types the same */
-        else if (var_type == init_type) {
-            printf("Declaration of variable \'%s\' of type \'%s\' has "
-                   "initialization value of same type\n",
-                   entry->id, data_type_to_string(var_type));
-        }
-        /* special case - T_FCONST is always double - float is compatible */
-        else if (init_type == DOUBLE_TYPE && var_type == FLOAT_TYPE) {
-            printf("Declaration of variable \'%s\' of type \'%s\' has "
-                   "initialization value of same type\n",
-                   entry->id, data_type_to_string(var_type));
-        }
-        /* types NOT the same */
-        else {
-            prom_type = promote_data_type(init_type, var_type);
-
-            /* type promotion possible */
-            if (prom_type == var_type) {
-                printf("Declaration of variable \'%s\' of type \'%s\' has "
-                       "initialization value of compatible type \'%s\'\n",
-                       entry->id, data_type_to_string(var_type),
-                       data_type_to_string(init_type));
-            }
-            /* type promotion not possible */
-            else {
+        } else {
+            switch (
+                verify_assignment_dtype_compatible(var_type, init_type, 1)) {
+            /* not compatible */
+            case 0:
                 printf("Declaration of variable \'%s\' of type \'%s\' has "
                        "initialization value of incompatible type \'%s\'\n",
+                       entry->id, data_type_to_string(var_type),
+                       data_type_to_string(init_type));
+                break;
+            /* same type */
+            case 1:
+                printf("Declaration of variable \'%s\' of type \'%s\' has "
+                       "initialization value of same type\n",
+                       entry->id, data_type_to_string(var_type));
+                break;
+            /* compatible type */
+            case 2:
+                printf("Declaration of variable \'%s\' of type \'%s\' has "
+                       "initialization value of compatible type \'%s\'\n",
                        entry->id, data_type_to_string(var_type),
                        data_type_to_string(init_type));
             }
@@ -363,6 +405,57 @@ void set_return_statement_ret_type(ast_node *node) {
                node->lineno, data_type_to_string(ret_type));
     }
     /* Else not required. Type is void in that case. */
+}
+
+void verify_return_statement_ret_type(ast_node *node) {
+    data_type ret_type = node->as.return_statement.ret_type;
+    data_type func_ret_type =
+        lookup_symtab_entry(cur_scope->id)->as.function.ret_type;
+
+    printf("Return statement data type is \'%s\'\n",
+           data_type_to_string(ret_type));
+    printf("Function return type is \'%s\'\n",
+           data_type_to_string(func_ret_type));
+
+    /* function has no return value */
+    if (func_ret_type == VOID_TYPE) {
+        /* return statement has no return value -> correct */
+        if (ret_type == VOID_TYPE) {
+            printf("Return statement correctly returns no value!\n");
+        }
+        /* return statement has return value -> incorrect */
+        else {
+            printf("Return statement incorrectly returns value!\n");
+        }
+    }
+    /* function has return value */
+    else {
+        /* return statement has no return value -> incorrect */
+        if (ret_type == VOID_TYPE) {
+            printf("Return statement incorrectly doesn't return value!\n");
+        }
+        /* return statement has return value */
+        else {
+            switch (verify_assignment_dtype_compatible(
+                func_ret_type, ret_type,
+                node->as.return_statement.expression->kind == CONSTANT)) {
+            /* not compatible */
+            case 0:
+                printf("The return value of the return statement is not "
+                       "compatible with the function return value!\n");
+                break;
+            /* same type */
+            case 1:
+                printf(
+                    "Return statement of same type as function return value\n");
+                break;
+            /* compatible type */
+            case 2:
+                printf("Return statement has value of compatible type to "
+                       "function return value!\n");
+            }
+        }
+    }
 }
 
 data_type expression_data_type(ast_node *node) {

@@ -34,10 +34,13 @@ void semantic_analysis_return_statement(ast_node *node);
 
 void verify_no_redeclaration_of_names(list_node *names, int declaration_lineno);
 void set_declaration_names_type(data_type d_type, list_node *names);
+int verify_assignment_dtype_compatible(data_type lhs_dtype, data_type rhs_dtype,
+                                       int rhs_is_constant);
 void verify_declaration_names_init_value(list_node *names);
 void verify_variable_declaration_before_use(symtab_entry *entry,
                                             int use_lineno);
 void set_return_statement_ret_type(ast_node *node);
+void verify_return_statement_ret_type(ast_node *node);
 data_type expression_data_type(ast_node *node);
 
 #endif /* SEMANTICS_H */
