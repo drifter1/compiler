@@ -52,7 +52,11 @@ WHITESPACE			[ \t\n\r\f]+
 <ML_COMMENT>[^*\n]+
 <ML_COMMENT>"*"
 <ML_COMMENT>"\n"
-
+<ML_COMMENT><<EOF>>	{
+						fprintf(stderr, "Lexical error at line %d. EOF in comment\n",
+									yylineno);
+    					exit(EXIT_FAILURE);
+					}
 
  /* Keywords */
 "break"				{ print_token("T_BREAK");		return T_BREAK;		}
