@@ -157,7 +157,18 @@ void semantic_analysis_variable_reference(ast_node *node) {
 }
 
 void semantic_analysis_function_call(ast_node *node) {
+    printf("Semantic analysis of function call node of function \'%s\' in line "
+           "no. %d\n",
+           node->as.function_call.entry->id, node->lineno);
+
     semantic_analysis_list(node->as.function_call.arguments);
+
+    list_node *arguments = node->as.function_call.arguments;
+    list_node *parameters =
+        node->as.function_call.entry->as.function.parameters;
+
+    verify_function_call_argument_count(parameters, arguments);
+    verify_function_call_argument_types(parameters, arguments);
 }
 
 void semantic_analysis_else_if(ast_node *node) {
@@ -436,6 +447,63 @@ void verify_variable_declaration_before_use(symtab_entry *entry,
         printf("Variable \'%s\' declared in line no. %d is correctly used in "
                "line no. %d\n",
                entry->id, first_lineno, use_lineno);
+    }
+}
+
+void verify_function_call_argument_count(list_node *parameters,
+                                         list_node *arguments) {
+    int argument_count = list_length(arguments);
+    int parameter_count = list_length(parameters);
+
+    printf("Argument count is %d\n", argument_count);
+    printf("Parameter count is %d\n", argument_count);
+
+    if (argument_count == parameter_count) {
+        printf("Function call arguments are equal to the parameters required "
+               "by the function!\n");
+    } else {
+        printf("Function call arguments are not equal to the parameters "
+               "required by the function!\n");
+    }
+}
+
+void verify_function_call_argument_types(list_node *parameters,
+                                         list_node *arguments) {
+    ast_node *argument;
+    symtab_entry *parameter;
+    data_type arg_dtype, par_dtype;
+
+    while (arguments != NULL) {
+        argument = (ast_node *)arguments->data;
+        parameter = (symtab_entry *)parameters->data;
+
+        /* verify type compatibility */
+        arg_dtype = expression_data_type(argument);
+        par_dtype = parameter->as.parameter.d_type;
+
+        switch (verify_assignment_dtype_compatible(
+            par_dtype, arg_dtype, argument->kind == CONSTANT)) {
+        case NOT_COMPATIBLE:
+            printf("Argument of type \'%s\' for parameter \'%s\' of type "
+                   "\'%s\' is of incompatible type!\n",
+                   data_type_to_string(arg_dtype), parameter->id,
+                   data_type_to_string(par_dtype));
+            break;
+        case SAME_TYPE:
+            printf("Argument for parameter \'%s\' of type "
+                   "\'%s\' is of same type!\n",
+                   parameter->id, data_type_to_string(par_dtype));
+            break;
+        case COMPATIBLE:
+            printf("Argument of type \'%s\' for parameter \'%s\' of type "
+                   "\'%s\' is of compatible type!\n",
+                   data_type_to_string(arg_dtype), parameter->id,
+                   data_type_to_string(par_dtype));
+            break;
+        }
+
+        arguments = arguments->next;
+        parameters = parameters->next;
     }
 }
 
