@@ -98,7 +98,8 @@ By default, typing `make run` will compile *example1.c* from the *simple_c_examp
 ./bin/compiler examples/simple_c_examples/example1.c
 ```
 
-The execution of the compiler prints out parsing debugging information in the terminal console and also creates debugging files (with *.out* and *.json* extensions).
+>[!NOTE]
+> By default, the compiler prints debugging information to the terminal console and creates debugging files with extensions *.out* and *.json*. Debugging can be disabled by setting the `DEBUG` flag to `0` in *include/compiler.h* or by adding the flag `-DDEBUG=0` to `gcc` compilation in the *Makefile*, which has the same effect.
 
 
 ## Cleaning up the build files and binaries
