@@ -1,4 +1,5 @@
 #include "../include/semantics.h"
+#include <stdlib.h>
 
 /* ------------------RETURN STATEMENT COUNT----------------- */
 
@@ -134,7 +135,7 @@ void semantic_analysis_expresssion_binary(ast_node *node) {
 
     data_type d_type = expression_data_type(node);
 
-    printf("Result data type of binary expression in line no. %d is \'%s\'\n",
+    printf("Result data type of binary expression at line no. %d is \'%s\'\n",
            node->lineno, data_type_to_string(d_type));
 }
 
@@ -143,14 +144,14 @@ void semantic_analysis_expresssion_unary(ast_node *node) {
 
     data_type d_type = expression_data_type(node);
 
-    printf("Result data type unary expression in line no. %d is \'%s\'\n",
+    printf("Result data type unary expression at line no. %d is \'%s\'\n",
            node->lineno, data_type_to_string(d_type));
 }
 
 void semantic_analysis_variable_reference(ast_node *node) {
     symtab_entry *entry = node->as.variable_reference.entry;
 
-    printf("Reference of variable \'%s\' in line no. %d is in scope \'%s\'\n",
+    printf("Reference of variable \'%s\' at line no. %d is in scope \'%s\'\n",
            entry->id, node->lineno, entry->scope->id);
 
     verify_variable_declaration_before_use(entry, node->lineno);
@@ -188,7 +189,7 @@ void semantic_analysis_for_loop(ast_node *node) {
 }
 
 void semantic_analysis_assignment(ast_node *node) {
-    printf("Semantic analysis of assignment node in line no. %d\n",
+    printf("Semantic analysis of assignment node at line no. %d\n",
            node->lineno);
 
     semantic_analysis(node->as.assignment.variable_reference);
@@ -205,8 +206,9 @@ void semantic_analysis_assignment(ast_node *node) {
         lhs_dtype, rhs_dtype,
         node->as.assignment.expression->kind == CONSTANT)) {
     case NOT_COMPATIBLE:
-        printf("Incompatible Types!\n");
-        break;
+        printf("Semantic error at line no. %d. Incompatible Types!\n",
+               node->lineno);
+        exit(EXIT_FAILURE);
     case SAME_TYPE:
         printf("Types are the same!\n");
         break;
@@ -232,7 +234,10 @@ void semantic_analysis_jump_statement(ast_node *node) {
     if (loop_depth) {
         printf("Jump Statement inside of loop!\n");
     } else {
-        printf("Jump Statement not inside of loop!\n");
+        printf("Semantic error at line no. %d. Jump Statement not inside of "
+               "loop!\n",
+               node->lineno);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -289,15 +294,16 @@ void verify_no_redeclaration_of_names(list_node *names,
         first_lineno = *((int *)entry->lines->data);
 
         if (declaration_lineno != first_lineno) {
-            printf("Variable \'%s\' gets redeclared in line no. %d\n",
-                   entry->id, declaration_lineno);
+            printf("Semantic error at line no. %d. Variable \'%s\' gets "
+                   "redeclared.\n",
+                   declaration_lineno, entry->id);
             return;
         }
 
         head = head->next;
     }
 
-    printf("No redeclaration of variable \'%s\' in line no. %d\n", entry->id,
+    printf("No redeclaration of variable \'%s\' at line no. %d\n", entry->id,
            declaration_lineno);
 }
 
@@ -361,6 +367,8 @@ void verify_declaration_names_init_value(list_node *names) {
         var_type = entry->as.variable.d_type;
         init_type = entry->as.variable.init_value.d_type;
 
+        int declaration_lineno = *((int *)entry->lines->data);
+
         /* initialization type is UNDEF_TYPE -> there is no init value */
         if (init_type == UNDEF_TYPE) {
             printf("Declaration of variable \'%s\' of type \'%s\' has no "
@@ -370,11 +378,13 @@ void verify_declaration_names_init_value(list_node *names) {
             switch (
                 verify_assignment_dtype_compatible(var_type, init_type, 1)) {
             case NOT_COMPATIBLE:
-                printf("Declaration of variable \'%s\' of type \'%s\' has "
+                printf("Semantic error at line no. %d. Declaration of variable "
+                       "\'%s\' of type \'%s\' has "
                        "initialization value of incompatible type \'%s\'\n",
-                       entry->id, data_type_to_string(var_type),
+                       declaration_lineno, entry->id,
+                       data_type_to_string(var_type),
                        data_type_to_string(init_type));
-                break;
+                exit(EXIT_FAILURE);
             case SAME_TYPE:
                 printf("Declaration of variable \'%s\' of type \'%s\' has "
                        "initialization value of same type\n",
@@ -395,6 +405,7 @@ void verify_declaration_names_init_value(list_node *names) {
 void verify_return_statement_last(list_node *statements) {
     symtab_entry *entry = lookup_symtab_entry(cur_scope->id);
     data_type ret_type = entry->as.function.ret_type;
+    int declaration_lineno = *((int *)entry->lines->data);
 
     /* locate last statement node in statement list */
     list_node *head = statements;
@@ -421,18 +432,23 @@ void verify_return_statement_last(list_node *statements) {
                    "type \'%s\' as required!\n",
                    entry->id, data_type_to_string(ret_type));
         } else {
-            printf("The return statement required at the end of function "
+            printf("Semantic error for function declared at line no. %d. The "
+                   "return statement required at the end of function "
                    "\'%s\' of "
                    "type \'%s\' was not found!\n",
-                   entry->id, data_type_to_string(ret_type));
+                   declaration_lineno, entry->id,
+                   data_type_to_string(ret_type));
+            exit(EXIT_FAILURE);
         }
     }
 
     /* check return statement count */
     if (return_count > 1) {
-        printf("More than one return statements were found for function "
+        printf("Semantic error for function declared at line no. %d. More than "
+               "one return statements were found for function "
                "\'%s\'!\n",
-               entry->id);
+               declaration_lineno, entry->id);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -441,10 +457,12 @@ void verify_variable_declaration_before_use(symtab_entry *entry,
     int first_lineno = *((int *)entry->lines->data);
 
     if (use_lineno == first_lineno) {
-        printf("Undeclared variable \'%s\' is used in line no. %d\n", entry->id,
-               use_lineno);
+        printf("Semantic error at line no. %d. Use of undeclared variable "
+               "\'%s\'.\n",
+               use_lineno, entry->id);
+        exit(EXIT_FAILURE);
     } else {
-        printf("Variable \'%s\' declared in line no. %d is correctly used in "
+        printf("Variable \'%s\' declared at line no. %d is correctly used in "
                "line no. %d\n",
                entry->id, first_lineno, use_lineno);
     }
@@ -462,8 +480,11 @@ void verify_function_call_argument_count(list_node *parameters,
         printf("Function call arguments are equal to the parameters required "
                "by the function!\n");
     } else {
-        printf("Function call arguments are not equal to the parameters "
-               "required by the function!\n");
+        printf("Semantic error at line no. %d. Function call arguments are not "
+               "equal to the parameters "
+               "required by the function!\n",
+               (*((ast_node *)arguments->data)).lineno);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -484,11 +505,12 @@ void verify_function_call_argument_types(list_node *parameters,
         switch (verify_assignment_dtype_compatible(
             par_dtype, arg_dtype, argument->kind == CONSTANT)) {
         case NOT_COMPATIBLE:
-            printf("Argument of type \'%s\' for parameter \'%s\' of type "
+            printf("Semantic error at line no. %d. Argument of type \'%s\' for "
+                   "parameter \'%s\' of type "
                    "\'%s\' is of incompatible type!\n",
-                   data_type_to_string(arg_dtype), parameter->id,
-                   data_type_to_string(par_dtype));
-            break;
+                   argument->lineno, data_type_to_string(arg_dtype),
+                   parameter->id, data_type_to_string(par_dtype));
+            exit(EXIT_FAILURE);
         case SAME_TYPE:
             printf("Argument for parameter \'%s\' of type "
                    "\'%s\' is of same type!\n",
@@ -537,14 +559,20 @@ void verify_return_statement_ret_type(ast_node *node) {
         }
         /* return statement has return value -> incorrect */
         else {
-            printf("Return statement incorrectly returns value!\n");
+            printf("Semantic error at line no. %d. Return statement "
+                   "incorrectly returns value!\n",
+                   node->lineno);
+            exit(EXIT_FAILURE);
         }
     }
     /* function has return value */
     else {
         /* return statement has no return value -> incorrect */
         if (ret_type == VOID_TYPE) {
-            printf("Return statement incorrectly doesn't return value!\n");
+            printf("Semantic error at line no. %d. Return statement "
+                   "incorrectly doesn't return value!\n",
+                   node->lineno);
+            exit(EXIT_FAILURE);
         }
         /* return statement has return value */
         else {
@@ -552,9 +580,11 @@ void verify_return_statement_ret_type(ast_node *node) {
                 func_ret_type, ret_type,
                 node->as.return_statement.expression->kind == CONSTANT)) {
             case NOT_COMPATIBLE:
-                printf("The return value of the return statement is not "
-                       "compatible with the function return value!\n");
-                break;
+                printf("Semantic error at line no. %d. The return value of the "
+                       "return statement is not "
+                       "compatible with the function return value!\n",
+                       node->lineno);
+                exit(EXIT_FAILURE);
             case SAME_TYPE:
                 printf("Return statement of same type as function return "
                        "value\n");
