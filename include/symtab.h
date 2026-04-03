@@ -9,7 +9,10 @@
 /* ---------------SYMBOL TABLE CONFIGURATION--------------- */
 
 /* maximum size of hash table */
+
+#ifndef SIZE
 #define SIZE 211
+#endif
 
 /* ----------------SYMBOL TABLE ENTRY KINDS---------------- */
 
