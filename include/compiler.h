@@ -9,13 +9,20 @@
 #include "../include/symtab.h"
 #include "../include/types.h"
 
-/* ------------------COMPILER SETTINGS----------------------- */
+/* --------------------COMPILER SETTINGS-------------------- */
+
 #define DEBUG 1
+
+/* ----------------------DEBUG RELATED---------------------- */
+
+#ifdef DEBUG
+extern FILE *lexer_dump_file;
 #define LEXER_DUMP_FILE_NAME "lexer_dump.out"
 #define SYMTAB_DUMP_FILE_NAME "symtab_dump.out"
 #define AST_JSON_DUMP_FILE_NAME "ast.json"
+#endif
 
-/* --------------FLEX / BISON REQUIREMENTS------------------- */
+/* ----------------FLEX / BISON REQUIREMENTS---------------- */
 
 extern FILE *yyin;
 extern FILE *yyout;

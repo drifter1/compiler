@@ -169,5 +169,5 @@ char *to_string(const char *str_in, int len) {
 
 void print_token(const char *token){
 	if(DEBUG)
-		fprintf(yyout, "%s", token);
+		fprintf(lexer_dump_file, "%s", token);
 }

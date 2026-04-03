@@ -3,6 +3,10 @@
 
 const char *filename;
 
+#ifdef DEBUG
+FILE *lexer_dump_file;
+#endif
+
 int main(int argc, char *argv[]) {
 
     if (argc == 2) {
@@ -22,7 +26,7 @@ int main(int argc, char *argv[]) {
 
         // open lexer dump file
         if (DEBUG)
-            yyout = fopen(LEXER_DUMP_FILE_NAME, "w");
+            lexer_dump_file = fopen(LEXER_DUMP_FILE_NAME, "w");
 
         // parsing
         yyparse();
@@ -30,7 +34,7 @@ int main(int argc, char *argv[]) {
 
         // close lexer dump file
         if (DEBUG)
-            fclose(yyout);
+            fclose(lexer_dump_file);
 
         if (DEBUG)
             printf("Parsing finished!\n");
@@ -41,9 +45,10 @@ int main(int argc, char *argv[]) {
         // symbol table dump
         if (DEBUG) {
             printf("Dumping symbol table to file...\n");
-            yyout = fopen(SYMTAB_DUMP_FILE_NAME, "w");
-            dump_symbol_table(yyout);
-            fclose(yyout);
+            FILE *symtab_dump_file;
+            symtab_dump_file = fopen(SYMTAB_DUMP_FILE_NAME, "w");
+            dump_symbol_table(symtab_dump_file);
+            fclose(symtab_dump_file);
         }
 
         // abstract syntax tree json dump file
