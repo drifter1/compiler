@@ -2,10 +2,15 @@
 #define SEMANTICS_H
 
 #include "ast.h"
+#include "list.h"
 
 /* -----------------DATA TYPE COMPATIBILITY----------------- */
 
 typedef enum { NOT_COMPATIBLE, SAME_TYPE, COMPATIBLE } dtype_compatibility;
+
+/* ------------------RETURN STATEMENT COUNT----------------- */
+
+extern int return_count;
 
 /* ------------------------LOOP DEPTH----------------------- */
 
@@ -42,6 +47,7 @@ dtype_compatibility verify_assignment_dtype_compatible(data_type lhs_dtype,
                                                        data_type rhs_dtype,
                                                        int rhs_is_constant);
 void verify_declaration_names_init_value(list_node *names);
+void verify_return_statement_last(list_node *statements);
 void verify_variable_declaration_before_use(symtab_entry *entry,
                                             int use_lineno);
 void set_return_statement_ret_type(ast_node *node);

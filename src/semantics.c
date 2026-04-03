@@ -1,5 +1,9 @@
 #include "../include/semantics.h"
 
+/* ------------------RETURN STATEMENT COUNT----------------- */
+
+int return_count = 0;
+
 /* ------------------------LOOP DEPTH----------------------- */
 
 int loop_depth = 0;
@@ -111,6 +115,10 @@ void semantic_analysis_function(ast_node *node) {
 void semantic_analysis_function_tail(ast_node *node) {
     semantic_analysis_list(node->as.function_tail.declarations);
     semantic_analysis_list(node->as.function_tail.statements);
+    verify_return_statement_last(node->as.function_tail.statements);
+
+    /* reset return statement counter */
+    return_count = 0;
 }
 
 void semantic_analysis_if_statement(ast_node *node) {
@@ -238,7 +246,7 @@ void semantic_analysis_input_statement(ast_node *node) {
     data_type d_type =
         get_data_type(node->as.input_statement.variable_reference->as
                           .variable_reference.entry->id);
-    printf("The data type of the input is: \'%s\',",
+    printf("The data type of the input is: \'%s\'\n",
            data_type_to_string(d_type));
 }
 
@@ -246,6 +254,9 @@ void semantic_analysis_return_statement(ast_node *node) {
     set_return_statement_ret_type(node);
     semantic_analysis(node->as.return_statement.expression);
     verify_return_statement_ret_type(node);
+
+    /* increment return statement counter */
+    return_count++;
 }
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
@@ -370,6 +381,50 @@ void verify_declaration_names_init_value(list_node *names) {
     }
 }
 
+void verify_return_statement_last(list_node *statements) {
+    symtab_entry *entry = lookup_symtab_entry(cur_scope->id);
+    data_type ret_type = entry->as.function.ret_type;
+
+    /* locate last statement node in statement list */
+    list_node *head = statements;
+    ast_node *statement;
+    while (head != NULL) {
+        statement = (ast_node *)head->data;
+        head = head->next;
+    }
+
+    /* function void -> return statement position check is optional */
+    if (ret_type == VOID_TYPE) {
+        /* check kind of last statement node */
+        if (statement->kind == RETURN_STATEMENT) {
+            printf("Optional return statement was found at the end of function "
+                   "\'%s\' of return type \'%s\'\n",
+                   entry->id, data_type_to_string(ret_type));
+        }
+    }
+    /* function NOT void -> return statement position check is required */
+    else {
+        /* check kind of last statement node */
+        if (statement->kind == RETURN_STATEMENT) {
+            printf("Return statement was located at the of function \'%s\' of "
+                   "type \'%s\' as required!\n",
+                   entry->id, data_type_to_string(ret_type));
+        } else {
+            printf("The return statement required at the end of function "
+                   "\'%s\' of "
+                   "type \'%s\' was not found!\n",
+                   entry->id, data_type_to_string(ret_type));
+        }
+    }
+
+    /* check return statement count */
+    if (return_count > 1) {
+        printf("More than one return statements were found for function "
+               "\'%s\'!\n",
+               entry->id);
+    }
+}
+
 void verify_variable_declaration_before_use(symtab_entry *entry,
                                             int use_lineno) {
     int first_lineno = *((int *)entry->lines->data);
@@ -389,7 +444,8 @@ void set_return_statement_ret_type(ast_node *node) {
     if (expression != NULL) {
         data_type ret_type = expression_data_type(expression);
         node->as.return_statement.ret_type = ret_type;
-        printf("Set return type of return statement in line no. %d to \'%s\'\n",
+        printf("Set return type of return statement in line no. %d to "
+               "\'%s\'\n",
                node->lineno, data_type_to_string(ret_type));
     }
     /* Else not required. Type is void in that case. */
@@ -432,8 +488,8 @@ void verify_return_statement_ret_type(ast_node *node) {
                        "compatible with the function return value!\n");
                 break;
             case SAME_TYPE:
-                printf(
-                    "Return statement of same type as function return value\n");
+                printf("Return statement of same type as function return "
+                       "value\n");
                 break;
             case COMPATIBLE:
                 printf("Return statement has value of compatible type to "
