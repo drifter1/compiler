@@ -138,21 +138,45 @@ void semantic_analysis_expresssion_binary(ast_node *node) {
     semantic_analysis(node->as.expression_binary.left);
     semantic_analysis(node->as.expression_binary.right);
 
-#if DEBUG
     data_type d_type = expression_data_type(node);
-    printf("Result data type of binary expression at line no. %d is \'%s\'\n",
-           node->lineno, data_type_to_string(d_type));
+
+    if (d_type == UNDEF_TYPE || d_type == VOID_TYPE) {
+        printf("Semantic error at line %d. The result data type of the binary "
+               "expression of operator type \'%s\' is: \'%s\'\n",
+               node->lineno,
+               operator_type_to_string(node->as.expression_binary.op_type),
+               data_type_to_string(d_type));
+        exit(EXIT_FAILURE);
+    } else {
+#if DEBUG
+        printf("Result data type of binary expression of operator type "
+               "\'%s\' at line no. %d is \'%s\'\n",
+               operator_type_to_string(node->as.expression_binary.op_type),
+               node->lineno, data_type_to_string(d_type));
 #endif
+    }
 }
 
 void semantic_analysis_expresssion_unary(ast_node *node) {
     semantic_analysis(node->as.expression_unary.operand);
 
-#if DEBUG
     data_type d_type = expression_data_type(node);
-    printf("Result data type unary expression at line no. %d is \'%s\'\n",
-           node->lineno, data_type_to_string(d_type));
+
+    if (d_type == UNDEF_TYPE || d_type == VOID_TYPE) {
+        printf("Semantic error at line %d. The result data type of the unary "
+               "expression of operator type \'%s\' is: \'%s\'\n",
+               node->lineno,
+               operator_type_to_string(node->as.expression_unary.op_type),
+               data_type_to_string(d_type));
+        exit(EXIT_FAILURE);
+    } else {
+#if DEBUG
+        printf("Result data type of unary expression of operator type \'%s\' "
+               "at line no. %d is \'%s\'\n",
+               operator_type_to_string(node->as.expression_unary.op_type),
+               node->lineno, data_type_to_string(d_type));
 #endif
+    }
 }
 
 void semantic_analysis_variable_reference(ast_node *node) {
