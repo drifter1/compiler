@@ -265,19 +265,24 @@ void semantic_analysis_jump_statement(ast_node *node) {
 }
 
 void semantic_analysis_print_statement(ast_node *node) {
-#if DEBUG
     data_type d_type;
-#endif
 
     switch (node->as.print_statement.p_type) {
     case EXPRESSION:
         semantic_analysis(node->as.print_statement.print_value.expression);
-#if DEBUG
         d_type = expression_data_type(
             node->as.print_statement.print_value.expression);
-        printf("The data type of the output value is: \'%s\'\n",
-               data_type_to_string(d_type));
+        if (d_type == UNDEF_TYPE || d_type == VOID_TYPE) {
+            printf("Semantic error at line %d. The data type of the output "
+                   "value is: \'%s\'\n",
+                   node->lineno, data_type_to_string(d_type));
+            exit(EXIT_FAILURE);
+        } else {
+#if DEBUG
+            printf("The data type of the output value is: \'%s\'\n",
+                   data_type_to_string(d_type));
 #endif
+        }
         break;
     case STRING:
 #if DEBUG
