@@ -185,16 +185,13 @@ void semantic_analysis_assignment(ast_node *node) {
     switch (verify_assignment_dtype_compatible(
         lhs_dtype, rhs_dtype,
         node->as.assignment.expression->kind == CONSTANT)) {
-    /* not compatible*/
-    case 0:
+    case NOT_COMPATIBLE:
         printf("Incompatible Types!\n");
         break;
-    /* same type */
-    case 1:
+    case SAME_TYPE:
         printf("Types are the same!\n");
         break;
-    /* compatible type */
-    case 2:
+    case COMPATIBLE:
         printf("Compatible Types!\n");
     }
 }
@@ -294,28 +291,22 @@ void set_declaration_names_type(data_type d_type, list_node *names) {
     }
 }
 
-int verify_assignment_dtype_compatible(data_type lhs_dtype, data_type rhs_dtype,
-                                       int rhs_is_constant) {
-    /*
-     * return value meaning
-     * 0: not compatible
-     * 1: same type
-     * 2: compatible type
-     */
-
+dtype_compatibility verify_assignment_dtype_compatible(data_type lhs_dtype,
+                                                       data_type rhs_dtype,
+                                                       int rhs_is_constant) {
     /* types the same */
     if (lhs_dtype == rhs_dtype) {
-        return 1;
+        return SAME_TYPE;
     }
     /* special case - T_FCONST is always double - float is compatible */
     else if (rhs_dtype == DOUBLE_TYPE && lhs_dtype == FLOAT_TYPE) {
         /* if expression is constant node */
         if (rhs_is_constant) {
-            return 1;
+            return SAME_TYPE;
         }
         /* if expression is not a constant node */
         else {
-            return 0;
+            return NOT_COMPATIBLE;
         }
 
     }
@@ -325,11 +316,11 @@ int verify_assignment_dtype_compatible(data_type lhs_dtype, data_type rhs_dtype,
 
         /* type promotion possible */
         if (prom_type == lhs_dtype) {
-            return 2;
+            return COMPATIBLE;
         }
         /* type promotion not possible */
         else {
-            return 0;
+            return NOT_COMPATIBLE;
         }
     }
 }
@@ -356,21 +347,18 @@ void verify_declaration_names_init_value(list_node *names) {
         } else {
             switch (
                 verify_assignment_dtype_compatible(var_type, init_type, 1)) {
-            /* not compatible */
-            case 0:
+            case NOT_COMPATIBLE:
                 printf("Declaration of variable \'%s\' of type \'%s\' has "
                        "initialization value of incompatible type \'%s\'\n",
                        entry->id, data_type_to_string(var_type),
                        data_type_to_string(init_type));
                 break;
-            /* same type */
-            case 1:
+            case SAME_TYPE:
                 printf("Declaration of variable \'%s\' of type \'%s\' has "
                        "initialization value of same type\n",
                        entry->id, data_type_to_string(var_type));
                 break;
-            /* compatible type */
-            case 2:
+            case COMPATIBLE:
                 printf("Declaration of variable \'%s\' of type \'%s\' has "
                        "initialization value of compatible type \'%s\'\n",
                        entry->id, data_type_to_string(var_type),
@@ -439,18 +427,15 @@ void verify_return_statement_ret_type(ast_node *node) {
             switch (verify_assignment_dtype_compatible(
                 func_ret_type, ret_type,
                 node->as.return_statement.expression->kind == CONSTANT)) {
-            /* not compatible */
-            case 0:
+            case NOT_COMPATIBLE:
                 printf("The return value of the return statement is not "
                        "compatible with the function return value!\n");
                 break;
-            /* same type */
-            case 1:
+            case SAME_TYPE:
                 printf(
                     "Return statement of same type as function return value\n");
                 break;
-            /* compatible type */
-            case 2:
+            case COMPATIBLE:
                 printf("Return statement has value of compatible type to "
                        "function return value!\n");
             }
