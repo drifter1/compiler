@@ -533,7 +533,7 @@ void foo() {                /* function without parameters */
 
 ### Expressions
 
-An expression may contain binary operations (arithmetic, logical, equality, relational), unary operations (increment/decrement, logical NOT, unary minus on constants), parenthesised sub‑expressions, variable references, constants, and non-void function calls.
+An expression may contain binary operations (arithmetic, logical, equality, relational), unary operations (increment/decrement, logical NOT, unary plus and minus on constants), parenthesized sub‑expressions, variable references, constants, and non-`void` function calls. Furthermore, the elements in an expression must be of compatible data types.
 
 <details>
     <summary><b>Examples</b></summary>
@@ -606,3 +606,26 @@ return 0;                   /* return statement */
 ```
 
 </details>
+
+#### Function calls
+
+The number of arguments in a function call must match the number of parameters declared in the function. Additionally, the data type of each argument must be compatible with that of the corresponding parameter.
+
+#### Assignments
+
+The result data type of the expression on the right-hand side of an assignment must be compatible with the data type of the variable to which the value is assigned on the left-hand side.
+
+#### Jump statements
+
+The jump statements `break` and `continue` can solely be used inside loops, as they only have a valid semantic meaning within them. The `break` statement causes the enclosing loop to terminate, while `continue` skips the remainder of the loop's body and advances to the next iteration.
+
+> [!NOTE]
+> Please be advised that, in the context of for loops, the `continue` statement jumps to the iteration statement, which then jumps to evaluate the loop condition. In contrast, in while loops, the `continue` statement jumps directly to the condition evaluation.
+
+#### Print statements
+
+A print statement can either output a string or the result of an expression. In the latter case, the expression cannot evaluate to a `void` type.
+
+#### Return statements
+
+If a function is not of type `void`, including a return statement is mandatory. If a function is of type `void`, an optional return statement with no return value (`return;`) may be included. The evaluation value of the expression in the return statement must be compatible with the function's return type. If present, the return statement must also be the last statement in the function body.
