@@ -1,5 +1,9 @@
 #include "../include/semantics.h"
 
+/* ------------------------LOOP DEPTH----------------------- */
+
+int loop_depth = 0;
+
 /* ----------------------MAIN FUNCTIONS--------------------- */
 
 void semantic_analysis(ast_node *node) {
@@ -154,10 +158,14 @@ void semantic_analysis_else_if(ast_node *node) {
 }
 
 void semantic_analysis_for_loop(ast_node *node) {
+    loop_depth++;
+
     semantic_analysis(node->as.for_loop.initialize);
     semantic_analysis(node->as.for_loop.condition);
     semantic_analysis(node->as.for_loop.increment);
     semantic_analysis_list(node->as.for_loop.for_branch);
+
+    loop_depth--;
 }
 
 void semantic_analysis_assignment(ast_node *node) {
@@ -182,13 +190,24 @@ void semantic_analysis_assignment(ast_node *node) {
 }
 
 void semantic_analysis_while_loop(ast_node *node) {
+    loop_depth++;
+
     semantic_analysis(node->as.while_loop.condition);
     semantic_analysis_list(node->as.while_loop.while_branch);
+
+    loop_depth--;
 }
 
 void semantic_analysis_jump_statement(ast_node *node) {
     printf("Jump Statement Node of type \'%s\'\n",
            jump_type_to_string(node->as.jump_statement.j_type));
+
+    /* check if jump statement is inside of loop */
+    if (loop_depth) {
+        printf("Jump Statement inside of loop!\n");
+    } else {
+        printf("Jump Statement not inside of loop!\n");
+    }
 }
 
 void semantic_analysis_print_statement(ast_node *node) {

@@ -3,6 +3,10 @@
 
 #include "ast.h"
 
+/* ------------------------LOOP DEPTH----------------------- */
+
+extern int loop_depth;
+
 /* ----------------------MAIN FUNCTIONS--------------------- */
 
 void semantic_analysis(ast_node *node);
