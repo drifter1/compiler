@@ -15,7 +15,7 @@
 
 /* ----------------------DEBUG RELATED---------------------- */
 
-#ifdef DEBUG
+#if DEBUG
 extern FILE *lexer_dump_file;
 #define LEXER_DUMP_FILE_NAME "lexer_dump.out"
 #define SYMTAB_DUMP_FILE_NAME "symtab_dump.out"

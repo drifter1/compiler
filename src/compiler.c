@@ -3,7 +3,7 @@
 
 const char *filename;
 
-#ifdef DEBUG
+#if DEBUG
 FILE *lexer_dump_file;
 #endif
 
@@ -24,38 +24,36 @@ int main(int argc, char *argv[]) {
         // initialize scope
         init_scope();
 
+#if DEBUG
         // open lexer dump file
-        if (DEBUG)
-            lexer_dump_file = fopen(LEXER_DUMP_FILE_NAME, "w");
+        lexer_dump_file = fopen(LEXER_DUMP_FILE_NAME, "w");
+#endif
 
         // parsing
         yyparse();
         fclose(yyin);
 
+#if DEBUG
         // close lexer dump file
-        if (DEBUG)
-            fclose(lexer_dump_file);
+        fclose(lexer_dump_file);
 
-        if (DEBUG)
-            printf("Parsing finished!\n");
-
+        printf("Parsing finished!\n");
+#endif
         // semantic analysis
         semantic_analysis(ast);
 
+#if DEBUG
         // symbol table dump
-        if (DEBUG) {
-            printf("Dumping symbol table to file...\n");
-            FILE *symtab_dump_file;
-            symtab_dump_file = fopen(SYMTAB_DUMP_FILE_NAME, "w");
-            dump_symbol_table(symtab_dump_file);
-            fclose(symtab_dump_file);
-        }
+        printf("Dumping symbol table to file...\n");
+        FILE *symtab_dump_file;
+        symtab_dump_file = fopen(SYMTAB_DUMP_FILE_NAME, "w");
+        dump_symbol_table(symtab_dump_file);
+        fclose(symtab_dump_file);
 
         // abstract syntax tree json dump file
-        if (DEBUG) {
-            printf("Dumping abstract syntax tree to JSON file...\n");
-            json_dump_abstract_syntax_tree(AST_JSON_DUMP_FILE_NAME);
-        }
+        printf("Dumping abstract syntax tree to JSON file...\n");
+        json_dump_abstract_syntax_tree(AST_JSON_DUMP_FILE_NAME);
+#endif
 
         exit(EXIT_SUCCESS);
     }

@@ -25,7 +25,6 @@ extern scope *cur_scope;
 /* --------------------SCOPE MANAGEMENT-------------------- */
 
 void init_scope();
-void hide_scope(const char *id);
 void hide_current_scope();
 scope *new_scope(scope_kind kind, const char *id);
 scope *new_global_scope();

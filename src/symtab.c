@@ -44,9 +44,10 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
         e->next = symbol_table[hashval];
         symbol_table[hashval] = e;
 
-        if (DEBUG)
-            printf("Inserted \'%s\' for the first time with line no. %d!\n", id,
-                   yylineno);
+#if DEBUG
+        printf("Inserted \'%s\' for the first time with line no. %d!\n", id,
+               yylineno);
+#endif
     }
     /* found in table */
     else {
@@ -65,8 +66,9 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
             t->next->data = (void *)p;
             t->next->next = NULL;
 
-            if (DEBUG)
-                printf("Found \'%s\' again at line no. %d!\n", id, yylineno);
+#if DEBUG
+            printf("Found \'%s\' again at line no. %d!\n", id, yylineno);
+#endif
         }
         /* new scope */
         else {
@@ -85,9 +87,10 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
             e->next = symbol_table[hashval];
             symbol_table[hashval] = e;
 
-            if (DEBUG)
-                printf("Inserted \'%s\' for a new scope with line no. %d!\n",
-                       id, yylineno);
+#if DEBUG
+            printf("Inserted \'%s\' for a new scope with line no. %d!\n", id,
+                   yylineno);
+#endif
         }
     }
 

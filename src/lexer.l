@@ -31,16 +31,22 @@ WHITESPACE			[ \t\n\r\f]+
  /* Comments */
 "//".*				{ 
 						/* single-line comment */
-						if(DEBUG) printf("Eat up comment at line %d\n", yylineno);
+						#if DEBUG
+						printf("Eat up comment at line %d\n", yylineno);
+						#endif
 					}
 
 "/*"				{
 						/* multi-line comment */ 
-						if(DEBUG) printf("Eat up comment from line %d ", yylineno);
+						#if DEBUG
+						printf("Eat up comment from line %d ", yylineno);
+						#endif
 						BEGIN(ML_COMMENT);
 					} 
 <ML_COMMENT>"*/" 	{
-						if(DEBUG) printf("to line %d\n", yylineno);
+						#if DEBUG
+						printf("to line %d\n", yylineno);
+						#endif
 						BEGIN(INITIAL);
 					}
 <ML_COMMENT>[^*\n]+
@@ -168,6 +174,7 @@ char *to_string(const char *str_in, int len) {
 }
 
 void print_token(const char *token){
-	if(DEBUG)
-		fprintf(lexer_dump_file, "%s", token);
+#if DEBUG
+	fprintf(lexer_dump_file, "%s", token);
+#endif
 }

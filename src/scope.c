@@ -8,15 +8,15 @@ scope *cur_scope = NULL;
 
 void init_scope() { cur_scope = new_global_scope(); }
 
-void hide_scope(const char *id) {
-    if (DEBUG)
-        printf("Hiding scope \'%s\'\n", id);
+void hide_current_scope() {
+
+#if DEBUG
+    printf("Hiding scope \'%s\'\n", cur_scope->id);
+#endif
 
     cur_scope->visibility = HIDDEN;
     cur_scope = cur_scope->parent;
 }
-
-void hide_current_scope() { hide_scope(cur_scope->id); }
 
 scope *new_scope(scope_kind kind, const char *id) {
     scope *s = malloc(sizeof(scope));
@@ -32,8 +32,11 @@ scope *new_global_scope() { return new_scope(GLOBAL, "_GLOBAL"); }
 scope *new_local_scope(const char *id) { return new_scope((LOCAL), id); }
 
 void enter_local_scope(const char *id) {
-    if (DEBUG)
-        printf("Entering scope \'%s\'\n", id);
+
+#if DEBUG
+    printf("Entering scope \'%s\'\n", id);
+#endif
+
     cur_scope = new_local_scope(id);
 }
 
