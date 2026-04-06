@@ -234,8 +234,8 @@ void semantic_analysis_assignment(ast_node *node) {
     semantic_analysis(node->as.assignment.variable_reference);
     semantic_analysis(node->as.assignment.expression);
 
-    data_type lhs_dtype = get_data_type(node->as.assignment.variable_reference
-                                            ->as.variable_reference.entry->id);
+    data_type lhs_dtype = get_data_type(
+        node->as.assignment.variable_reference->as.variable_reference.entry);
     data_type rhs_dtype = expression_data_type(node->as.assignment.expression);
 
 #if DEBUG
@@ -329,7 +329,7 @@ void semantic_analysis_input_statement(ast_node *node) {
 #if DEBUG
     data_type d_type =
         get_data_type(node->as.input_statement.variable_reference->as
-                          .variable_reference.entry->id);
+                          .variable_reference.entry);
     printf("The data type of the input is: \'%s\'\n",
            data_type_to_string(d_type));
 #endif
@@ -738,11 +738,11 @@ data_type expression_data_type(ast_node *node) {
         right_type = UNDEF_TYPE;
         return get_op_result_type(op_type, left_type, right_type);
     case VARIABLE_REFERENCE:
-        return get_data_type(node->as.variable_reference.entry->id);
+        return get_data_type(node->as.variable_reference.entry);
     case CONSTANT:
         return node->as.constant.d_type;
     case FUNCTION_CALL:
-        return get_data_type(node->as.function_call.entry->id);
+        return get_data_type(node->as.function_call.entry);
     default:
         return UNDEF_TYPE;
     }

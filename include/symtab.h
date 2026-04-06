@@ -81,7 +81,7 @@ symtab_entry *set_variable_init_value(symtab_entry *entry, data_type d_type,
                                       value val);
 symtab_entry *set_function_parameters(symtab_entry *entry,
                                       list_node *parameters);
-data_type get_data_type(const char *id);
+data_type get_data_type(symtab_entry *entry);
 char *symtab_entry_kind_to_string(symtab_entry_kind kind);
 int get_first_lineno(symtab_entry *entry);
 

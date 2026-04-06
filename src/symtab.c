@@ -141,7 +141,7 @@ void dump_symbol_table(FILE *of) {
                 }
                 fprintf(of, "%-13s", e->id);
                 fprintf(of, "%-15s", symtab_entry_kind_to_string(e->kind));
-                fprintf(of, "%-15s", data_type_to_string(get_data_type(e->id)));
+                fprintf(of, "%-15s", data_type_to_string(get_data_type(e)));
                 fprintf(of, "%-13s", e->scope->id);
                 list_node *t = e->lines;
                 int lineno;
@@ -215,19 +215,17 @@ symtab_entry *set_function_parameters(symtab_entry *entry,
     return entry;
 }
 
-data_type get_data_type(const char *id) {
-    symtab_entry *e = lookup_symtab_entry(id);
-
-    if (e != NULL) {
-        switch (e->kind) {
+data_type get_data_type(symtab_entry *entry) {
+    if (entry != NULL) {
+        switch (entry->kind) {
         case VARIABLE_ENTRY:
-            return e->as.variable.d_type;
+            return entry->as.variable.d_type;
         case PARAMETER_ENTRY:
-            return e->as.parameter.d_type;
+            return entry->as.parameter.d_type;
         case FUNCTION_ENTRY:
-            return e->as.function.ret_type;
+            return entry->as.function.ret_type;
         case TEMPORARY_ENTRY:
-            return e->as.temporary.d_type;
+            return entry->as.temporary.d_type;
         }
     }
     return UNDEF_TYPE;
