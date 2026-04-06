@@ -201,9 +201,34 @@ operand intermediate_code_generation_variable_reference(ast_node *node) {
 }
 
 operand intermediate_code_generation_function_call(ast_node *node) {
-    // intermediate_code_generation_list(node->as.function_call.arguments);
-    /* not implemented yet */
-    return op_none();
+    list_node *head;
+    ast_node *argument;
+    operand arg;
+    operand none = op_none();
+
+    /* function call arguments */
+    head = node->as.function_call.arguments;
+    while (head != NULL) {
+        argument = (ast_node *)head->data;
+        arg = intermediate_code_generation_expression(argument);
+        tac_list_add(tac_create(OP_ARG, arg, op_none(), op_none()));
+        head = head->next;
+    }
+
+    /* perform function call */
+    tac_list_add(tac_create(OP_CALL, op_var(node->as.function_call.entry),
+                            op_none(), op_none()));
+
+    /* retrieve return value (when there is one) */
+    data_type ret_type = node->as.function_call.entry->as.function.ret_type;
+
+    if ((ret_type != UNDEF_TYPE) && (ret_type != VOID_TYPE)) {
+        operand result = op_temp(new_temporary(node->lineno, ret_type));
+        tac_list_add(tac_create(OP_GETRET, result, op_none(), op_none()));
+        return result;
+    }
+
+    return none;
 }
 
 void intermediate_code_generation_else_if(ast_node *node) {
