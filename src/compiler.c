@@ -42,6 +42,9 @@ int main(int argc, char *argv[]) {
         // semantic analysis
         semantic_analysis(ast);
 
+        // intermediate code generation
+        intermediate_code_generation(ast);
+
 #if DEBUG
         // symbol table dump
         printf("Dumping symbol table to file...\n");

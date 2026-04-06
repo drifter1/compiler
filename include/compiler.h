@@ -2,11 +2,14 @@
 #define COMPILER_H
 
 #include "../include/ast.h"
+#include "../include/context.h"
+#include "../include/ir.h"
 #include "../include/json.h"
 #include "../include/list.h"
 #include "../include/scope.h"
 #include "../include/semantics.h"
 #include "../include/symtab.h"
+#include "../include/tac.h"
 #include "../include/types.h"
 
 /* --------------------COMPILER SETTINGS-------------------- */
