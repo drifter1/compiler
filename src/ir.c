@@ -29,10 +29,10 @@ void intermediate_code_generation(ast_node *node) {
         intermediate_code_generation_if_statement(node);
         break;
     case EXPRESSION_BINARY:
-        intermediate_code_generation_expresssion_binary(node);
+        intermediate_code_generation_expression_binary(node);
         break;
     case EXPRESSION_UNARY:
-        intermediate_code_generation_expresssion_unary(node);
+        intermediate_code_generation_expression_unary(node);
         break;
     case VARIABLE_REFERENCE:
         intermediate_code_generation_variable_reference(node);
@@ -136,17 +136,60 @@ void intermediate_code_generation_if_statement(ast_node *node) {
     intermediate_code_generation_list(node->as.if_statement.else_branch);
 }
 
-operand intermediate_code_generation_expresssion_binary(ast_node *node) {
-    intermediate_code_generation(node->as.expression_binary.left);
-    intermediate_code_generation(node->as.expression_binary.right);
-    /* not implemented yet */
-    return op_none();
+operand intermediate_code_generation_expression_binary(ast_node *node) {
+    operator_type op_type;
+    op_code op;
+    operand arg1, arg2, result;
+    tac t;
+    op_type = node->as.expression_binary.op_type;
+    op = operator_type_to_op_code(op_type);
+    arg1 = intermediate_code_generation_expression(
+        node->as.expression_binary.left);
+    arg2 = intermediate_code_generation_expression(
+        node->as.expression_binary.right);
+    result = op_label("_tmp"); /* change: handle with symbol table */
+    tac_create(op, result, arg1, arg2);
+    tac_list_add(t);
+    return result;
 }
 
-operand intermediate_code_generation_expresssion_unary(ast_node *node) {
-    intermediate_code_generation(node->as.expression_unary.operand);
-    /* not implemented yet */
-    return op_none();
+operand intermediate_code_generation_expression_unary(ast_node *node) {
+    operator_type op_type;
+    op_code op;
+    operand arg, result;
+    operand none = op_none();
+    op_type = node->as.expression_unary.op_type;
+    op = operator_type_to_op_code(op_type);
+    arg = intermediate_code_generation_expression(
+        node->as.expression_unary.operand);
+    switch (op_type) {
+    /* postfix inc/dec perform operation but return the original
+     * value for the surrounding expression */
+    case POST_INC:
+    case POST_DEC:
+        result = op_label("_tmp"); /* change: handle with symbol table */
+        tac_list_add(tac_create(OP_ASSIGN, result, arg, none));
+        tac_list_add(tac_create(op, arg, none, none));
+        return arg;
+    /* prefix inc/dec performs operation and returns the result
+     * for the surrounding expression */
+    case PRE_INC:
+    case PRE_DEC:
+        tac_list_add(tac_create(op, arg, op_none(), op_none()));
+        return arg;
+    /* unary plus yields no operation and simply returns the original value
+     * for the surrounding expression */
+    case UNARY_PLUS:
+        return arg;
+    /* unary minus performs operation and returns the result
+     * for the surrounding expression */
+    case UNARY_MINUS:
+        result = op_label("_tmp"); /* change: handle with symbol table */
+        tac_list_add(tac_create(op, result, arg, op_none()));
+        return result;
+    default:
+        return op_label("_error");
+    }
 }
 
 operand intermediate_code_generation_variable_reference(ast_node *node) {
@@ -186,25 +229,39 @@ void intermediate_code_generation_jump_statement(ast_node *node) {}
 
 void intermediate_code_generation_print_statement(ast_node *node) {
     print_type p_type = node->as.print_statement.p_type;
+    operand arg;
+    operand none = op_none();
+    tac t;
     switch (p_type) {
     case EXPRESSION:
-        intermediate_code_generation(
+        arg = intermediate_code_generation_expression(
             node->as.print_statement.print_value.expression);
         break;
     case STRING:
-        break;
+        arg = op_string(node->as.print_statement.print_value.sval);
     }
+    t = tac_create(OP_PRINT, arg, none, none);
+    tac_list_add(t);
 }
 
 void intermediate_code_generation_input_statement(ast_node *node) {
-    intermediate_code_generation(node->as.input_statement.variable_reference);
+    operand arg = intermediate_code_generation_variable_reference(
+        node->as.input_statement.variable_reference);
+    tac t = tac_create(OP_INPUT, arg, op_none(), op_none());
+    tac_list_add(t);
 }
 
 void intermediate_code_generation_return_statement(ast_node *node) {
     ast_node *expression = node->as.return_statement.expression;
+    operand none = op_none();
+    tac t;
     if (expression != NULL) {
-        intermediate_code_generation(expression);
+        operand arg = intermediate_code_generation_expression(expression);
+        t = tac_create(OP_RETV, arg, none, none);
+    } else {
+        t = tac_create(OP_RET, none, none, none);
     }
+    tac_list_add(t);
 }
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
@@ -214,9 +271,9 @@ operand intermediate_code_generation_expression(ast_node *node) {
     case CONSTANT:
         return intermediate_code_generation_constant(node);
     case EXPRESSION_BINARY:
-        return intermediate_code_generation_expresssion_binary(node);
+        return intermediate_code_generation_expression_binary(node);
     case EXPRESSION_UNARY:
-        return intermediate_code_generation_expresssion_unary(node);
+        return intermediate_code_generation_expression_unary(node);
     case VARIABLE_REFERENCE:
         return intermediate_code_generation_variable_reference(node);
     case FUNCTION_CALL:
