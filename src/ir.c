@@ -225,3 +225,57 @@ operand intermediate_code_generation_expression(ast_node *node) {
         return op_none();
     }
 }
+
+op_code operator_type_to_op_code(operator_type op_type) {
+    switch (op_type) {
+    case NO_OP:
+        return OP_NOP;
+    case ASSIGN:
+        return OP_ASSIGN;
+    case INC:
+        return OP_INC;
+    case DEC:
+        return OP_DEC;
+    case PRE_INC:
+        return OP_INC;
+    case PRE_DEC:
+        return OP_DEC;
+    case POST_INC:
+        return OP_INC;
+    case POST_DEC:
+        return OP_DEC;
+    case ADD:
+        return OP_ADD;
+    case SUB:
+        return OP_SUB;
+    case MUL:
+        return OP_MUL;
+    case DIV:
+        return OP_DIV;
+    case REM:
+        return OP_REM;
+    case UNARY_PLUS:
+        return OP_NOP;
+    case UNARY_MINUS:
+        return OP_NEG;
+    case OR:
+        return OP_OR;
+    case AND:
+        return OP_AND;
+    case NOT:
+        return OP_NOT;
+    case EQUAL:
+        return OP_EQ;
+    case NOT_EQUAL:
+        return OP_NEQ;
+    case GREATER:
+        return OP_GT;
+    case LESS:
+        return OP_LT;
+    case GREATER_EQUAL:
+        return OP_GE;
+    case LESS_EQUAL:
+        return OP_LE;
+    }
+    return OP_NOP;
+}

@@ -29,5 +29,6 @@ void intermediate_code_generation_return_statement(ast_node *node);
 /* ---------------------HELPER FUNCTIONS-------------------- */
 
 operand intermediate_code_generation_expression(ast_node *node);
+op_code operator_type_to_op_code(operator_type op_type);
 
 #endif /* IR_H */
