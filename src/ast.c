@@ -51,7 +51,7 @@ ast_node *ast_function(symtab_entry *entry, ast_node *function_tail) {
     ast_node *v = new_ast_node();
 
     v->kind = FUNCTION;
-    v->lineno = get_first_lineno(entry);
+    v->lineno = function_tail->lineno - 1;
 
     v->as.function.entry = entry;
     v->as.function.function_tail = function_tail;
