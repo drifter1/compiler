@@ -147,7 +147,8 @@ operand intermediate_code_generation_expression_binary(ast_node *node) {
         node->as.expression_binary.left);
     arg2 = intermediate_code_generation_expression(
         node->as.expression_binary.right);
-    result = op_label("_tmp"); /* change: handle with symbol table */
+    result =
+        op_temp(new_temporary(node->lineno, node->as.expression_binary.d_type));
     tac_create(op, result, arg1, arg2);
     tac_list_add(t);
     return result;
@@ -167,7 +168,8 @@ operand intermediate_code_generation_expression_unary(ast_node *node) {
      * value for the surrounding expression */
     case POST_INC:
     case POST_DEC:
-        result = op_label("_tmp"); /* change: handle with symbol table */
+        result = op_temp(
+            new_temporary(node->lineno, node->as.expression_unary.d_type));
         tac_list_add(tac_create(OP_ASSIGN, result, arg, none));
         tac_list_add(tac_create(op, arg, none, none));
         return arg;
@@ -184,7 +186,8 @@ operand intermediate_code_generation_expression_unary(ast_node *node) {
     /* unary minus performs operation and returns the result
      * for the surrounding expression */
     case UNARY_MINUS:
-        result = op_label("_tmp"); /* change: handle with symbol table */
+        result = op_temp(
+            new_temporary(node->lineno, node->as.expression_unary.d_type));
         tac_list_add(tac_create(op, result, arg, op_none()));
         return result;
     default:
@@ -335,4 +338,12 @@ op_code operator_type_to_op_code(operator_type op_type) {
         return OP_LE;
     }
     return OP_NOP;
+}
+
+symtab_entry *new_temporary(int lineno, data_type d_type) {
+    static int temp_count = 0;
+    char *id = (char *)malloc(15 * sizeof(char));
+    sprintf(id, "_tmp%d", temp_count);
+    temp_count++;
+    return insert_temporary_entry(id, lineno, d_type);
 }
