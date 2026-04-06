@@ -106,7 +106,9 @@ void intermediate_code_generation_declaration(ast_node *node) {
     }
 }
 
-void intermediate_code_generation_constant(ast_node *node) {}
+operand intermediate_code_generation_constant(ast_node *node) {
+    return op_const(node);
+}
 
 void intermediate_code_generation_function(ast_node *node) {
     /* generate label with function identifier */
@@ -134,19 +136,28 @@ void intermediate_code_generation_if_statement(ast_node *node) {
     intermediate_code_generation_list(node->as.if_statement.else_branch);
 }
 
-void intermediate_code_generation_expresssion_binary(ast_node *node) {
+operand intermediate_code_generation_expresssion_binary(ast_node *node) {
     intermediate_code_generation(node->as.expression_binary.left);
     intermediate_code_generation(node->as.expression_binary.right);
+    /* not implemented yet */
+    return op_none();
 }
 
-void intermediate_code_generation_expresssion_unary(ast_node *node) {
+operand intermediate_code_generation_expresssion_unary(ast_node *node) {
     intermediate_code_generation(node->as.expression_unary.operand);
+    /* not implemented yet */
+    return op_none();
 }
 
-void intermediate_code_generation_variable_reference(ast_node *node) {}
+operand intermediate_code_generation_variable_reference(ast_node *node) {
+    symtab_entry *entry = node->as.variable_reference.entry;
+    return op_var(entry);
+}
 
-void intermediate_code_generation_function_call(ast_node *node) {
-    intermediate_code_generation_list(node->as.function_call.arguments);
+operand intermediate_code_generation_function_call(ast_node *node) {
+    // intermediate_code_generation_list(node->as.function_call.arguments);
+    /* not implemented yet */
+    return op_none();
 }
 
 void intermediate_code_generation_else_if(ast_node *node) {
@@ -193,5 +204,24 @@ void intermediate_code_generation_return_statement(ast_node *node) {
     ast_node *expression = node->as.return_statement.expression;
     if (expression != NULL) {
         intermediate_code_generation(expression);
+    }
+}
+
+/* ---------------------HELPER FUNCTIONS-------------------- */
+
+operand intermediate_code_generation_expression(ast_node *node) {
+    switch (node->kind) {
+    case CONSTANT:
+        return intermediate_code_generation_constant(node);
+    case EXPRESSION_BINARY:
+        return intermediate_code_generation_expresssion_binary(node);
+    case EXPRESSION_UNARY:
+        return intermediate_code_generation_expresssion_unary(node);
+    case VARIABLE_REFERENCE:
+        return intermediate_code_generation_variable_reference(node);
+    case FUNCTION_CALL:
+        return intermediate_code_generation_function_call(node);
+    default:
+        return op_none();
     }
 }
