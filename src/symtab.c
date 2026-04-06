@@ -1,4 +1,5 @@
 #include "../include/compiler.h"
+#include <complex.h>
 #include <string.h>
 
 /* -----------------SYMBOL TABLE STRUCTURE----------------- */
@@ -22,7 +23,8 @@ unsigned int hash(const char *key) {
     return hashval % SIZE;
 }
 
-symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
+symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id,
+                                  int lineno) {
     unsigned int hashval = hash(id);
 
     symtab_entry *e = lookup_symtab_entry(id);
@@ -36,7 +38,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
         e->scope = cur_scope;
         e->lines = (list_node *)malloc(sizeof(list_node));
         int *p = (int *)malloc(sizeof(int));
-        *p = yylineno;
+        *p = lineno;
         e->lines->data = (void *)p;
         e->lines->next = NULL;
 
@@ -46,7 +48,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
 
 #if DEBUG
         printf("Inserted \'%s\' for the first time with line no. %d!\n", id,
-               yylineno);
+               lineno);
 #endif
     }
     /* found in table */
@@ -62,12 +64,12 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
             t->next = (list_node *)malloc(sizeof(list_node));
 
             int *p = (int *)malloc(sizeof(int));
-            *p = yylineno;
+            *p = lineno;
             t->next->data = (void *)p;
             t->next->next = NULL;
 
 #if DEBUG
-            printf("Found \'%s\' again at line no. %d!\n", id, yylineno);
+            printf("Found \'%s\' again at line no. %d!\n", id, lineno);
 #endif
         }
         /* new scope */
@@ -79,7 +81,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
             e->scope = cur_scope;
             e->lines = (list_node *)malloc(sizeof(list_node));
             int *p = (int *)malloc(sizeof(int));
-            *p = yylineno;
+            *p = lineno;
             e->lines->data = (void *)p;
             e->lines->next = NULL;
 
@@ -89,7 +91,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id) {
 
 #if DEBUG
             printf("Inserted \'%s\' for a new scope with line no. %d!\n", id,
-                   yylineno);
+                   lineno);
 #endif
         }
     }
@@ -160,7 +162,7 @@ void dump_symbol_table(FILE *of) {
 symtab_entry *insert_variable_entry(const char *id, data_type d_type) {
     symtab_entry *e;
 
-    e = insert_symtab_entry(VARIABLE_ENTRY, id);
+    e = insert_symtab_entry(VARIABLE_ENTRY, id, yylineno);
 
     if (e->kind == VARIABLE_ENTRY)
         e->as.variable.d_type = d_type;
@@ -171,7 +173,7 @@ symtab_entry *insert_variable_entry(const char *id, data_type d_type) {
 symtab_entry *insert_parameter_entry(const char *id, data_type d_type) {
     symtab_entry *e;
 
-    e = insert_symtab_entry(PARAMETER_ENTRY, id);
+    e = insert_symtab_entry(PARAMETER_ENTRY, id, yylineno);
 
     e->as.parameter.d_type = d_type;
 
@@ -181,10 +183,21 @@ symtab_entry *insert_parameter_entry(const char *id, data_type d_type) {
 symtab_entry *insert_function_entry(const char *id, data_type ret_type) {
     symtab_entry *e;
 
-    e = insert_symtab_entry(FUNCTION_ENTRY, id);
+    e = insert_symtab_entry(FUNCTION_ENTRY, id, yylineno);
 
     e->as.function.ret_type = ret_type;
     e->as.function.parameters = NULL;
+
+    return e;
+}
+
+symtab_entry *insert_temporary_entry(const char *id, int lineno,
+                                     data_type d_type) {
+    symtab_entry *e;
+
+    e = insert_symtab_entry(TEMPORARY_ENTRY, id, lineno);
+
+    e->as.temporary.d_type = d_type;
 
     return e;
 }
@@ -213,6 +226,8 @@ data_type get_data_type(const char *id) {
             return e->as.parameter.d_type;
         case FUNCTION_ENTRY:
             return e->as.function.ret_type;
+        case TEMPORARY_ENTRY:
+            return e->as.temporary.d_type;
         }
     }
     return UNDEF_TYPE;
@@ -226,6 +241,8 @@ char *symtab_entry_kind_to_string(symtab_entry_kind kind) {
         return "parameter";
     case FUNCTION_ENTRY:
         return "function";
+    case TEMPORARY_ENTRY:
+        return "temporary";
     }
     return "_error";
 }

@@ -271,6 +271,11 @@ json_t *json_construct_symtab_entry(symtab_entry *entry) {
         json_object_set(
             json_symtab_entry, "parameters",
             json_construct_parameters(entry->as.function.parameters));
+        break;
+    case TEMPORARY_ENTRY:
+        json_object_set(
+            json_symtab_entry, "d_type",
+            json_string(data_type_to_string(entry->as.temporary.d_type)));
     }
 
     return json_symtab_entry;

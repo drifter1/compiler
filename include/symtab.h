@@ -19,7 +19,8 @@
 typedef enum {
     VARIABLE_ENTRY,
     PARAMETER_ENTRY,
-    FUNCTION_ENTRY
+    FUNCTION_ENTRY,
+    TEMPORARY_ENTRY
 } symtab_entry_kind;
 
 /* ------------------SYMBOL TABLE ENTRIES------------------ */
@@ -47,6 +48,9 @@ typedef struct symtab_entry {
             data_type ret_type;
             list_node *parameters;
         } function;
+        struct {
+            data_type d_type;
+        } temporary;
     } as;
 } symtab_entry;
 
@@ -58,7 +62,8 @@ extern symtab_entry **symbol_table;
 
 void init_symbol_table();
 unsigned int hash(const char *key);
-symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id);
+symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id,
+                                  int lineno);
 symtab_entry *lookup_symtab_entry(const char *id);
 
 /* -----------------SYMBOL TABLE DUMP FILE----------------- */
@@ -70,6 +75,8 @@ void dump_symbol_table(FILE *of);
 symtab_entry *insert_variable_entry(const char *id, data_type d_type);
 symtab_entry *insert_parameter_entry(const char *id, data_type d_type);
 symtab_entry *insert_function_entry(const char *id, data_type ret_type);
+symtab_entry *insert_temporary_entry(const char *id, int lineno,
+                                     data_type d_type);
 symtab_entry *set_variable_init_value(symtab_entry *entry, data_type d_type,
                                       value val);
 symtab_entry *set_function_parameters(symtab_entry *entry,
