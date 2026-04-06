@@ -66,10 +66,12 @@ typedef struct ast_node {
             struct ast_node *left;
             operator_type op_type;
             struct ast_node *right;
+            data_type d_type;
         } expression_binary;
         struct {
             struct ast_node *operand;
             operator_type op_type;
+            data_type d_type;
         } expression_unary;
         struct {
             symtab_entry *entry;

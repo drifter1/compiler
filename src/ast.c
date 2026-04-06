@@ -98,6 +98,7 @@ ast_node *ast_expression_binary(ast_node *left, operator_type op_type,
     v->as.expression_binary.left = left;
     v->as.expression_binary.op_type = op_type;
     v->as.expression_binary.right = right;
+    v->as.expression_binary.d_type = UNDEF_TYPE;
 
     return v;
 }
@@ -112,6 +113,7 @@ ast_node *ast_expression_unary(ast_node *operand, operator_type op_type,
     v->as.expression_unary.operand = operand;
     v->as.expression_unary.op_type =
         ast_expression_unary_op_type(op_type, fixity);
+    v->as.expression_unary.d_type = UNDEF_TYPE;
 
     return v;
 }

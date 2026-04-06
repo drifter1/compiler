@@ -150,6 +150,7 @@ void semantic_analysis_expresssion_binary(ast_node *node) {
                data_type_to_string(d_type));
         exit(EXIT_FAILURE);
     } else {
+        node->as.expression_binary.d_type = d_type;
 #if DEBUG
         printf("Result data type of binary expression of operator type "
                "\'%s\' at line no. %d is \'%s\'\n",
@@ -172,6 +173,7 @@ void semantic_analysis_expresssion_unary(ast_node *node) {
                data_type_to_string(d_type));
         exit(EXIT_FAILURE);
     } else {
+        node->as.expression_unary.d_type = d_type;
 #if DEBUG
         printf("Result data type of unary expression of operator type \'%s\' "
                "at line no. %d is \'%s\'\n",

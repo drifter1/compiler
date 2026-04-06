@@ -93,6 +93,9 @@ json_t *json_construct_ast_node(ast_node *node) {
         json_object_set(
             json_ast_node, "right",
             json_construct_ast_node(node->as.expression_binary.right));
+        json_object_set(json_ast_node, "d_type",
+                        json_string(data_type_to_string(
+                            node->as.expression_binary.d_type)));
         break;
     case EXPRESSION_UNARY:
         json_object_set(
@@ -101,6 +104,9 @@ json_t *json_construct_ast_node(ast_node *node) {
         json_object_set(json_ast_node, "op_type",
                         json_string(operator_type_to_string(
                             node->as.expression_unary.op_type)));
+        json_object_set(
+            json_ast_node, "d_type",
+            json_string(data_type_to_string(node->as.expression_unary.d_type)));
         break;
     case VARIABLE_REFERENCE:
         json_object_set(
