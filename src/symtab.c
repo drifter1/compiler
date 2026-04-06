@@ -229,3 +229,7 @@ char *symtab_entry_kind_to_string(symtab_entry_kind kind) {
     }
     return "_error";
 }
+
+int get_first_lineno(symtab_entry *entry) {
+    return *((int *)entry->lines->data);
+}

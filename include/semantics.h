@@ -46,6 +46,8 @@ dtype_compatibility verify_assignment_dtype_compatible(data_type lhs_dtype,
                                                        data_type rhs_dtype,
                                                        int rhs_is_constant);
 void verify_declaration_names_init_value(list_node *names);
+void verify_no_redeclaration_of_function_name(symtab_entry *entry,
+                                              int declaration_lineno);
 void verify_return_statement_last(list_node *statements);
 void verify_variable_declaration_before_use(symtab_entry *entry,
                                             int use_lineno);

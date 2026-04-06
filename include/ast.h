@@ -150,6 +150,8 @@ ast_node *ast_return_statement(data_type ret_type, ast_node *expression);
 
 /* --------------------AST NODE HELPERS--------------------- */
 
+int ast_program_lineno(ast_node *node);
+int ast_function_tail_lineno(ast_node *node);
 ast_node *ast_constant_undef();
 operator_type ast_expression_unary_op_type(operator_type op_type,
                                            fixity_type fixity);

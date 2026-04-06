@@ -13,11 +13,12 @@ ast_node *ast_program(list_node *declarations, list_node *functions,
     ast_node *v = new_ast_node();
 
     v->kind = PROGRAM;
-    v->lineno = yylineno;
 
     v->as.program.declarations = declarations;
     v->as.program.functions = functions;
     v->as.program.main_function = main_function;
+
+    v->lineno = ast_program_lineno(v);
 
     return v;
 }
@@ -50,7 +51,7 @@ ast_node *ast_function(symtab_entry *entry, ast_node *function_tail) {
     ast_node *v = new_ast_node();
 
     v->kind = FUNCTION;
-    v->lineno = yylineno;
+    v->lineno = get_first_lineno(entry);
 
     v->as.function.entry = entry;
     v->as.function.function_tail = function_tail;
@@ -62,10 +63,11 @@ ast_node *ast_function_tail(list_node *declarations, list_node *statements) {
     ast_node *v = new_ast_node();
 
     v->kind = FUNCTION_TAIL;
-    v->lineno = yylineno;
 
     v->as.function_tail.declarations = declarations;
     v->as.function_tail.statements = statements;
+
+    v->lineno = ast_function_tail_lineno(v);
 
     return v;
 }
@@ -76,7 +78,7 @@ ast_node *ast_if_statement(ast_node *condition, list_node *if_branch,
     ast_node *v = new_ast_node();
 
     v->kind = IF_STATEMENT;
-    v->lineno = yylineno;
+    v->lineno = condition->lineno;
 
     v->as.if_statement.condition = condition;
     v->as.if_statement.if_branch = if_branch;
@@ -141,7 +143,7 @@ ast_node *ast_else_if(ast_node *condition, list_node *else_if_branch) {
     ast_node *v = new_ast_node();
 
     v->kind = ELSE_IF;
-    v->lineno = yylineno;
+    v->lineno = condition->lineno;
 
     v->as.else_if.condition = condition;
     v->as.else_if.else_if_branch = else_if_branch;
@@ -154,7 +156,7 @@ ast_node *ast_for_loop(ast_node *initialize, ast_node *condition,
     ast_node *v = new_ast_node();
 
     v->kind = FOR_LOOP;
-    v->lineno = yylineno;
+    v->lineno = initialize->lineno;
 
     v->as.for_loop.initialize = initialize;
     v->as.for_loop.condition = condition;
@@ -180,7 +182,7 @@ ast_node *ast_while_loop(ast_node *condition, list_node *while_branch) {
     ast_node *v = new_ast_node();
 
     v->kind = WHILE_LOOP;
-    v->lineno = yylineno;
+    v->lineno = condition->lineno;
 
     v->as.while_loop.condition = condition;
     v->as.while_loop.while_branch = while_branch;
@@ -243,6 +245,31 @@ ast_node *ast_return_statement(data_type ret_type, ast_node *expression) {
 }
 
 /* --------------------AST NODE HELPERS--------------------- */
+
+int ast_program_lineno(ast_node *node) {
+    if (node->as.program.declarations != NULL) {
+        ast_node *declaration = (ast_node *)node->as.program.declarations->data;
+        return declaration->lineno;
+    }
+
+    if (node->as.program.functions != NULL) {
+        ast_node *function = (ast_node *)node->as.program.functions->data;
+        return function->lineno;
+    }
+
+    return node->as.program.main_function->lineno;
+}
+
+int ast_function_tail_lineno(ast_node *node) {
+    if (node->as.function_tail.declarations != NULL) {
+        ast_node *declaration =
+            (ast_node *)node->as.function_tail.declarations->data;
+        return declaration->lineno;
+    }
+
+    ast_node *statement = (ast_node *)node->as.function_tail.statements->data;
+    return statement->lineno;
+}
 
 ast_node *ast_constant_undef() {
     value val;

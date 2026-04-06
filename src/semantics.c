@@ -111,7 +111,8 @@ void semantic_analysis_constant(ast_node *node) {
 
 void semantic_analysis_function(ast_node *node) {
     symtab_entry *entry = node->as.function.entry;
-    int declaration_lineno = *((int *)entry->lines->data);
+    int declaration_lineno = get_first_lineno(entry);
+    verify_no_redeclaration_of_function_name(entry, node->lineno);
     verify_no_redeclaration_of_names(entry->as.function.parameters,
                                      declaration_lineno);
     enter_local_scope(entry->id);
@@ -359,11 +360,11 @@ void verify_no_redeclaration_of_names(list_node *names,
     while (head != NULL) {
         entry = (symtab_entry *)head->data;
 
-        first_lineno = *((int *)entry->lines->data);
+        first_lineno = get_first_lineno(entry);
 
         if (declaration_lineno != first_lineno) {
-            printf("Semantic error at line no. %d. Variable \'%s\' gets "
-                   "redeclared.\n",
+            printf("Semantic error at line no. %d. Identifier \'%s\' gets "
+                   "redeclared as variable!\n",
                    declaration_lineno, entry->id);
             exit(EXIT_FAILURE);
             return;
@@ -373,7 +374,7 @@ void verify_no_redeclaration_of_names(list_node *names,
     }
 
 #if DEBUG
-    printf("No redeclaration of variable \'%s\' at line no. %d\n", entry->id,
+    printf("No redeclaration of identifier \'%s\' at line no. %d\n", entry->id,
            declaration_lineno);
 #endif
 }
@@ -440,7 +441,7 @@ void verify_declaration_names_init_value(list_node *names) {
         var_type = entry->as.variable.d_type;
         init_type = entry->as.variable.init_value.d_type;
 
-        int declaration_lineno = *((int *)entry->lines->data);
+        int declaration_lineno = get_first_lineno(entry);
 
         /* initialization type is UNDEF_TYPE -> there is no init value */
         if (init_type == UNDEF_TYPE) {
@@ -481,10 +482,30 @@ void verify_declaration_names_init_value(list_node *names) {
     }
 }
 
+void verify_no_redeclaration_of_function_name(symtab_entry *entry,
+                                              int declaration_lineno) {
+    int first_lineno;
+
+    first_lineno = get_first_lineno(entry);
+
+    if (declaration_lineno != first_lineno) {
+        printf("Semantic error at line no. %d. Identifier \'%s\' gets "
+               "redeclared as function name.\n",
+               declaration_lineno, entry->id);
+        exit(EXIT_FAILURE);
+        return;
+    } else {
+#if DEBUG
+        printf("No redeclaration of identifier \'%s\' at line no. %d\n",
+               entry->id, declaration_lineno);
+#endif
+    }
+}
+
 void verify_return_statement_last(list_node *statements) {
     symtab_entry *entry = lookup_symtab_entry(cur_scope->id);
     data_type ret_type = entry->as.function.ret_type;
-    int declaration_lineno = *((int *)entry->lines->data);
+    int declaration_lineno = get_first_lineno(entry);
 
     /* locate last statement node in statement list */
     list_node *head = statements;
@@ -537,7 +558,7 @@ void verify_return_statement_last(list_node *statements) {
 
 void verify_variable_declaration_before_use(symtab_entry *entry,
                                             int use_lineno) {
-    int first_lineno = *((int *)entry->lines->data);
+    int first_lineno = get_first_lineno(entry);
 
     if (use_lineno == first_lineno) {
         printf("Semantic error at line no. %d. Use of undeclared variable "
