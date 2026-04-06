@@ -82,6 +82,12 @@ json_t *json_construct_ast_node(ast_node *node) {
         json_object_set(
             json_ast_node, "else_branch",
             json_construct_ast_node_list(node->as.if_statement.else_branch));
+        json_object_set(json_ast_node, "label_if_branch",
+                        json_string(node->as.if_statement.label_if_branch));
+        json_object_set(json_ast_node, "label_else_branch",
+                        json_string(node->as.if_statement.label_else_branch));
+        json_object_set(json_ast_node, "label_end",
+                        json_string(node->as.if_statement.label_end));
         break;
     case EXPRESSION_BINARY:
         json_object_set(
@@ -127,6 +133,8 @@ json_t *json_construct_ast_node(ast_node *node) {
         json_object_set(
             json_ast_node, "else_if_branch",
             json_construct_ast_node_list(node->as.else_if.else_if_branch));
+        json_object_set(json_ast_node, "label_branch",
+                        json_string(node->as.else_if.label_branch));
         break;
     case FOR_LOOP:
         json_object_set(json_ast_node, "initialize",
@@ -138,6 +146,12 @@ json_t *json_construct_ast_node(ast_node *node) {
         json_object_set(
             json_ast_node, "for_branch",
             json_construct_ast_node_list(node->as.for_loop.for_branch));
+        json_object_set(json_ast_node, "label_start",
+                        json_string(node->as.for_loop.label_start));
+        json_object_set(json_ast_node, "label_increment",
+                        json_string(node->as.for_loop.label_increment));
+        json_object_set(json_ast_node, "label_end",
+                        json_string(node->as.for_loop.label_end));
         break;
     case ASSIGNMENT:
         json_object_set(
@@ -153,11 +167,17 @@ json_t *json_construct_ast_node(ast_node *node) {
         json_object_set(
             json_ast_node, "while_branch",
             json_construct_ast_node_list(node->as.while_loop.while_branch));
+        json_object_set(json_ast_node, "label_start",
+                        json_string(node->as.while_loop.label_start));
+        json_object_set(json_ast_node, "label_end",
+                        json_string(node->as.while_loop.label_end));
         break;
     case JUMP_STATEMENT:
         json_object_set(
             json_ast_node, "j_type",
             json_string(jump_type_to_string(node->as.jump_statement.j_type)));
+        json_object_set(json_ast_node, "label_target",
+                        json_string(node->as.jump_statement.label_target));
         break;
     case PRINT_STATEMENT:
         json_object_set(

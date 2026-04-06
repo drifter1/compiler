@@ -61,6 +61,9 @@ typedef struct ast_node {
             list_node *if_branch;
             list_node *else_if_branches;
             list_node *else_branch;
+            const char *label_if_branch;
+            const char *label_else_branch;
+            const char *label_end;
         } if_statement;
         struct {
             struct ast_node *left;
@@ -83,12 +86,16 @@ typedef struct ast_node {
         struct {
             struct ast_node *condition;
             list_node *else_if_branch;
+            const char *label_branch;
         } else_if;
         struct {
             struct ast_node *initialize;
             struct ast_node *condition;
             struct ast_node *increment;
             list_node *for_branch;
+            const char *label_start;
+            const char *label_increment;
+            const char *label_end;
         } for_loop;
         struct {
             struct ast_node *variable_reference;
@@ -97,9 +104,12 @@ typedef struct ast_node {
         struct {
             struct ast_node *condition;
             list_node *while_branch;
+            const char *label_start;
+            const char *label_end;
         } while_loop;
         struct {
             jump_type j_type;
+            const char *label_target;
         } jump_statement;
         struct {
             print_type p_type;
