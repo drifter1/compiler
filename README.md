@@ -129,11 +129,9 @@ The programming language is being explained [here](/docs/simple-c-language.md).
 
 # Current Status
 
-- Semantic analysis on the generated AST (issue [#13](https://github.com/drifter1/compiler/issues/13))
-
+- Intermediate code generation (issue [#14](https://github.com/drifter1/compiler/issues/14))
 
 # Next Steps
 
-- Intermediate code generation (Since the language contains control flow elements, we will most likely need to traverse the AST again to create a linear representation of the program)
 - Machine code generation (The original implementation targeted MIPS Assembly. Might now switch to RISC-V instead).
 - Further optimizations and enhancements in the compiler's source code
