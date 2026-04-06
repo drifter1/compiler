@@ -76,38 +76,90 @@ void intermediate_code_generation_list(list_node *list_head) {
     }
 }
 
-void intermediate_code_generation_program(ast_node *node) {}
+void intermediate_code_generation_program(ast_node *node) {
+    intermediate_code_generation_list(node->as.program.declarations);
+    intermediate_code_generation(node->as.program.main_function);
+    intermediate_code_generation_list(node->as.program.functions);
+}
 
 void intermediate_code_generation_declaration(ast_node *node) {}
 
 void intermediate_code_generation_constant(ast_node *node) {}
 
-void intermediate_code_generation_function(ast_node *node) {}
+void intermediate_code_generation_function(ast_node *node) {
+    intermediate_code_generation(node->as.function.function_tail);
+}
 
-void intermediate_code_generation_function_tail(ast_node *node) {}
+void intermediate_code_generation_function_tail(ast_node *node) {
+    intermediate_code_generation_list(node->as.function_tail.declarations);
+    intermediate_code_generation_list(node->as.function_tail.statements);
+}
 
-void intermediate_code_generation_if_statement(ast_node *node) {}
+void intermediate_code_generation_if_statement(ast_node *node) {
+    intermediate_code_generation(node->as.if_statement.condition);
+    intermediate_code_generation_list(node->as.if_statement.if_branch);
+    intermediate_code_generation_list(node->as.if_statement.else_if_branches);
+    intermediate_code_generation_list(node->as.if_statement.else_branch);
+}
 
-void intermediate_code_generation_expresssion_binary(ast_node *node) {}
+void intermediate_code_generation_expresssion_binary(ast_node *node) {
+    intermediate_code_generation(node->as.expression_binary.left);
+    intermediate_code_generation(node->as.expression_binary.right);
+}
 
-void intermediate_code_generation_expresssion_unary(ast_node *node) {}
+void intermediate_code_generation_expresssion_unary(ast_node *node) {
+    intermediate_code_generation(node->as.expression_unary.operand);
+}
 
 void intermediate_code_generation_variable_reference(ast_node *node) {}
 
-void intermediate_code_generation_function_call(ast_node *node) {}
+void intermediate_code_generation_function_call(ast_node *node) {
+    intermediate_code_generation_list(node->as.function_call.arguments);
+}
 
-void intermediate_code_generation_else_if(ast_node *node) {}
+void intermediate_code_generation_else_if(ast_node *node) {
+    intermediate_code_generation(node->as.else_if.condition);
+    intermediate_code_generation_list(node->as.else_if.else_if_branch);
+}
 
-void intermediate_code_generation_for_loop(ast_node *node) {}
+void intermediate_code_generation_for_loop(ast_node *node) {
+    intermediate_code_generation(node->as.for_loop.initialize);
+    intermediate_code_generation(node->as.for_loop.condition);
+    intermediate_code_generation_list(node->as.for_loop.for_branch);
+    intermediate_code_generation(node->as.for_loop.increment);
+}
 
-void intermediate_code_generation_assignment(ast_node *node) {}
+void intermediate_code_generation_assignment(ast_node *node) {
+    intermediate_code_generation(node->as.assignment.expression);
+    intermediate_code_generation(node->as.assignment.variable_reference);
+}
 
-void intermediate_code_generation_while_loop(ast_node *node) {}
+void intermediate_code_generation_while_loop(ast_node *node) {
+    intermediate_code_generation(node->as.while_loop.condition);
+    intermediate_code_generation_list(node->as.while_loop.while_branch);
+}
 
 void intermediate_code_generation_jump_statement(ast_node *node) {}
 
-void intermediate_code_generation_print_statement(ast_node *node) {}
+void intermediate_code_generation_print_statement(ast_node *node) {
+    print_type p_type = node->as.print_statement.p_type;
+    switch (p_type) {
+    case EXPRESSION:
+        intermediate_code_generation(
+            node->as.print_statement.print_value.expression);
+        break;
+    case STRING:
+        break;
+    }
+}
 
-void intermediate_code_generation_input_statement(ast_node *node) {}
+void intermediate_code_generation_input_statement(ast_node *node) {
+    intermediate_code_generation(node->as.input_statement.variable_reference);
+}
 
-void intermediate_code_generation_return_statement(ast_node *node) {}
+void intermediate_code_generation_return_statement(ast_node *node) {
+    ast_node *expression = node->as.return_statement.expression;
+    if (expression != NULL) {
+        intermediate_code_generation(expression);
+    }
+}
