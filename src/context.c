@@ -1,4 +1,4 @@
-#include "../include/context.h"
+#include "../include/compiler.h"
 #include <stdlib.h>
 
 /* ----------------------CURRENT CONTEXT--------------------- */
@@ -10,8 +10,10 @@ context *cur_context;
 void init_context() { cur_context = new_context(NULL); }
 
 void hide_current_context() {
+#if DEBUG
     printf("Hiding context with kind \'%s\'\n",
            context_kind_to_string(cur_context->kind));
+#endif
 
     context *temp = cur_context;
     cur_context = cur_context->parent;
@@ -45,8 +47,10 @@ context *new_context(ast_node *node) {
 }
 
 void enter_new_context(ast_node *node) {
+#if DEBUG
     printf("Entering context with node of kind \'%s\'\n",
            ast_node_kind_to_string(node->kind));
+#endif
 
     cur_context = new_context(node);
 }
