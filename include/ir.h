@@ -31,5 +31,6 @@ void intermediate_code_generation_return_statement(ast_node *node);
 operand intermediate_code_generation_expression(ast_node *node);
 op_code operator_type_to_op_code(operator_type op_type);
 symtab_entry *new_temporary(int lineno, data_type d_type);
+char *new_label();
 
 #endif /* IR_H */

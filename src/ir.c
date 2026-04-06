@@ -79,6 +79,7 @@ void intermediate_code_generation_list(list_node *list_head) {
 
 void intermediate_code_generation_program(ast_node *node) {
     tac_list_init();
+    init_context();
     intermediate_code_generation_list(node->as.program.declarations);
     intermediate_code_generation(node->as.program.main_function);
     intermediate_code_generation_list(node->as.program.functions);
@@ -130,6 +131,13 @@ void intermediate_code_generation_function_tail(ast_node *node) {
 }
 
 void intermediate_code_generation_if_statement(ast_node *node) {
+
+    /* label generation */
+    node->as.if_statement.label_if_branch = new_label();
+    node->as.if_statement.label_else_branch = new_label();
+    node->as.if_statement.label_end = new_label();
+    /* else ifs to be done */
+
     intermediate_code_generation(node->as.if_statement.condition);
     intermediate_code_generation_list(node->as.if_statement.if_branch);
     intermediate_code_generation_list(node->as.if_statement.else_if_branches);
@@ -237,10 +245,19 @@ void intermediate_code_generation_else_if(ast_node *node) {
 }
 
 void intermediate_code_generation_for_loop(ast_node *node) {
+    enter_new_context(node);
+
+    /* label generation */
+    node->as.for_loop.label_start = new_label();
+    node->as.for_loop.label_increment = new_label();
+    node->as.for_loop.label_end = new_label();
+
     intermediate_code_generation(node->as.for_loop.initialize);
     intermediate_code_generation(node->as.for_loop.condition);
     intermediate_code_generation_list(node->as.for_loop.for_branch);
     intermediate_code_generation(node->as.for_loop.increment);
+
+    hide_current_context();
 }
 
 void intermediate_code_generation_assignment(ast_node *node) {
@@ -249,11 +266,32 @@ void intermediate_code_generation_assignment(ast_node *node) {
 }
 
 void intermediate_code_generation_while_loop(ast_node *node) {
+    enter_new_context(node);
+
+    /* label generation */
+    node->as.while_loop.label_start = new_label();
+    node->as.while_loop.label_end = new_label();
+
     intermediate_code_generation(node->as.while_loop.condition);
     intermediate_code_generation_list(node->as.while_loop.while_branch);
+
+    hide_current_context();
 }
 
-void intermediate_code_generation_jump_statement(ast_node *node) {}
+void intermediate_code_generation_jump_statement(ast_node *node) {
+    /* set label for jump statement depending on context and jump type */
+    switch (node->as.jump_statement.j_type) {
+    case CONTINUE:
+        node->as.jump_statement.label_target = get_current_continue_target();
+        break;
+    case BREAK:
+        node->as.jump_statement.label_target = get_current_break_target();
+    }
+
+    operand jump_target = op_label(node->as.jump_statement.label_target);
+    tac t = tac_create(OP_JUMP, jump_target, op_none(), op_none());
+    tac_list_add(t);
+}
 
 void intermediate_code_generation_print_statement(ast_node *node) {
     print_type p_type = node->as.print_statement.p_type;
@@ -371,4 +409,12 @@ symtab_entry *new_temporary(int lineno, data_type d_type) {
     sprintf(id, "_tmp%d", temp_count);
     temp_count++;
     return insert_temporary_entry(id, lineno, d_type);
+}
+
+char *new_label() {
+    static int label_count = 0;
+    char *label = (char *)malloc(15 * sizeof(char));
+    sprintf(label, "_L%d", label_count);
+    label_count++;
+    return label;
 }
