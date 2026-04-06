@@ -165,6 +165,7 @@ ast_node *ast_return_statement(data_type ret_type, ast_node *expression);
 int ast_program_lineno(ast_node *node);
 int ast_function_tail_lineno(ast_node *node);
 ast_node *ast_constant_undef();
+ast_node *ast_constant_init(symtab_entry *entry);
 operator_type ast_expression_unary_op_type(operator_type op_type,
                                            fixity_type fixity);
 char *ast_node_kind_to_string(ast_node_kind kind);

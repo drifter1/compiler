@@ -58,6 +58,8 @@ int main(int argc, char *argv[]) {
         json_dump_abstract_syntax_tree(AST_JSON_DUMP_FILE_NAME);
 #endif
 
+        tac_list_print();
+
         exit(EXIT_SUCCESS);
     }
 

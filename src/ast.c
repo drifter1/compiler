@@ -279,6 +279,12 @@ ast_node *ast_constant_undef() {
     return ast_constant(UNDEF_TYPE, val);
 }
 
+ast_node *ast_constant_init(symtab_entry *entry) {
+    data_type d_type = entry->as.variable.init_value.d_type;
+    value val = entry->as.variable.init_value.val;
+    return ast_constant(d_type, val);
+}
+
 operator_type ast_expression_unary_op_type(operator_type op_type,
                                            fixity_type fixity) {
     switch (op_type) {
