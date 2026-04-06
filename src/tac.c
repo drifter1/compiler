@@ -13,7 +13,7 @@ tac tac_create(op_code op, operand result, operand arg1, operand arg2) {
     return t;
 }
 
-void tac_print(tac t) {
+void tac_print(FILE *of, tac t) {
     const char *op_str = op_code_to_string(t.op);
     const char *result_str = operand_to_string(t.result);
     const char *arg1_str = operand_to_string(t.arg1);
@@ -21,31 +21,31 @@ void tac_print(tac t) {
 
     switch (t.op) {
     case OP_NOP:
-        printf("%s\n", op_str);
+        fprintf(of, "%s\n", op_str);
         break;
     case OP_ASSIGN:
-        printf("%s %s %s\n", result_str, op_str, arg1_str);
+        fprintf(of, "%s %s %s\n", result_str, op_str, arg1_str);
         break;
     case OP_ADD:
     case OP_SUB:
     case OP_MUL:
     case OP_DIV:
     case OP_REM:
-        printf("%s = %s %s %s\n", result_str, arg1_str, op_str, arg2_str);
+        fprintf(of, "%s = %s %s %s\n", result_str, arg1_str, op_str, arg2_str);
         break;
     case OP_INC:
     case OP_DEC:
-        printf("%s%s\n", result_str, op_str);
+        fprintf(of, "%s%s\n", result_str, op_str);
         break;
     case OP_NEG:
-        printf("%s = %s%s\n", result_str, op_str, arg1_str);
+        fprintf(of, "%s = %s%s\n", result_str, op_str, arg1_str);
         break;
     case OP_OR:
     case OP_AND:
-        printf("%s = %s %s %s\n", result_str, arg1_str, op_str, arg2_str);
+        fprintf(of, "%s = %s %s %s\n", result_str, arg1_str, op_str, arg2_str);
         break;
     case OP_NOT:
-        printf("%s = %s %s\n", result_str, op_str, arg1_str);
+        fprintf(of, "%s = %s %s\n", result_str, op_str, arg1_str);
         break;
     case OP_EQ:
     case OP_NEQ:
@@ -53,17 +53,17 @@ void tac_print(tac t) {
     case OP_LT:
     case OP_GE:
     case OP_LE:
-        printf("%s = %s %s %s\n", result_str, arg1_str, op_str, arg2_str);
+        fprintf(of, "%s = %s %s %s\n", result_str, arg1_str, op_str, arg2_str);
         break;
     case OP_JUMP:
-        printf("%s %s\n", op_str, result_str);
+        fprintf(of, "%s %s\n", op_str, result_str);
         break;
     case OP_JUMPIF:
     case OP_JUMPIFZ:
-        printf("%s %s, %s\n", op_str, result_str, arg1_str);
+        fprintf(of, "%s %s, %s\n", op_str, result_str, arg1_str);
         break;
     case OP_LABEL:
-        printf("%s%s\n", result_str, op_str);
+        fprintf(of, "%s%s\n", result_str, op_str);
         break;
     case OP_PRINT:
     case OP_INPUT:
@@ -71,18 +71,18 @@ void tac_print(tac t) {
     case OP_CALL:
     case OP_GETRET:
     case OP_PARAM:
-        printf("%s %s\n", op_str, result_str);
+        fprintf(of, "%s %s\n", op_str, result_str);
         break;
     case OP_RET:
-        printf("%s\n", op_str);
+        fprintf(of, "%s\n", op_str);
         break;
     case OP_RETV:
-        printf("%s %s\n", op_str, result_str);
+        fprintf(of, "%s %s\n", op_str, result_str);
         break;
     case OP_ICAST:
     case OP_FCAST:
     case OP_DCAST:
-        printf("%s = %s(%s)\n", op_str, result_str, arg1_str);
+        fprintf(of, "%s = %s(%s)\n", op_str, result_str, arg1_str);
     }
 }
 
@@ -106,10 +106,10 @@ void tac_list_free() {
     free(tl);
 }
 
-void tac_list_print() {
+void tac_list_print(FILE *of) {
     int i;
     for (i = 0; i < tl->size; i++) {
-        tac_print(tl->t[i]);
+        tac_print(of, tl->t[i]);
     }
 }
 

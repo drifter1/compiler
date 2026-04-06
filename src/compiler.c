@@ -58,7 +58,10 @@ int main(int argc, char *argv[]) {
         json_dump_abstract_syntax_tree(AST_JSON_DUMP_FILE_NAME);
 #endif
 
-        tac_list_print();
+        // output intermediate code
+        yyout = fopen(OUTPUT_FILE_NAME, "w");
+        tac_list_print(yyout);
+        fclose(yyout);
 
         exit(EXIT_SUCCESS);
     }

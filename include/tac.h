@@ -113,12 +113,12 @@ extern tac_list *tl;
 /* ----------------------MAIN FUNCTIONS--------------------- */
 
 tac tac_create(op_code op, operand result, operand arg1, operand arg2);
-void tac_print(tac t);
+void tac_print(FILE *of, tac t);
 
 void tac_list_init();
 void tac_list_add(tac t);
 void tac_list_free();
-void tac_list_print();
+void tac_list_print(FILE *of);
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
 

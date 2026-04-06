@@ -14,6 +14,10 @@
 
 /* --------------------COMPILER SETTINGS-------------------- */
 
+#ifndef OUTPUT_FILE_NAME
+#define OUTPUT_FILE_NAME "compiler.out"
+#endif
+
 #ifndef DEBUG
 #define DEBUG 1
 #endif
