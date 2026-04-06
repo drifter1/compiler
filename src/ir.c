@@ -109,7 +109,17 @@ void intermediate_code_generation_declaration(ast_node *node) {
 void intermediate_code_generation_constant(ast_node *node) {}
 
 void intermediate_code_generation_function(ast_node *node) {
+    /* generate label with function identifier */
+    symtab_entry *entry = node->as.function.entry;
+    operand label = op_label(entry->id);
+    operand none = op_none();
+    tac t = tac_create(OP_LABEL, label, none, none);
+    tac_list_add(t);
+
+    /* generate code for function tail */
+    enter_local_scope(entry->id);
     intermediate_code_generation(node->as.function.function_tail);
+    hide_current_scope();
 }
 
 void intermediate_code_generation_function_tail(ast_node *node) {
