@@ -261,8 +261,12 @@ void intermediate_code_generation_for_loop(ast_node *node) {
 }
 
 void intermediate_code_generation_assignment(ast_node *node) {
-    intermediate_code_generation(node->as.assignment.expression);
-    intermediate_code_generation(node->as.assignment.variable_reference);
+    operand arg =
+        intermediate_code_generation_expression(node->as.assignment.expression);
+    operand result = intermediate_code_generation_variable_reference(
+        node->as.assignment.variable_reference);
+    tac t = tac_create(OP_ASSIGN, result, arg, op_none());
+    tac_list_add(t);
 }
 
 void intermediate_code_generation_while_loop(ast_node *node) {
@@ -272,8 +276,28 @@ void intermediate_code_generation_while_loop(ast_node *node) {
     node->as.while_loop.label_start = new_label();
     node->as.while_loop.label_end = new_label();
 
-    intermediate_code_generation(node->as.while_loop.condition);
+    operand while_start = op_label(node->as.while_loop.label_start);
+    operand while_end = op_label(node->as.while_loop.label_end);
+    operand none = op_none();
+
+    /* output while start label */
+    tac_list_add(tac_create(OP_LABEL, while_start, none, none));
+
+    /* condition expression */
+    operand arg =
+        intermediate_code_generation_expression(node->as.while_loop.condition);
+
+    /* output branch operation */
+    tac_list_add(tac_create(OP_JUMPIFZ, while_end, arg, none));
+
+    /* output while branch*/
     intermediate_code_generation_list(node->as.while_loop.while_branch);
+
+    /* output jump operation */
+    tac_list_add(tac_create(OP_JUMP, while_start, none, none));
+
+    /* output while end label*/
+    tac_list_add(tac_create(OP_LABEL, while_end, none, none));
 
     hide_current_context();
 }
