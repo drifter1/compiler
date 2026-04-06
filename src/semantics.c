@@ -103,7 +103,8 @@ void semantic_analysis_declaration(ast_node *node) {
 
 void semantic_analysis_constant(ast_node *node) {
 #if DEBUG
-    printf("Constant Node of data type \'%s\' used in line no. %d\n",
+    printf("Constant Node of data type \'%s\' used in line no. %d. No semantic "
+           "analysis necessary!\n",
            data_type_to_string(node->as.constant.d_type), node->lineno);
 #endif
 }
@@ -271,7 +272,7 @@ void semantic_analysis_while_loop(ast_node *node) {
 
 void semantic_analysis_jump_statement(ast_node *node) {
 #if DEBUG
-    printf("Jump Statement Node of type \'%s\'\n",
+    printf("Jump statement node of type \'%s\'\n",
            jump_type_to_string(node->as.jump_statement.j_type));
 #endif
 
@@ -283,12 +284,17 @@ void semantic_analysis_jump_statement(ast_node *node) {
         exit(EXIT_FAILURE);
     } else {
 #if DEBUG
-        printf("Jump Statement inside of loop!\n");
+        printf("Jump statement at line no. %d inside of loop!\n", node->lineno);
 #endif
     }
 }
 
 void semantic_analysis_print_statement(ast_node *node) {
+#if DEBUG
+    printf("Print statement node of type \'%s\'\n",
+           print_type_to_string(node->as.print_statement.p_type));
+#endif
+
     data_type d_type;
 
     switch (node->as.print_statement.p_type) {
@@ -310,7 +316,8 @@ void semantic_analysis_print_statement(ast_node *node) {
         break;
     case STRING:
 #if DEBUG
-        printf("The output value is a STRING\n");
+        printf(
+            "The output value is a STRING. No semantic analysis necessary!\n");
 #endif
     }
 }
