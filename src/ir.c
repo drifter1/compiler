@@ -136,12 +136,71 @@ void intermediate_code_generation_if_statement(ast_node *node) {
     node->as.if_statement.label_if_branch = new_label();
     node->as.if_statement.label_else_branch = new_label();
     node->as.if_statement.label_end = new_label();
-    /* else ifs to be done */
 
-    intermediate_code_generation(node->as.if_statement.condition);
+    operand if_branch = op_label(node->as.if_statement.label_if_branch);
+    operand else_branch = op_label(node->as.if_statement.label_else_branch);
+    operand end_if = op_label(node->as.if_statement.label_end);
+
+    /* if condition */
+    operand condition;
+    condition = intermediate_code_generation_expression(
+        node->as.if_statement.condition);
+
+    tac_list_add(tac_create(OP_JUMPIF, if_branch, condition, op_none()));
+
+    /* else if conditions */
+    list_node *head;
+    ast_node *else_if;
+    head = node->as.if_statement.else_if_branches;
+    while (head != NULL) {
+        else_if = (ast_node *)head->data;
+
+        /* label generation */
+        else_if->as.else_if.label_branch = new_label();
+
+        condition = intermediate_code_generation_expression(
+            else_if->as.else_if.condition);
+
+        tac_list_add(tac_create(OP_JUMPIF,
+                                op_label(else_if->as.else_if.label_branch),
+                                condition, op_none()));
+
+        head = head->next;
+    }
+
+    /* no condition met, jump to else branch */
+    tac_list_add(tac_create(OP_JUMP, else_branch, op_none(), op_none()));
+
+    /* if branch */
+    tac_list_add(tac_create(OP_LABEL, if_branch, op_none(), op_none()));
+
     intermediate_code_generation_list(node->as.if_statement.if_branch);
-    intermediate_code_generation_list(node->as.if_statement.else_if_branches);
+
+    tac_list_add(tac_create(OP_JUMP, end_if, op_none(), op_none()));
+
+    /* else if branches */
+    head = node->as.if_statement.else_if_branches;
+    while (head != NULL) {
+        else_if = (ast_node *)head->data;
+
+        tac_list_add(tac_create(OP_LABEL,
+                                op_label(else_if->as.else_if.label_branch),
+                                op_none(), op_none()));
+
+        intermediate_code_generation_else_if(else_if);
+
+        tac_list_add(tac_create(OP_JUMP, end_if, op_none(), op_none()));
+
+        head = head->next;
+    }
+
+    /* else branch */
+    tac_list_add(tac_create(OP_LABEL, else_branch, op_none(), op_none()));
+
     intermediate_code_generation_list(node->as.if_statement.else_branch);
+
+    /* end label */
+    tac_list_add(tac_create(OP_LABEL, end_if, op_none(), op_none()));
 }
 
 operand intermediate_code_generation_expression_binary(ast_node *node) {
@@ -240,7 +299,10 @@ operand intermediate_code_generation_function_call(ast_node *node) {
 }
 
 void intermediate_code_generation_else_if(ast_node *node) {
-    intermediate_code_generation(node->as.else_if.condition);
+    /*
+     * condition and label handled in
+     * intermediate_code_generation_if_statement()
+     */
     intermediate_code_generation_list(node->as.else_if.else_if_branch);
 }
 
