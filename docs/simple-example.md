@@ -16,7 +16,7 @@ int main() {
 
 ## Intermediate Code Representation
 
-```x86asm
+```assembly
 main:
 declare i
 declare val
