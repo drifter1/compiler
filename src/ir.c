@@ -119,9 +119,23 @@ void intermediate_code_generation_function(ast_node *node) {
     tac t = tac_create(OP_LABEL, label, none, none);
     tac_list_add(t);
 
-    /* generate code for function tail */
     enter_local_scope(entry->id);
+
+    /* generate code for arguments */
+    list_node *head;
+    symtab_entry *parameter;
+    operand arg;
+    head = entry->as.function.parameters;
+    while (head != NULL) {
+        parameter = (symtab_entry *)head->data;
+        arg = op_var(parameter);
+        tac_list_add(tac_create(OP_PARAM, arg, none, none));
+        head = head->next;
+    }
+
+    /* generate code for function tail */
     intermediate_code_generation(node->as.function.function_tail);
+
     hide_current_scope();
 }
 
