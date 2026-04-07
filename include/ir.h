@@ -28,7 +28,19 @@ void intermediate_code_generation_return_statement(ast_node *node);
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
 
+void intermediate_code_generation_names_declare(list_node *names);
+void intermediate_code_generation_names_init(list_node *names);
+void intermediate_code_generation_function_label(symtab_entry *entry);
+void intermediate_code_generation_function_parameters(list_node *parameters);
 operand intermediate_code_generation_expression(ast_node *node);
+void intermediate_code_generation_else_if_conditions(
+    list_node *else_if_branches);
+void intermediate_code_generation_else_if_branches(list_node *else_if_branches,
+                                                   operand end_if);
+void intermediate_code_generation_function_call_arguments(list_node *arguments);
+operand intermediate_code_generation_function_call_ret_value(ast_node *node);
+void intermediate_code_generation_for_loop_increment(ast_node *increment,
+                                                     operand for_increment);
 op_code operator_type_to_op_code(operator_type op_type);
 symtab_entry *new_temporary(int lineno, data_type d_type);
 char *new_label();

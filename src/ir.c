@@ -86,27 +86,9 @@ void intermediate_code_generation_program(ast_node *node) {
 }
 
 void intermediate_code_generation_declaration(ast_node *node) {
-    list_node *head;
-    symtab_entry *entry;
-    operand var, init;
-    operand none = op_none();
-
-    head = node->as.declaration.names;
-    while (head != NULL) {
-        entry = (symtab_entry *)head->data;
-
-        var = op_var(entry);
-
-        /* generate declaration for every declared variable */
-        tac_list_add(tac_create(OP_DECL, var, none, none));
-
-        /* generate assignment for each variable with init value */
-        if (entry->as.variable.init_value.d_type != UNDEF_TYPE) {
-            init = op_const(ast_constant_init(entry));
-            tac_list_add(tac_create(OP_ASSIGN, var, init, none));
-        }
-        head = head->next;
-    }
+    list_node *names = node->as.declaration.names;
+    intermediate_code_generation_names_declare(names);
+    intermediate_code_generation_names_init(names);
 }
 
 operand intermediate_code_generation_constant(ast_node *node) {
@@ -114,28 +96,15 @@ operand intermediate_code_generation_constant(ast_node *node) {
 }
 
 void intermediate_code_generation_function(ast_node *node) {
-    /* generate label with function identifier */
     symtab_entry *entry = node->as.function.entry;
-    operand label = op_label(entry->id);
-    operand none = op_none();
-    tac t = tac_create(OP_LABEL, label, none, none);
-    tac_list_add(t);
+
+    intermediate_code_generation_function_label(entry);
 
     enter_local_scope(entry->id);
 
-    /* generate code for arguments */
-    list_node *head;
-    symtab_entry *parameter;
-    operand arg;
-    head = entry->as.function.parameters;
-    while (head != NULL) {
-        parameter = (symtab_entry *)head->data;
-        arg = op_var(parameter);
-        tac_list_add(tac_create(OP_PARAM, arg, none, none));
-        head = head->next;
-    }
+    intermediate_code_generation_function_parameters(
+        entry->as.function.parameters);
 
-    /* generate code for function tail */
     intermediate_code_generation(node->as.function.function_tail);
 
     hide_current_scope();
@@ -165,24 +134,8 @@ void intermediate_code_generation_if_statement(ast_node *node) {
     tac_list_add(tac_create(OP_JUMPIF, if_branch, condition, op_none()));
 
     /* else if conditions */
-    list_node *head;
-    ast_node *else_if;
-    head = node->as.if_statement.else_if_branches;
-    while (head != NULL) {
-        else_if = (ast_node *)head->data;
-
-        /* label generation */
-        else_if->as.else_if.label_branch = new_label();
-
-        condition = intermediate_code_generation_expression(
-            else_if->as.else_if.condition);
-
-        tac_list_add(tac_create(OP_JUMPIF,
-                                op_label(else_if->as.else_if.label_branch),
-                                condition, op_none()));
-
-        head = head->next;
-    }
+    intermediate_code_generation_else_if_conditions(
+        node->as.if_statement.else_if_branches);
 
     /* no condition met, jump to else branch */
     tac_list_add(tac_create(OP_JUMP, else_branch, op_none(), op_none()));
@@ -195,20 +148,8 @@ void intermediate_code_generation_if_statement(ast_node *node) {
     tac_list_add(tac_create(OP_JUMP, end_if, op_none(), op_none()));
 
     /* else if branches */
-    head = node->as.if_statement.else_if_branches;
-    while (head != NULL) {
-        else_if = (ast_node *)head->data;
-
-        tac_list_add(tac_create(OP_LABEL,
-                                op_label(else_if->as.else_if.label_branch),
-                                op_none(), op_none()));
-
-        intermediate_code_generation_else_if(else_if);
-
-        tac_list_add(tac_create(OP_JUMP, end_if, op_none(), op_none()));
-
-        head = head->next;
-    }
+    intermediate_code_generation_else_if_branches(
+        node->as.if_statement.else_if_branches, end_if);
 
     /* else branch */
     tac_list_add(tac_create(OP_LABEL, else_branch, op_none(), op_none()));
@@ -284,34 +225,18 @@ operand intermediate_code_generation_variable_reference(ast_node *node) {
 }
 
 operand intermediate_code_generation_function_call(ast_node *node) {
-    list_node *head;
-    ast_node *argument;
-    operand arg;
     operand none = op_none();
 
     /* function call arguments */
-    head = node->as.function_call.arguments;
-    while (head != NULL) {
-        argument = (ast_node *)head->data;
-        arg = intermediate_code_generation_expression(argument);
-        tac_list_add(tac_create(OP_ARG, arg, none, none));
-        head = head->next;
-    }
+    intermediate_code_generation_function_call_arguments(
+        node->as.function_call.arguments);
 
     /* perform function call */
     tac_list_add(
         tac_create(OP_CALL, op_var(node->as.function_call.entry), none, none));
 
     /* retrieve return value (when there is one) */
-    data_type ret_type = node->as.function_call.entry->as.function.ret_type;
-
-    if ((ret_type != UNDEF_TYPE) && (ret_type != VOID_TYPE)) {
-        operand result = op_temp(new_temporary(node->lineno, ret_type));
-        tac_list_add(tac_create(OP_GETRET, result, none, none));
-        return result;
-    }
-
-    return none;
+    return intermediate_code_generation_function_call_ret_value(node);
 }
 
 void intermediate_code_generation_else_if(ast_node *node) {
@@ -351,16 +276,9 @@ void intermediate_code_generation_for_loop(ast_node *node) {
     /* output for branch */
     intermediate_code_generation_list(node->as.for_loop.for_branch);
 
-    /* output for increment label */
-    tac_list_add(tac_create(OP_LABEL, for_increment, none, none));
-
-    /* increment/decrement statement */
-    ast_node *increment = node->as.for_loop.increment;
-    operator_type op_type = increment->as.expression_unary.op_type;
-    op_code op = operator_type_to_op_code(op_type);
-    operand arg1 = intermediate_code_generation_expression(
-        increment->as.expression_unary.operand);
-    tac_list_add(tac_create(op, arg1, none, none));
+    /* increment statement */
+    intermediate_code_generation_for_loop_increment(node->as.for_loop.increment,
+                                                    for_increment);
 
     /* output jump operation */
     tac_list_add(tac_create(OP_JUMP, for_start, none, none));
@@ -469,6 +387,56 @@ void intermediate_code_generation_return_statement(ast_node *node) {
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
 
+void intermediate_code_generation_names_declare(list_node *names) {
+    symtab_entry *entry;
+    operand var;
+    operand none = op_none();
+
+    /* generate declaration for every declared variable */
+    while (names != NULL) {
+        entry = (symtab_entry *)names->data;
+        var = op_var(entry);
+        tac_list_add(tac_create(OP_DECL, var, none, none));
+        names = names->next;
+    }
+}
+
+void intermediate_code_generation_names_init(list_node *names) {
+    symtab_entry *entry;
+    operand lhs, rhs;
+    operand none = op_none();
+
+    /* generate assignment for each variable with init value */
+    while (names != NULL) {
+        entry = (symtab_entry *)names->data;
+        if (entry->as.variable.init_value.d_type != UNDEF_TYPE) {
+            lhs = op_var(entry);
+            rhs = op_const(ast_constant_init(entry));
+            tac_list_add(tac_create(OP_ASSIGN, lhs, rhs, none));
+        }
+        names = names->next;
+    }
+}
+
+void intermediate_code_generation_function_label(symtab_entry *entry) {
+    operand label = op_label(entry->id);
+    operand none = op_none();
+    tac t = tac_create(OP_LABEL, label, none, none);
+    tac_list_add(t);
+}
+
+void intermediate_code_generation_function_parameters(list_node *parameters) {
+    symtab_entry *parameter;
+    operand arg;
+    operand none = op_none();
+    while (parameters != NULL) {
+        parameter = (symtab_entry *)parameters->data;
+        arg = op_var(parameter);
+        tac_list_add(tac_create(OP_PARAM, arg, none, none));
+        parameters = parameters->next;
+    }
+}
+
 operand intermediate_code_generation_expression(ast_node *node) {
     switch (node->kind) {
     case CONSTANT:
@@ -484,6 +452,86 @@ operand intermediate_code_generation_expression(ast_node *node) {
     default:
         return op_none();
     }
+}
+
+void intermediate_code_generation_else_if_conditions(
+    list_node *else_if_branches) {
+    ast_node *else_if;
+    operand condition;
+    while (else_if_branches != NULL) {
+        else_if = (ast_node *)else_if_branches->data;
+
+        /* label generation */
+        else_if->as.else_if.label_branch = new_label();
+
+        condition = intermediate_code_generation_expression(
+            else_if->as.else_if.condition);
+
+        tac_list_add(tac_create(OP_JUMPIF,
+                                op_label(else_if->as.else_if.label_branch),
+                                condition, op_none()));
+
+        else_if_branches = else_if_branches->next;
+    }
+}
+
+void intermediate_code_generation_else_if_branches(list_node *else_if_branches,
+                                                   operand end_if) {
+    ast_node *else_if;
+    while (else_if_branches != NULL) {
+        else_if = (ast_node *)else_if_branches->data;
+
+        tac_list_add(tac_create(OP_LABEL,
+                                op_label(else_if->as.else_if.label_branch),
+                                op_none(), op_none()));
+
+        intermediate_code_generation_else_if(else_if);
+
+        tac_list_add(tac_create(OP_JUMP, end_if, op_none(), op_none()));
+
+        else_if_branches = else_if_branches->next;
+    }
+}
+
+void intermediate_code_generation_function_call_arguments(
+    list_node *arguments) {
+    ast_node *argument;
+    operand arg;
+    operand none = op_none();
+    while (arguments != NULL) {
+        argument = (ast_node *)arguments->data;
+        arg = intermediate_code_generation_expression(argument);
+        tac_list_add(tac_create(OP_ARG, arg, none, none));
+        arguments = arguments->next;
+    }
+}
+
+operand intermediate_code_generation_function_call_ret_value(ast_node *node) {
+    operand none = op_none();
+    data_type ret_type = node->as.function_call.entry->as.function.ret_type;
+
+    if ((ret_type != UNDEF_TYPE) && (ret_type != VOID_TYPE)) {
+        operand result = op_temp(new_temporary(node->lineno, ret_type));
+        tac_list_add(tac_create(OP_GETRET, result, none, none));
+        return result;
+    }
+
+    return none;
+}
+
+void intermediate_code_generation_for_loop_increment(ast_node *increment,
+                                                     operand for_increment) {
+    operand none = op_none();
+
+    /* output for increment label */
+    tac_list_add(tac_create(OP_LABEL, for_increment, none, none));
+
+    /* output increment/decrement statement */
+    operator_type op_type = increment->as.expression_unary.op_type;
+    op_code op = operator_type_to_op_code(op_type);
+    operand arg1 = intermediate_code_generation_expression(
+        increment->as.expression_unary.operand);
+    tac_list_add(tac_create(op, arg1, none, none));
 }
 
 op_code operator_type_to_op_code(operator_type op_type) {
