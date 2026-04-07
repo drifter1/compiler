@@ -99,7 +99,11 @@ By default, typing `make run` will compile *example1.c* from the *simple_c_examp
 ```
 
 >[!NOTE]
-> By default, the compiler prints debugging information to the terminal console and creates debugging files with extensions *.out* and *.json*. Debugging can be disabled by setting the `DEBUG` flag to `0` in *include/compiler.h* or by adding the flag `-DDEBUG=0` to `gcc` compilation in the *Makefile*, which has the same effect.
+> By default, the compiler also prints debugging information to the terminal console and creates debugging files with extensions *.out* and *.json*. Debugging can be disabled by setting the `DEBUG` flag to `0` in *include/compiler.h* or by adding the flag `-DDEBUG=0` to `gcc` compilation in the *Makefile*, which has the same effect.
+
+### Compiler output example
+
+The compiler output and debugging for *example1.c* can be seen [here](/docs/simple-example.md).
 
 
 ## Cleaning up the build files and binaries
@@ -129,9 +133,10 @@ The programming language is being explained [here](/docs/simple-c-language.md).
 
 # Current Status
 
-- Intermediate code generation (issue [#14](https://github.com/drifter1/compiler/issues/14))
+- Debugging and comprehensive testing
+- Implementation of any overlooked syntax or semantic checks
+- Optimizations and enhancements in the compiler's source code
 
 # Next Steps
 
-- Machine code generation (The original implementation targeted MIPS Assembly. Might now switch to RISC-V instead).
-- Further optimizations and enhancements in the compiler's source code
+- Machine code generation (Most likely in RISC-V assembly language, rather than MIPS, which was originally the target)
