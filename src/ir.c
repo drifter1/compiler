@@ -88,20 +88,22 @@ void intermediate_code_generation_program(ast_node *node) {
 void intermediate_code_generation_declaration(ast_node *node) {
     list_node *head;
     symtab_entry *entry;
-    operand lhs, rhs;
+    operand var, init;
     operand none = op_none();
-    tac t;
 
     head = node->as.declaration.names;
     while (head != NULL) {
         entry = (symtab_entry *)head->data;
 
+        var = op_var(entry);
+
+        /* generate declaration for every declared variable */
+        tac_list_add(tac_create(OP_DECL, var, none, none));
+
         /* generate assignment for each variable with init value */
         if (entry->as.variable.init_value.d_type != UNDEF_TYPE) {
-            lhs = op_var(entry);
-            rhs = op_const(ast_constant_init(entry));
-            t = tac_create(OP_ASSIGN, lhs, rhs, none);
-            tac_list_add(t);
+            init = op_const(ast_constant_init(entry));
+            tac_list_add(tac_create(OP_ASSIGN, var, init, none));
         }
         head = head->next;
     }

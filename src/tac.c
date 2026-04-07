@@ -23,6 +23,9 @@ void tac_print(FILE *of, tac t) {
     case OP_NOP:
         fprintf(of, "%s\n", op_str);
         break;
+    case OP_DECL:
+        fprintf(of, "%s %s\n", op_str, result_str);
+        break;
     case OP_ASSIGN:
         fprintf(of, "%s %s %s\n", result_str, op_str, arg1_str);
         break;
@@ -159,6 +162,9 @@ const char *op_code_to_string(op_code op) {
     switch (op) {
     case OP_NOP:
         return ";";
+    /* Declaration */
+    case OP_DECL:
+        return "declare";
     /* Assignment */
     case OP_ASSIGN:
         return "=";

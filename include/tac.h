@@ -7,6 +7,8 @@
 
 typedef enum {
     OP_NOP,
+    /* Declaration */
+    OP_DECL,
     /* Assignment */
     OP_ASSIGN,
     /* Arithmetic */
