@@ -121,6 +121,22 @@ symtab_entry *lookup_symtab_entry(const char *id) {
     return e;
 }
 
+void free_symbol_table() {
+    symtab_entry *temp;
+    int i;
+    for (i = 0; i < SIZE; i++) {
+        while (symbol_table[i] != NULL) {
+            temp = symbol_table[i];
+            symbol_table[i] = symbol_table[i]->next;
+
+            list_free(temp->lines);
+            if (temp->kind == FUNCTION_ENTRY)
+                list_free(temp->as.function.parameters);
+            free(temp);
+        }
+    }
+}
+
 /* -----------------SYMBOL TABLE DUMP FILE----------------- */
 
 void dump_symbol_table(FILE *of) {

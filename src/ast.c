@@ -237,6 +237,100 @@ ast_node *ast_return_statement(data_type ret_type, ast_node *expression) {
     return v;
 }
 
+void free_ast_node(ast_node *node) {
+    if (node == NULL)
+        return;
+
+    switch (node->kind) {
+    case PROGRAM:
+        free_ast_node_list(node->as.program.declarations);
+        free_ast_node_list(node->as.program.functions);
+        free_ast_node(node->as.program.main_function);
+        break;
+    case DECLARATION:
+        list_free(node->as.declaration.names);
+        break;
+    case CONSTANT:
+        break;
+    case FUNCTION:
+        /* entry handled in symtab */
+        free_ast_node(node->as.function.function_tail);
+        break;
+    case FUNCTION_TAIL:
+        free_ast_node_list(node->as.function_tail.declarations);
+        free_ast_node_list(node->as.function_tail.statements);
+        break;
+    case IF_STATEMENT:
+        free_ast_node(node->as.if_statement.condition);
+        free_ast_node_list(node->as.if_statement.if_branch);
+        free_ast_node_list(node->as.if_statement.else_branch);
+        free_ast_node_list(node->as.if_statement.else_if_branches);
+        break;
+    case EXPRESSION_BINARY:
+        free_ast_node(node->as.expression_binary.left);
+        free_ast_node(node->as.expression_binary.right);
+        break;
+    case EXPRESSION_UNARY:
+        free_ast_node(node->as.expression_unary.operand);
+        break;
+    case VARIABLE_REFERENCE:
+        /* entry handled in symtab */
+        break;
+    case FUNCTION_CALL:
+        /* entry handled in symtab */
+        free_ast_node_list(node->as.function_call.arguments);
+        break;
+    case ELSE_IF:
+        free_ast_node_list(node->as.else_if.else_if_branch);
+        break;
+    case FOR_LOOP:
+        free_ast_node(node->as.for_loop.initialize);
+        free_ast_node(node->as.for_loop.condition);
+        free_ast_node(node->as.for_loop.increment);
+        free_ast_node_list(node->as.for_loop.for_branch);
+        break;
+    case ASSIGNMENT:
+        free_ast_node((node->as.assignment.variable_reference));
+        free_ast_node((node->as.assignment.expression));
+        break;
+    case WHILE_LOOP:
+        free_ast_node(node->as.while_loop.condition);
+        free_ast_node_list(node->as.while_loop.while_branch);
+        break;
+    case JUMP_STATEMENT:
+        break;
+    case PRINT_STATEMENT:
+        switch (node->as.print_statement.p_type) {
+        case EXPRESSION:
+            free_ast_node(node->as.print_statement.print_value.expression);
+            break;
+        case STRING:
+            break;
+        }
+        break;
+    case INPUT_STATEMENT:
+        free_ast_node(node->as.input_statement.variable_reference);
+        break;
+    case RETURN_STATEMENT:
+        free_ast_node(node->as.return_statement.expression);
+        break;
+    }
+
+    free(node);
+    node = NULL;
+}
+
+void free_ast_node_list(list_node *list_head) {
+    list_node *head;
+    ast_node *node;
+    head = list_head;
+    while (head != NULL) {
+        node = (ast_node *)head->data;
+        free_ast_node(node);
+        head = head->next;
+    }
+}
+
 /* --------------------AST NODE HELPERS--------------------- */
 
 int ast_program_lineno(ast_node *node) {

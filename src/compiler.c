@@ -63,6 +63,11 @@ int main(int argc, char *argv[]) {
         tac_list_print(yyout);
         fclose(yyout);
 
+        // memory free-up
+        tac_list_free();
+        free_ast_node(ast);
+        free_symbol_table();
+
         exit(EXIT_SUCCESS);
     }
 

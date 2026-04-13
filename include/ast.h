@@ -159,6 +159,9 @@ ast_node *ast_print_statement(print_type p_type, const char *sval,
                               ast_node *expression);
 ast_node *ast_input_statement(ast_node *variable_reference);
 ast_node *ast_return_statement(data_type ret_type, ast_node *expression);
+void free_ast_node(ast_node *node);
+void free_ast_node_list(list_node *list_head);
+
 
 /* --------------------AST NODE HELPERS--------------------- */
 

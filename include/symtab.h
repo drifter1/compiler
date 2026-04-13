@@ -65,6 +65,7 @@ unsigned int hash(const char *key);
 symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id,
                                   int lineno);
 symtab_entry *lookup_symtab_entry(const char *id);
+void free_symbol_table();
 
 /* -----------------SYMBOL TABLE DUMP FILE----------------- */
 
