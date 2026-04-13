@@ -102,12 +102,12 @@ WHITESPACE			[ \t\n\r\f]+
 
 
  /* Other tokens */
-"("					{ print_token(" T_LPAREN");	return T_LPAREN; }
-")"					{ print_token(" T_RPAREN");	return T_RPAREN; }
+"("					{ print_token("T_LPAREN");	return T_LPAREN; }
+")"					{ print_token("T_RPAREN");	return T_RPAREN; }
 "{"					{ print_token("T_LBRACE");	return T_LBRACE; }
 "}"					{ print_token("T_RBRACE");	return T_RBRACE; }
 ","					{ print_token("T_COMMA");	return T_COMMA;  }
-";"					{ print_token(" T_SEMI");	return T_SEMI;   }
+";"					{ print_token("T_SEMI");	return T_SEMI;   }
 
 
  /* Identifiers, Constants, Strings */
