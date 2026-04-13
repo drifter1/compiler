@@ -174,7 +174,8 @@ symtab_entry *insert_parameter_entry(const char *id, data_type d_type) {
 
     e = insert_symtab_entry(PARAMETER_ENTRY, id, yylineno);
 
-    e->as.parameter.d_type = d_type;
+    if (e->kind == PARAMETER_ENTRY)
+        e->as.parameter.d_type = d_type;
 
     return e;
 }
@@ -184,8 +185,10 @@ symtab_entry *insert_function_entry(const char *id, data_type ret_type) {
 
     e = insert_symtab_entry(FUNCTION_ENTRY, id, yylineno);
 
-    e->as.function.ret_type = ret_type;
-    e->as.function.parameters = NULL;
+    if (e->kind == FUNCTION_ENTRY) {
+        e->as.function.ret_type = ret_type;
+        e->as.function.parameters = NULL;
+    }
 
     return e;
 }
@@ -196,21 +199,25 @@ symtab_entry *insert_temporary_entry(const char *id, int lineno,
 
     e = insert_symtab_entry(TEMPORARY_ENTRY, id, lineno);
 
-    e->as.temporary.d_type = d_type;
+    if (e->kind == TEMPORARY_ENTRY)
+        e->as.temporary.d_type = d_type;
 
     return e;
 }
 
 symtab_entry *set_variable_init_value(symtab_entry *entry, data_type d_type,
                                       value val) {
-    entry->as.variable.init_value.d_type = d_type;
-    entry->as.variable.init_value.val = val;
+    if (entry->kind == VARIABLE_ENTRY) {
+        entry->as.variable.init_value.d_type = d_type;
+        entry->as.variable.init_value.val = val;
+    }
     return entry;
 }
 
 symtab_entry *set_function_parameters(symtab_entry *entry,
                                       list_node *parameters) {
-    entry->as.function.parameters = parameters;
+    if (entry->kind == FUNCTION_ENTRY)
+        entry->as.function.parameters = parameters;
     return entry;
 }
 
