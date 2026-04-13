@@ -1,5 +1,4 @@
 #include "../include/compiler.h"
-#include <complex.h>
 #include <string.h>
 
 /* -----------------SYMBOL TABLE STRUCTURE----------------- */

@@ -1,5 +1,4 @@
 #include "../include/json.h"
-#include <jansson.h>
 
 json_t *json_construct_ast_node(ast_node *node) {
     json_t *json_ast_node = json_object();
