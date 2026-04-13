@@ -134,7 +134,7 @@ extern ast_node *ast;
 
 /* ------------------AST NODE MANAGEMENT-------------------- */
 
-ast_node *new_ast_node(void);
+ast_node *new_ast_node(ast_node_kind kind);
 ast_node *ast_program(list_node *declarations, list_node *functions,
                       ast_node *main_function);
 ast_node *ast_declaration(data_type d_type, list_node *names);

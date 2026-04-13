@@ -6,13 +6,22 @@ ast_node *ast;
 
 /* ------------------AST NODE MANAGEMENT-------------------- */
 
-ast_node *new_ast_node(void) { return (ast_node *)malloc(sizeof(ast_node)); }
+ast_node *new_ast_node(ast_node_kind kind) {
+    ast_node *node = (ast_node *)malloc(sizeof(ast_node));
+
+    node->kind = kind;
+
+#if DEBUG
+    printf("Created new AST node of kind \'%s\'\n",
+           ast_node_kind_to_string(kind));
+#endif
+
+    return node;
+}
 
 ast_node *ast_program(list_node *declarations, list_node *functions,
                       ast_node *main_function) {
-    ast_node *v = new_ast_node();
-
-    v->kind = PROGRAM;
+    ast_node *v = new_ast_node(PROGRAM);
 
     v->as.program.declarations = declarations;
     v->as.program.functions = functions;
@@ -24,9 +33,8 @@ ast_node *ast_program(list_node *declarations, list_node *functions,
 }
 
 ast_node *ast_declaration(data_type d_type, list_node *names) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(DECLARATION);
 
-    v->kind = DECLARATION;
     v->lineno = yylineno;
 
     v->as.declaration.d_type = d_type;
@@ -36,9 +44,8 @@ ast_node *ast_declaration(data_type d_type, list_node *names) {
 }
 
 ast_node *ast_constant(data_type d_type, value val) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(CONSTANT);
 
-    v->kind = CONSTANT;
     v->lineno = yylineno;
 
     v->as.constant.d_type = d_type;
@@ -48,9 +55,8 @@ ast_node *ast_constant(data_type d_type, value val) {
 }
 
 ast_node *ast_function(symtab_entry *entry, ast_node *function_tail) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(FUNCTION);
 
-    v->kind = FUNCTION;
     v->lineno = function_tail->lineno - 1;
 
     v->as.function.entry = entry;
@@ -60,9 +66,7 @@ ast_node *ast_function(symtab_entry *entry, ast_node *function_tail) {
 }
 
 ast_node *ast_function_tail(list_node *declarations, list_node *statements) {
-    ast_node *v = new_ast_node();
-
-    v->kind = FUNCTION_TAIL;
+    ast_node *v = new_ast_node(FUNCTION_TAIL);
 
     v->as.function_tail.declarations = declarations;
     v->as.function_tail.statements = statements;
@@ -75,9 +79,8 @@ ast_node *ast_function_tail(list_node *declarations, list_node *statements) {
 ast_node *ast_if_statement(ast_node *condition, list_node *if_branch,
                            list_node *else_if_branches,
                            list_node *else_branch) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(IF_STATEMENT);
 
-    v->kind = IF_STATEMENT;
     v->lineno = condition->lineno;
 
     v->as.if_statement.condition = condition;
@@ -90,9 +93,8 @@ ast_node *ast_if_statement(ast_node *condition, list_node *if_branch,
 
 ast_node *ast_expression_binary(ast_node *left, operator_type op_type,
                                 ast_node *right) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(EXPRESSION_BINARY);
 
-    v->kind = EXPRESSION_BINARY;
     v->lineno = yylineno;
 
     v->as.expression_binary.left = left;
@@ -105,9 +107,8 @@ ast_node *ast_expression_binary(ast_node *left, operator_type op_type,
 
 ast_node *ast_expression_unary(ast_node *operand, operator_type op_type,
                                fixity_type fixity) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(EXPRESSION_UNARY);
 
-    v->kind = EXPRESSION_UNARY;
     v->lineno = yylineno;
 
     v->as.expression_unary.operand = operand;
@@ -119,9 +120,8 @@ ast_node *ast_expression_unary(ast_node *operand, operator_type op_type,
 }
 
 ast_node *ast_variable_reference(symtab_entry *entry) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(VARIABLE_REFERENCE);
 
-    v->kind = VARIABLE_REFERENCE;
     v->lineno = yylineno;
 
     v->as.variable_reference.entry = entry;
@@ -130,9 +130,8 @@ ast_node *ast_variable_reference(symtab_entry *entry) {
 }
 
 ast_node *ast_function_call(symtab_entry *entry, list_node *arguments) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(FUNCTION_CALL);
 
-    v->kind = FUNCTION_CALL;
     v->lineno = yylineno;
 
     v->as.function_call.entry = entry;
@@ -142,9 +141,8 @@ ast_node *ast_function_call(symtab_entry *entry, list_node *arguments) {
 }
 
 ast_node *ast_else_if(ast_node *condition, list_node *else_if_branch) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(ELSE_IF);
 
-    v->kind = ELSE_IF;
     v->lineno = condition->lineno;
 
     v->as.else_if.condition = condition;
@@ -155,9 +153,8 @@ ast_node *ast_else_if(ast_node *condition, list_node *else_if_branch) {
 
 ast_node *ast_for_loop(ast_node *initialize, ast_node *condition,
                        ast_node *increment, list_node *for_branch) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(FOR_LOOP);
 
-    v->kind = FOR_LOOP;
     v->lineno = initialize->lineno;
 
     v->as.for_loop.initialize = initialize;
@@ -169,9 +166,8 @@ ast_node *ast_for_loop(ast_node *initialize, ast_node *condition,
 }
 
 ast_node *ast_assignment(ast_node *variable_reference, ast_node *expression) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(ASSIGNMENT);
 
-    v->kind = ASSIGNMENT;
     v->lineno = yylineno;
 
     v->as.assignment.variable_reference = variable_reference;
@@ -181,9 +177,8 @@ ast_node *ast_assignment(ast_node *variable_reference, ast_node *expression) {
 }
 
 ast_node *ast_while_loop(ast_node *condition, list_node *while_branch) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(WHILE_LOOP);
 
-    v->kind = WHILE_LOOP;
     v->lineno = condition->lineno;
 
     v->as.while_loop.condition = condition;
@@ -193,9 +188,8 @@ ast_node *ast_while_loop(ast_node *condition, list_node *while_branch) {
 }
 
 ast_node *ast_jump_statement(jump_type j_type) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(JUMP_STATEMENT);
 
-    v->kind = JUMP_STATEMENT;
     v->lineno = yylineno;
 
     v->as.jump_statement.j_type = j_type;
@@ -205,9 +199,8 @@ ast_node *ast_jump_statement(jump_type j_type) {
 
 ast_node *ast_print_statement(print_type p_type, const char *sval,
                               ast_node *expression) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(PRINT_STATEMENT);
 
-    v->kind = PRINT_STATEMENT;
     v->lineno = yylineno;
 
     v->as.print_statement.p_type = p_type;
@@ -224,9 +217,8 @@ ast_node *ast_print_statement(print_type p_type, const char *sval,
 }
 
 ast_node *ast_input_statement(ast_node *variable_reference) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(INPUT_STATEMENT);
 
-    v->kind = INPUT_STATEMENT;
     v->lineno = yylineno;
 
     v->as.input_statement.variable_reference = variable_reference;
@@ -235,9 +227,8 @@ ast_node *ast_input_statement(ast_node *variable_reference) {
 }
 
 ast_node *ast_return_statement(data_type ret_type, ast_node *expression) {
-    ast_node *v = new_ast_node();
+    ast_node *v = new_ast_node(RETURN_STATEMENT);
 
-    v->kind = RETURN_STATEMENT;
     v->lineno = yylineno;
 
     v->as.return_statement.ret_type = ret_type;
