@@ -14,8 +14,8 @@ typedef enum { ERROR, WARNING, NOTE } error_kind;
 
 /* -----------------SYNTAX ANALYSIS ERRORS------------------ */
 
-/* Generic syntax error */
-#define GENERIC_SYNTAX_ERR "generic syntax error"
+/* Missing semicolon */
+#define MISSING_SEMICOLON "expected \';\' at the end of the statement"
 
 /* -----------------SEMANTIC ANALYSIS ERRORS---------------- */
 

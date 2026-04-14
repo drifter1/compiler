@@ -1,5 +1,6 @@
 %{
 	#include "../include/compiler.h"
+	#include <string.h>
 %}
 
 /* YYSTYPE union */
@@ -119,6 +120,8 @@ declarations:			  declarations declaration								{ $$ = list_add($1, $2); }
 						| declaration											{ $$ = list_add(NULL, $1); }
 						;
 declaration:		  	  basic_type names T_SEMI								{ $$ = ast_declaration($1, $2); }
+						| basic_type names										{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						;
 basic_type:				  T_INT													{ $$ = INT_TYPE;	}
 						| T_CHAR												{ $$ = CHAR_TYPE;	}
@@ -165,11 +168,23 @@ statement:				  if_statement											{ $$ = $1; }
 						| for_loop												{ $$ = $1; }
 						| while_loop											{ $$ = $1; }
 						| assignment T_SEMI										{ $$ = $1; }
+						| assignment 											{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						| T_CONTINUE T_SEMI										{ $$ = ast_jump_statement(CONTINUE); }
+						| T_CONTINUE											{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						| T_BREAK T_SEMI										{ $$ = ast_jump_statement(BREAK); }
+						| T_BREAK												{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						| function_call T_SEMI									{ $$ = $1; }
+						| function_call											{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						| var_ref T_INCDEC T_SEMI								{ $$ = ast_expression_unary($1, $2, POSTFIX); }
+						| var_ref T_INCDEC										{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						| T_INCDEC var_ref T_SEMI								{ $$ = ast_expression_unary($2, $1, PREFIX); }
+						| T_INCDEC var_ref 										{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						| print_statement										{ $$ = $1; }
 						| input_statement										{ $$ = $1; }
 						| return_statement										{ $$ = $1; }
@@ -225,12 +240,22 @@ assignment:			 	  var_ref T_ASSIGN expression							{ $$ = ast_assignment($1, $3
 while_loop:				  T_WHILE T_LPAREN expression T_RPAREN tail				{ $$ = ast_while_loop($3, $5); }
 						;
 print_statement:		  T_PRINT expression T_SEMI								{ $$ = ast_print_statement(EXPRESSION, NULL, $2); }
+						| T_PRINT expression									{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						| T_PRINT T_STRING T_SEMI								{ $$ = ast_print_statement(STRING, $2, NULL); }
+						| T_PRINT T_STRING										{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						;
 input_statement:		  T_INPUT var_ref T_SEMI								{ $$ = ast_input_statement($2); }
+						| T_INPUT var_ref										{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						;
 return_statement:		  T_RETURN expression T_SEMI							{ $$ = ast_return_statement(UNDEF_TYPE, $2); }
+						| T_RETURN expression 									{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						| T_RETURN T_SEMI										{ $$ = ast_return_statement(VOID_TYPE, NULL); }
+						| T_RETURN												{ yyerror(MISSING_SEMICOLON); }
+							error												{ $$ = NULL; }
 						;
 main_function:		 	  main_head function_tail								{ $$ = ast_function($1, $2); }
 						;
@@ -239,6 +264,9 @@ main_head:				  T_INT T_MAIN T_LPAREN T_RPAREN						{ $$ = insert_function_entry
 
 %%
 
-void yyerror(){
-	syntax_analysis_error(yylineno, GENERIC_SYNTAX_ERR);
+void yyerror(const char *s){
+	if (strcmp(s, MISSING_SEMICOLON) == 0)
+        syntax_analysis_error(yylineno - 1, s);
+	else
+    	syntax_analysis_error(yylineno, s);
 }

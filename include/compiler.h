@@ -52,6 +52,6 @@ extern int yylineno;
 
 int yylex();
 int yyparse();
-void yyerror();
+void yyerror(const char *s);
 
 #endif /* COMPILER_H */
