@@ -240,6 +240,5 @@ main_head:				  T_INT T_MAIN T_LPAREN T_RPAREN						{ $$ = insert_function_entry
 %%
 
 void yyerror(){
-	fprintf(stderr, "Syntax error at line %d\n", yylineno);
-    exit(EXIT_FAILURE);
+	syntax_analysis_error(GENERIC_SYNTAX_ERR);
 }
