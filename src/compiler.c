@@ -1,6 +1,4 @@
 #include "../include/compiler.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 const char *filename;
 
