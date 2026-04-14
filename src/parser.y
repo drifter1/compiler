@@ -98,7 +98,7 @@
 %type <list_node> 		else_if
 %type <list_node> 		optional_else
 %type <ast_node> 		for_loop
-%type <ast_node> 		assigment
+%type <ast_node> 		assignment
 %type <ast_node> 		while_loop
 %type <ast_node> 		print_statement
 %type <ast_node> 		input_statement
@@ -164,7 +164,7 @@ statements:			 	  statements statement									{ $$ = list_add($1, $2); }
 statement:				  if_statement											{ $$ = $1; }
 						| for_loop												{ $$ = $1; }
 						| while_loop											{ $$ = $1; }
-						| assigment T_SEMI										{ $$ = $1; }
+						| assignment T_SEMI										{ $$ = $1; }
 						| T_CONTINUE T_SEMI										{ $$ = ast_jump_statement(CONTINUE); }
 						| T_BREAK T_SEMI										{ $$ = ast_jump_statement(BREAK); }
 						| function_call T_SEMI									{ $$ = $1; }
@@ -216,11 +216,11 @@ else_if:				  else_if T_ELSE T_IF
 optional_else:		  	  T_ELSE tail											{ $$ = $2; }
 						| /* empty */											{ $$ = NULL; }
 						;
-for_loop:			 	  T_FOR T_LPAREN assigment T_SEMI
+for_loop:			 	  T_FOR T_LPAREN assignment T_SEMI
 							expression T_SEMI
 							var_ref T_INCDEC T_RPAREN tail						{ $$ = ast_for_loop($3, $5, ast_expression_unary($7, $8, POSTFIX), $10); }
 						;
-assigment:			 	  var_ref T_ASSIGN expression							{ $$ = ast_assignment($1, $3); }
+assignment:			 	  var_ref T_ASSIGN expression							{ $$ = ast_assignment($1, $3); }
 						;
 while_loop:				  T_WHILE T_LPAREN expression T_RPAREN tail				{ $$ = ast_while_loop($3, $5); }
 						;
@@ -240,5 +240,5 @@ main_head:				  T_INT T_MAIN T_LPAREN T_RPAREN						{ $$ = insert_function_entry
 %%
 
 void yyerror(){
-	syntax_analysis_error(GENERIC_SYNTAX_ERR);
+	syntax_analysis_error(yylineno, GENERIC_SYNTAX_ERR);
 }
