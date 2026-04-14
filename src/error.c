@@ -48,6 +48,41 @@ void lexical_analysis_error(const char *error, ...) {
     exit(EXIT_FAILURE);
 }
 
+void semantic_analysis_error(int lineno, const char *error, ...) {
+    va_list args;
+    va_start(args, error);
+
+    fprintf(stderr, BWHT "%s:%d: " BRED "error: " CRESET, filename, lineno);
+    vfprintf(stderr, error, args);
+
+    char line[256];
+    int count = 0;
+    FILE *fp;
+
+    // open file
+    if (!(fp = fopen(filename, "r")))
+        internal_error(filename);
+
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        count++;
+        // when in line of token
+        if (count == lineno) {
+            fprintf(stderr, "\n    %4d | %s", lineno, line);
+        }
+    }
+
+    // close file
+    if (fclose(fp))
+        internal_error(filename);
+
+    fprintf(stderr, "         |");
+    fprintf(stderr, " \n");
+
+    va_end(args);
+
+    exit(EXIT_FAILURE);
+}
+
 /* ---------------------HELPER FUNCTIONS-------------------- */
 
 int find_token_start_col(const char *line, const char *token) {

@@ -1,5 +1,4 @@
 #include "../include/compiler.h"
-#include <stdlib.h>
 
 /* ------------------RETURN STATEMENT COUNT----------------- */
 
@@ -143,12 +142,13 @@ void semantic_analysis_expresssion_binary(ast_node *node) {
     data_type d_type = expression_data_type(node);
 
     if (d_type == UNDEF_TYPE || d_type == VOID_TYPE) {
-        printf("Semantic error at line %d. The result data type of the binary "
-               "expression of operator type \'%s\' is: \'%s\'\n",
-               node->lineno,
-               operator_type_to_string(node->as.expression_binary.op_type),
-               data_type_to_string(d_type));
-        exit(EXIT_FAILURE);
+        semantic_analysis_error(
+            node->lineno, ERR_BIN_INVALID_OPERANDS,
+            data_type_to_string(
+                expression_data_type(node->as.expression_binary.left)),
+            data_type_to_string(
+                expression_data_type(node->as.expression_binary.right)),
+            operator_type_to_string(node->as.expression_binary.op_type));
     } else {
         node->as.expression_binary.d_type = d_type;
 #if DEBUG
@@ -166,12 +166,11 @@ void semantic_analysis_expresssion_unary(ast_node *node) {
     data_type d_type = expression_data_type(node);
 
     if (d_type == UNDEF_TYPE || d_type == VOID_TYPE) {
-        printf("Semantic error at line %d. The result data type of the unary "
-               "expression of operator type \'%s\' is: \'%s\'\n",
-               node->lineno,
-               operator_type_to_string(node->as.expression_unary.op_type),
-               data_type_to_string(d_type));
-        exit(EXIT_FAILURE);
+        semantic_analysis_error(
+            node->lineno, ERR_UNARY_INVALID_OPERANDS,
+            data_type_to_string(
+                expression_data_type(node->as.expression_unary.operand)),
+            operator_type_to_string(node->as.expression_unary.op_type));
     } else {
         node->as.expression_unary.d_type = d_type;
 #if DEBUG
@@ -207,8 +206,8 @@ void semantic_analysis_function_call(ast_node *node) {
     list_node *parameters =
         node->as.function_call.entry->as.function.parameters;
 
-    verify_function_call_argument_count(parameters, arguments);
-    verify_function_call_argument_types(parameters, arguments);
+    verify_function_call_argument_count(parameters, arguments, node->lineno);
+    verify_function_call_argument_types(parameters, arguments, node->lineno);
 }
 
 void semantic_analysis_else_if(ast_node *node) {
@@ -249,9 +248,10 @@ void semantic_analysis_assignment(ast_node *node) {
         lhs_dtype, rhs_dtype,
         node->as.assignment.expression->kind == CONSTANT)) {
     case NOT_COMPATIBLE:
-        printf("Semantic error at line no. %d. Incompatible Types!\n",
-               node->lineno);
-        exit(EXIT_FAILURE);
+        semantic_analysis_error(node->lineno, ERR_ASSIGN_INCOMPATIBLE,
+                                data_type_to_string(rhs_dtype),
+                                data_type_to_string(lhs_dtype));
+        break;
     case SAME_TYPE:
 #if DEBUG
         printf("Types are the same!\n");
@@ -281,10 +281,10 @@ void semantic_analysis_jump_statement(ast_node *node) {
 
     /* check if jump statement is inside of loop */
     if (!loop_depth) {
-        printf("Semantic error at line no. %d. Jump Statement not inside of "
-               "loop!\n",
-               node->lineno);
-        exit(EXIT_FAILURE);
+        semantic_analysis_error(
+            node->lineno, ERR_JUMP_NOT_IN_LOOP,
+            jump_type_to_string(node->as.jump_statement.j_type));
+
     } else {
 #if DEBUG
         printf("Jump statement at line no. %d inside of loop!\n", node->lineno);
@@ -306,10 +306,8 @@ void semantic_analysis_print_statement(ast_node *node) {
         d_type = expression_data_type(
             node->as.print_statement.print_value.expression);
         if (d_type == UNDEF_TYPE || d_type == VOID_TYPE) {
-            printf("Semantic error at line %d. The data type of the output "
-                   "value is: \'%s\'\n",
-                   node->lineno, data_type_to_string(d_type));
-            exit(EXIT_FAILURE);
+            semantic_analysis_error(node->lineno, ERR_OUTPUT_TYPE,
+                                    data_type_to_string(d_type));
         } else {
 #if DEBUG
             printf("The data type of the output value is: \'%s\'\n",
@@ -365,11 +363,8 @@ void verify_no_redeclaration_of_names(list_node *names,
         first_lineno = get_first_lineno(entry);
 
         if (declaration_lineno != first_lineno) {
-            printf("Semantic error at line no. %d. Identifier \'%s\' gets "
-                   "redeclared as variable!\n",
-                   declaration_lineno, entry->id);
-            exit(EXIT_FAILURE);
-            return;
+            semantic_analysis_error(declaration_lineno, ERR_REDECLARED_VAR,
+                                    entry->id);
         }
 
         head = head->next;
@@ -456,13 +451,11 @@ void verify_declaration_names_init_value(list_node *names) {
             switch (
                 verify_assignment_dtype_compatible(var_type, init_type, 1)) {
             case NOT_COMPATIBLE:
-                printf("Semantic error at line no. %d. Declaration of variable "
-                       "\'%s\' of type \'%s\' has "
-                       "initialization value of incompatible type \'%s\'\n",
-                       declaration_lineno, entry->id,
-                       data_type_to_string(var_type),
-                       data_type_to_string(init_type));
-                exit(EXIT_FAILURE);
+                semantic_analysis_error(declaration_lineno,
+                                        ERR_VAR_INIT_INCOMPATIBLE, entry->id,
+                                        data_type_to_string(var_type),
+                                        data_type_to_string(init_type));
+                break;
             case SAME_TYPE:
 #if DEBUG
                 printf("Declaration of variable \'%s\' of type \'%s\' has "
@@ -491,11 +484,8 @@ void verify_no_redeclaration_of_function_name(symtab_entry *entry,
     first_lineno = get_first_lineno(entry);
 
     if (declaration_lineno != first_lineno) {
-        printf("Semantic error at line no. %d. Identifier \'%s\' gets "
-               "redeclared as function name.\n",
-               declaration_lineno, entry->id);
-        exit(EXIT_FAILURE);
-        return;
+        semantic_analysis_error(declaration_lineno, ERR_REDECLARED_FUNC,
+                                entry->id);
     } else {
 #if DEBUG
         printf("No redeclaration of identifier \'%s\' at line no. %d\n",
@@ -538,23 +528,15 @@ void verify_return_statement_last(list_node *statements) {
                    entry->id, data_type_to_string(ret_type));
 #endif
         } else {
-            printf("Semantic error for function declared at line no. %d. The "
-                   "return statement required at the end of function "
-                   "\'%s\' of "
-                   "type \'%s\' was not found!\n",
-                   declaration_lineno, entry->id,
-                   data_type_to_string(ret_type));
-            exit(EXIT_FAILURE);
+            semantic_analysis_error(declaration_lineno, ERR_MISSING_RETURN,
+                                    entry->id, data_type_to_string(ret_type));
         }
     }
 
     /* check return statement count */
     if (return_count > 1) {
-        printf("Semantic error for function declared at line no. %d. More than "
-               "one return statements were found for function "
-               "\'%s\'!\n",
-               declaration_lineno, entry->id);
-        exit(EXIT_FAILURE);
+        semantic_analysis_error(declaration_lineno, ERR_MULTIPLE_RETURNS,
+                                entry->id);
     }
 }
 
@@ -563,10 +545,7 @@ void verify_variable_declaration_before_use(symtab_entry *entry,
     int first_lineno = get_first_lineno(entry);
 
     if (use_lineno == first_lineno) {
-        printf("Semantic error at line no. %d. Use of undeclared variable "
-               "\'%s\'.\n",
-               use_lineno, entry->id);
-        exit(EXIT_FAILURE);
+        semantic_analysis_error(use_lineno, ERR_UNDECLARED_VAR, entry->id);
     } else {
 #if DEBUG
         printf("Variable \'%s\' declared at line no. %d is correctly used in "
@@ -577,7 +556,7 @@ void verify_variable_declaration_before_use(symtab_entry *entry,
 }
 
 void verify_function_call_argument_count(list_node *parameters,
-                                         list_node *arguments) {
+                                         list_node *arguments, int lineno) {
     int argument_count = list_length(arguments);
     int parameter_count = list_length(parameters);
 
@@ -587,11 +566,8 @@ void verify_function_call_argument_count(list_node *parameters,
 #endif
 
     if (argument_count != parameter_count) {
-        printf("Semantic error at line no. %d. Function call arguments are not "
-               "equal to the parameters "
-               "required by the function!\n",
-               (*((ast_node *)arguments->data)).lineno);
-        exit(EXIT_FAILURE);
+        semantic_analysis_error(lineno, ERR_FUNC_ARG_NUM_MISMATCH,
+                                argument_count, parameter_count);
     } else {
 #if DEBUG
         printf("Function call arguments are equal to the parameters required "
@@ -601,7 +577,7 @@ void verify_function_call_argument_count(list_node *parameters,
 }
 
 void verify_function_call_argument_types(list_node *parameters,
-                                         list_node *arguments) {
+                                         list_node *arguments, int lineno) {
     ast_node *argument;
     symtab_entry *parameter;
     data_type arg_dtype, par_dtype;
@@ -617,12 +593,11 @@ void verify_function_call_argument_types(list_node *parameters,
         switch (verify_assignment_dtype_compatible(
             par_dtype, arg_dtype, argument->kind == CONSTANT)) {
         case NOT_COMPATIBLE:
-            printf("Semantic error at line no. %d. Argument of type \'%s\' for "
-                   "parameter \'%s\' of type "
-                   "\'%s\' is of incompatible type!\n",
-                   argument->lineno, data_type_to_string(arg_dtype),
-                   parameter->id, data_type_to_string(par_dtype));
-            exit(EXIT_FAILURE);
+            semantic_analysis_error(lineno, ERR_FUNC_ARG_TYPE_MISMATCH,
+                                    data_type_to_string(arg_dtype),
+                                    parameter->id,
+                                    data_type_to_string(par_dtype));
+            break;
         case SAME_TYPE:
 #if DEBUG
             printf("Argument for parameter \'%s\' of type "
@@ -681,20 +656,15 @@ void verify_return_statement_ret_type(ast_node *node) {
         }
         /* return statement has return value -> incorrect */
         else {
-            printf("Semantic error at line no. %d. Return statement "
-                   "incorrectly returns value!\n",
-                   node->lineno);
-            exit(EXIT_FAILURE);
+            semantic_analysis_error(node->lineno, ERR_RETURN_VALUE_IN_VOID);
         }
     }
     /* function has return value */
     else {
         /* return statement has no return value -> incorrect */
         if (ret_type == VOID_TYPE) {
-            printf("Semantic error at line no. %d. Return statement "
-                   "incorrectly doesn't return value!\n",
-                   node->lineno);
-            exit(EXIT_FAILURE);
+            semantic_analysis_error(node->lineno, ERR_RETURN_NO_VALUE,
+                                    data_type_to_string(func_ret_type));
         }
         /* return statement has return value */
         else {
@@ -702,11 +672,10 @@ void verify_return_statement_ret_type(ast_node *node) {
                 func_ret_type, ret_type,
                 node->as.return_statement.expression->kind == CONSTANT)) {
             case NOT_COMPATIBLE:
-                printf("Semantic error at line no. %d. The return value of the "
-                       "return statement is not "
-                       "compatible with the function return value!\n",
-                       node->lineno);
-                exit(EXIT_FAILURE);
+                semantic_analysis_error(node->lineno, ERR_RETURN_TYPE_MISMATCH,
+                                        data_type_to_string(ret_type),
+                                        data_type_to_string(func_ret_type));
+                break;
             case SAME_TYPE:
 #if DEBUG
                 printf("Return statement of same type as function return "

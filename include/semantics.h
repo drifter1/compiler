@@ -52,9 +52,9 @@ void verify_return_statement_last(list_node *statements);
 void verify_variable_declaration_before_use(symtab_entry *entry,
                                             int use_lineno);
 void verify_function_call_argument_count(list_node *parameters,
-                                         list_node *arguments);
+                                         list_node *arguments, int lineno);
 void verify_function_call_argument_types(list_node *parameters,
-                                         list_node *arguments);
+                                         list_node *arguments, int lineno);
 void set_return_statement_ret_type(ast_node *node);
 void verify_return_statement_ret_type(ast_node *node);
 data_type expression_data_type(ast_node *node);
