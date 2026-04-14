@@ -1,9 +1,7 @@
 #ifndef AST_H
 #define AST_H
 
-#include "list.h"
 #include "symtab.h"
-#include "types.h"
 
 /* ----------------------AST NODE KINDS--------------------- */
 
@@ -161,7 +159,6 @@ ast_node *ast_input_statement(ast_node *variable_reference);
 ast_node *ast_return_statement(data_type ret_type, ast_node *expression);
 void free_ast_node(ast_node *node);
 void free_ast_node_list(list_node *list_head);
-
 
 /* --------------------AST NODE HELPERS--------------------- */
 
