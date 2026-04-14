@@ -12,7 +12,7 @@ typedef enum { ERROR, WARNING, NOTE } error_kind;
 /* Unrecognized character in source */
 #define UNRECOGNIZED_CHARACTER "unrecognized character \'%c\' (ASCII value: %d)"
 
-/* -----------------SYNTAX ANALYSIS ERRORS----------------- */
+/* -----------------SYNTAX ANALYSIS ERRORS------------------ */
 
 /* Generic syntax error */
 #define GENERIC_SYNTAX_ERR "generic syntax error"
@@ -66,7 +66,7 @@ typedef enum { ERROR, WARNING, NOTE } error_kind;
 
 void internal_error(const char *error);
 void lexical_analysis_error(const char *error, ...);
-void syntax_analysis_error(const char *error, ...);
+void syntax_analysis_error(int lineno, const char *error, ...);
 void semantic_analysis_error(int lineno, const char *error, ...);
 
 /* ---------------------HELPER FUNCTIONS-------------------- */

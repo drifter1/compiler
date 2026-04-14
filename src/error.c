@@ -49,11 +49,11 @@ void lexical_analysis_error(const char *error, ...) {
     exit(EXIT_FAILURE);
 }
 
-void syntax_analysis_error(const char *error, ...) {
+void syntax_analysis_error(int lineno, const char *error, ...) {
     va_list args;
     va_start(args, error);
 
-    fprintf(stderr, BWHT "%s:%d: " BRED "error: " CRESET, filename, yylineno);
+    fprintf(stderr, BWHT "%s:%d: " BRED "error: " CRESET, filename, lineno);
     vfprintf(stderr, error, args);
 
     char line[256];
@@ -67,8 +67,8 @@ void syntax_analysis_error(const char *error, ...) {
     while (fgets(line, sizeof(line), fp) != NULL) {
         count++;
         // when in line of token
-        if (count == yylineno) {
-            fprintf(stderr, "\n    %4d | %s", yylineno, line);
+        if (count == lineno) {
+            fprintf(stderr, "\n    %4d | %s", lineno, line);
         }
     }
 
