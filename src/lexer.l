@@ -52,11 +52,7 @@ WHITESPACE			[ \t\n\r\f]+
 <ML_COMMENT>[^*\n]+
 <ML_COMMENT>"*"
 <ML_COMMENT>"\n"
-<ML_COMMENT><<EOF>>	{
-						fprintf(stderr, "Lexical error at line %d. EOF in comment\n",
-									yylineno);
-    					exit(EXIT_FAILURE);
-					}
+<ML_COMMENT><<EOF>>	{ lexical_analysis_error(EOF_IN_COMMENT);	}
 
  /* Keywords */
 "break"				{ print_token("T_BREAK");		return T_BREAK;		}
@@ -123,11 +119,7 @@ WHITESPACE			[ \t\n\r\f]+
 
 
  /* Unrecognized tokens - Error */
-.					{
-						fprintf(stderr, "Lexical error at line %d. Unrecognized Token: \"%s\"\n",
-									yylineno, yytext);
-    					exit(EXIT_FAILURE);
-					}
+.					{ lexical_analysis_error(UNRECOGNIZED_CHARACTER, yytext[0], yytext[0]); }
 
 %%
 

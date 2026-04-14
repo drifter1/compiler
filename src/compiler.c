@@ -1,5 +1,6 @@
 #include "../include/compiler.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 const char *filename;
 
@@ -12,11 +13,9 @@ int main(int argc, char *argv[]) {
     if (argc == 2) {
         filename = argv[1];
 
-        // open file
-        if (!(yyin = fopen(filename, "r"))) {
-            fprintf(stderr, "Unable to open file %s\n", filename);
-            exit(EXIT_FAILURE);
-        }
+        // open input file
+        if (!(yyin = fopen(filename, "r")))
+            internal_error(filename);
 
         // initialize symbol table
         init_symbol_table();
@@ -26,42 +25,54 @@ int main(int argc, char *argv[]) {
 
 #if DEBUG
         // open lexer dump file
-        lexer_dump_file = fopen(LEXER_DUMP_FILE_NAME, "w");
+        if (!(lexer_dump_file = fopen(LEXER_DUMP_FILE_NAME, "w")))
+            internal_error(LEXER_DUMP_FILE_NAME);
 #endif
 
-        // parsing
+        // perform parsing
         yyparse();
-        fclose(yyin);
+
+        // close input file
+        if (fclose(yyin))
+            internal_error(filename);
 
 #if DEBUG
         // close lexer dump file
-        fclose(lexer_dump_file);
-
-        printf("Parsing finished!\n");
+        if (fclose(lexer_dump_file))
+            internal_error(LEXER_DUMP_FILE_NAME);
 #endif
-        // semantic analysis
+
+        // perform semantic analysis
         semantic_analysis(ast);
 
-        // intermediate code generation
+        // perform intermediate code generation
         intermediate_code_generation(ast);
 
 #if DEBUG
         // symbol table dump
         printf("Dumping symbol table to file...\n");
         FILE *symtab_dump_file;
-        symtab_dump_file = fopen(SYMTAB_DUMP_FILE_NAME, "w");
+        if (!(symtab_dump_file = fopen(SYMTAB_DUMP_FILE_NAME, "w")))
+            internal_error(SYMTAB_DUMP_FILE_NAME);
         dump_symbol_table(symtab_dump_file);
-        fclose(symtab_dump_file);
+        if (fclose(symtab_dump_file))
+            internal_error(SYMTAB_DUMP_FILE_NAME);
 
         // abstract syntax tree json dump file
         printf("Dumping abstract syntax tree to JSON file...\n");
         json_dump_abstract_syntax_tree(AST_JSON_DUMP_FILE_NAME);
 #endif
 
+        // open output file
+        if (!(yyout = fopen(OUTPUT_FILE_NAME, "w")))
+            internal_error(OUTPUT_FILE_NAME);
+
         // output intermediate code
-        yyout = fopen(OUTPUT_FILE_NAME, "w");
         tac_list_print(yyout);
-        fclose(yyout);
+
+        // close output file
+        if (fclose(yyout))
+            internal_error(OUTPUT_FILE_NAME);
 
         // memory free-up
         tac_list_free();

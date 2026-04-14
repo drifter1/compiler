@@ -1,4 +1,5 @@
 #include "../include/json.h"
+#include "../include/error.h"
 
 json_t *json_construct_ast_node(ast_node *node) {
     json_t *json_ast_node = json_object();
@@ -393,5 +394,7 @@ json_t *json_construct_parameters(list_node *parameters) {
 
 void json_dump_abstract_syntax_tree(const char *filename) {
     json_t *json_ast_node = json_construct_ast_node(ast);
-    json_dump_file(json_ast_node, filename, JSON_INDENT(4));
+
+    if (json_dump_file(json_ast_node, filename, JSON_INDENT(4)) != 0)
+        internal_error(filename);
 }

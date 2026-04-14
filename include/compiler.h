@@ -1,8 +1,10 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#include "../include/ansi_colors.h"
 #include "../include/ast.h"
 #include "../include/context.h"
+#include "../include/error.h"
 #include "../include/ir.h"
 #include "../include/json.h"
 #include "../include/list.h"
