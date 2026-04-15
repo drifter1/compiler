@@ -16,6 +16,12 @@ typedef enum { ERROR, WARNING, NOTE } error_kind;
 
 /* Missing semicolon */
 #define MISSING_SEMICOLON "expected \';\' at the end of the statement"
+/* Invalid identifier */
+#define DECL_INVALID_ID "expected identifier after type %s"
+/* Empty declaration */
+#define DECL_EMPTY                                                             \
+    "empty declaration: type %s must be followed by at least one "             \
+    "identifier"
 
 /* -----------------SEMANTIC ANALYSIS ERRORS---------------- */
 

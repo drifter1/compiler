@@ -122,6 +122,9 @@ declarations:			  declarations declaration								{ $$ = list_add($1, $2); }
 declaration:		  	  basic_type names T_SEMI								{ $$ = ast_declaration($1, $2); }
 						| basic_type names										{ yyerror(MISSING_SEMICOLON); }
 							error												{ $$ = NULL; }
+						| basic_type 											{ syntax_analysis_error(yylineno, DECL_INVALID_ID, data_type_to_string($1)); }
+							error T_SEMI										{ $$ = NULL; }
+						| basic_type T_SEMI 									{ syntax_analysis_error(yylineno, DECL_EMPTY, data_type_to_string($1)); $$ = NULL; }
 						;
 basic_type:				  T_INT													{ $$ = INT_TYPE;	}
 						| T_CHAR												{ $$ = CHAR_TYPE;	}
