@@ -23,6 +23,9 @@ void tac_print(FILE *of, tac t) {
     case OP_NOP:
         fprintf(of, "%s\n", op_str);
         break;
+    case OP_GDECL:
+    fprintf(of, "%s %s, %s\n", op_str, result_str, arg1_str);
+        break;
     case OP_DECL:
         fprintf(of, "%s %s\n", op_str, result_str);
         break;
@@ -162,6 +165,9 @@ const char *op_code_to_string(op_code op) {
     switch (op) {
     case OP_NOP:
         return ";";
+    /* Global Declaration */
+    case OP_GDECL:
+        return "global_declare";
     /* Declaration */
     case OP_DECL:
         return "declare";

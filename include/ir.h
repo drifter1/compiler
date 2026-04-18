@@ -28,6 +28,7 @@ void intermediate_code_generation_return_statement(ast_node *node);
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
 
+void intermediate_code_generation_names_global_declare(list_node *names);
 void intermediate_code_generation_names_declare(list_node *names);
 void intermediate_code_generation_names_init(list_node *names);
 void intermediate_code_generation_function_label(symtab_entry *entry);

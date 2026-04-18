@@ -87,8 +87,14 @@ void intermediate_code_generation_program(ast_node *node) {
 
 void intermediate_code_generation_declaration(ast_node *node) {
     list_node *names = node->as.declaration.names;
-    intermediate_code_generation_names_declare(names);
-    intermediate_code_generation_names_init(names);
+    switch (cur_scope->kind) {
+    case GLOBAL:
+        intermediate_code_generation_names_global_declare(names);
+        break;
+    case LOCAL:
+        intermediate_code_generation_names_declare(names);
+        intermediate_code_generation_names_init(names);
+    }
 }
 
 operand intermediate_code_generation_constant(ast_node *node) {
@@ -386,6 +392,29 @@ void intermediate_code_generation_return_statement(ast_node *node) {
 }
 
 /* ---------------------HELPER FUNCTIONS-------------------- */
+
+void intermediate_code_generation_names_global_declare(list_node *names) {
+    symtab_entry *entry;
+    operand var;
+    operand init;
+    operand none = op_none();
+
+    /* generate global declaration for every globally declared variable */
+    while (names != NULL) {
+        entry = (symtab_entry *)names->data;
+        var = op_var(entry);
+        // use init value when specified
+        if (entry->as.variable.init_value.d_type != UNDEF_TYPE) {
+            init = op_const(ast_constant_init(entry));
+        }
+        // otherwise default to 0
+        else {
+            init = op_const(ast_constant_zero(get_data_type(entry)));
+        }
+        tac_list_add(tac_create(OP_GDECL, var, init, none));
+        names = names->next;
+    }
+}
 
 void intermediate_code_generation_names_declare(list_node *names) {
     symtab_entry *entry;

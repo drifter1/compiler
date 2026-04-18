@@ -370,6 +370,29 @@ ast_node *ast_constant_init(symtab_entry *entry) {
     return ast_constant(d_type, val);
 }
 
+ast_node *ast_constant_zero(data_type d_type) {
+    value val;
+    switch (d_type) {
+    case UNDEF_TYPE:
+        val.ival = 0;
+        break;
+    case INT_TYPE:
+        val.ival = 0;
+        break;
+    case CHAR_TYPE:
+        val.cval = 0;
+        break;
+    case FLOAT_TYPE:
+    case DOUBLE_TYPE:
+        val.fval = 0.0;
+        break;
+    case VOID_TYPE:
+        val.ival = 0;
+        break;
+    }
+    return ast_constant(d_type, val);
+}
+
 operator_type ast_expression_unary_op_type(operator_type op_type,
                                            fixity_type fixity) {
     switch (op_type) {
