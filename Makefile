@@ -65,4 +65,4 @@ run:
 
 # Clean run files
 clean-run:
-	@rm *.out *.json
+	@rm *.out *.json *.ic

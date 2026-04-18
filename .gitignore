@@ -4,6 +4,7 @@
 *.lo
 *.out
 *.json
+*.ic
 
 build/
 bin/

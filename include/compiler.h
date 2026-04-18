@@ -17,7 +17,7 @@
 /* --------------------COMPILER SETTINGS-------------------- */
 
 #ifndef OUTPUT_FILE_NAME
-#define OUTPUT_FILE_NAME "compiler.out"
+#define OUTPUT_FILE_NAME "compiler.ic"
 #endif
 
 #ifndef DEBUG
