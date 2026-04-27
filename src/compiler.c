@@ -2,7 +2,7 @@
 
 const char *filename;
 
-#if DEBUG
+#if LEX_DUMP_FILE_OUTPUT
 FILE *lexer_dump_file;
 #endif
 
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         // initialize scope
         init_scope();
 
-#if DEBUG
+#if LEX_DUMP_FILE_OUTPUT
         // open lexer dump file
         if (!(lexer_dump_file = fopen(LEXER_DUMP_FILE_NAME, "w")))
             internal_error(LEXER_DUMP_FILE_NAME);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         if (fclose(yyin))
             internal_error(filename);
 
-#if DEBUG
+#if LEX_DUMP_FILE_OUTPUT
         // close lexer dump file
         if (fclose(lexer_dump_file))
             internal_error(LEXER_DUMP_FILE_NAME);
@@ -46,8 +46,7 @@ int main(int argc, char *argv[]) {
         // perform intermediate code generation
         intermediate_code_generation(ast);
 
-#if DEBUG
-        // symbol table dump
+#if SYMTAB_DUMP_FILE_OUTPUT
         printf("Dumping symbol table to file...\n");
         FILE *symtab_dump_file;
         if (!(symtab_dump_file = fopen(SYMTAB_DUMP_FILE_NAME, "w")))
@@ -55,10 +54,12 @@ int main(int argc, char *argv[]) {
         dump_symbol_table(symtab_dump_file);
         if (fclose(symtab_dump_file))
             internal_error(SYMTAB_DUMP_FILE_NAME);
+#endif
 
-        // abstract syntax tree json dump file
+#if AST_DUMP_FILE_OUTPUT
         printf("Dumping abstract syntax tree to JSON file...\n");
         json_dump_abstract_syntax_tree(AST_JSON_DUMP_FILE_NAME);
+
 #endif
 
         // open output file

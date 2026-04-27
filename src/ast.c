@@ -11,7 +11,7 @@ ast_node *new_ast_node(ast_node_kind kind) {
 
     node->kind = kind;
 
-#if DEBUG
+#if AST_DEBUG_CREATE_NODE
     printf("Created new AST node of kind \'%s\'\n",
            ast_node_kind_to_string(kind));
 #endif

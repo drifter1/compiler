@@ -32,19 +32,7 @@
 
 #if DEBUG
 
-extern FILE *lexer_dump_file;
-
-#ifndef LEXER_DUMP_FILE_NAME
-#define LEXER_DUMP_FILE_NAME "lexer_dump.out"
-#endif
-
-#ifndef SYMTAB_DUMP_FILE_NAME
-#define SYMTAB_DUMP_FILE_NAME "symtab_dump.out"
-#endif
-
-#ifndef AST_JSON_DUMP_FILE_NAME
-#define AST_JSON_DUMP_FILE_NAME "ast.json"
-#endif
+#include "debug.h"
 
 #endif
 

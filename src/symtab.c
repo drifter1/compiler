@@ -45,7 +45,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id,
         e->next = symbol_table[hashval];
         symbol_table[hashval] = e;
 
-#if DEBUG
+#if SYMTAB_DEBUG_INSERT
         printf("Inserted \'%s\' for the first time with line no. %d!\n", id,
                lineno);
 #endif
@@ -67,7 +67,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id,
             t->next->data = (void *)p;
             t->next->next = NULL;
 
-#if DEBUG
+#if SYMTAB_DEBUG_INSERT
             printf("Found \'%s\' again at line no. %d!\n", id, lineno);
 #endif
         }
@@ -88,7 +88,7 @@ symtab_entry *insert_symtab_entry(symtab_entry_kind kind, const char *id,
             e->next = symbol_table[hashval];
             symbol_table[hashval] = e;
 
-#if DEBUG
+#if SYMTAB_DEBUG_INSERT
             printf("Inserted \'%s\' for a new scope with line no. %d!\n", id,
                    lineno);
 #endif
