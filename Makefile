@@ -55,6 +55,22 @@ $(BIN_DIR):
 $(OBJ_DIR):
 	@$(MKDIR_P) $@
 
+# Lexical analysis
+lex: CFLAGS += -DCOMPILER_STAGE=1
+lex: $(TARGET)
+
+# Syntax analysis
+syntax: CFLAGS += -DCOMPILER_STAGE=2
+syntax: $(TARGET)
+
+# Semantic analysis
+semantic: CFLAGS += -DCOMPILER_STAGE=3
+semantic: $(TARGET)
+
+# Intermediate code generation
+ir: CFLAGS += -DCOMPILER_STAGE=4
+ir: $(TARGET)
+
 # Clean build files
 clean:
 	@rm -rf $(BIN_DIR) $(OBJ_DIR)
