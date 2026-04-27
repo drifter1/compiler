@@ -35,7 +35,11 @@ TARGET = $(BIN_DIR)/compiler
 EXAMPLES_DIR = examples/simple_c_examples
 EXAMPLE = $(EXAMPLES_DIR)/example1.c
 
-.PHONY: all lex syntax semantic ir clean run clean-run
+# tests related
+PYTHON = python3
+TEST_SCRIPT = tests/test.py
+
+.PHONY: all lex syntax semantic ir clean run clean-run test
 
 # Default target
 all: $(TARGET)
@@ -82,3 +86,8 @@ run:
 # Clean run files
 clean-run:
 	@rm *.out *.json *.ic
+
+# Tests
+test: CFLAGS = -g -Wall -std=c99 -DDEBUG=0 -DSTOP_ON_ERROR=1 -DCOMPILER_STAGE=3
+test: $(TARGET)
+	@$(PYTHON) $(TEST_SCRIPT) --binary-path $< --example-dir $(EXAMPLES_DIR)

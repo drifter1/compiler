@@ -12,6 +12,7 @@ This repository contains the code for a compiler implementation written in the C
 - Flex (derivative of Lex)
 - Bison (derivative of Yacc)
 - Jansson library (for debugging purposes)
+- Python 3 (for testing purposes)
 - MIPS32 Simulator (for original implementation)
 
 
@@ -22,7 +23,7 @@ This repository contains the code for a compiler implementation written in the C
 For Arch-based distributions:
 ```sh
 sudo pacman -Syu
-sudo pacman -S --needed base-devel jansson
+sudo pacman -S --needed base-devel jansson python
 ```
 
 > [!NOTE]
@@ -32,7 +33,7 @@ sudo pacman -S --needed base-devel jansson
 For Debian-based distributions:
 ```sh
 sudo apt update
-sudo apt install build-essential flex bison libjansson-dev
+sudo apt install build-essential flex bison libjansson-dev python3
 ```
 
 > [!NOTE]
@@ -42,7 +43,7 @@ For Fedora-based distributions:
 ```sh
 sudo dnf makecache
 sudo dnf group install development-tools
-sudo dnf install flex flex-devel bison bison-devel jansson jansson-devel
+sudo dnf install flex flex-devel bison bison-devel jansson jansson-devel python3 python3-devel
 ```
 
 > [!NOTE]
@@ -68,7 +69,7 @@ Next, install a package manager such as Homebrew (`brew`), through which you can
 ```sh
 xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install flex bison jansson
+brew install flex bison jansson python
 ```
 
 
@@ -118,6 +119,14 @@ To clean the build files and binary executable, you just have to type `make clea
 
 To clean the debugging files when using the compiler in `DEBUG` mode (the default setting), simply type `make clean-run` after `make run`.
 
+## Python testing
+
+As C does not include platform-independent libraries for looping through directories, Python was used for testing purposes instead.
+
+To compile all the Simple C examples in the *examples/simple_c_examples* directory, simply type `make test`.
+
+>[!NOTE]
+> The above uses the Python 3 script *test.py*, which is located under the directory *tests*.
 
 # Advanced Usage
 
