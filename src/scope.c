@@ -1,6 +1,4 @@
-#include "../include/scope.h"
-#include "../include/debug.h"
-#include <stdlib.h>
+#include "../include/compiler.h"
 
 /* ----------------------CURRENT SCOPE--------------------- */
 

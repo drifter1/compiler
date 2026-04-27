@@ -1,6 +1,4 @@
-#include "../include/semantics.h"
-#include "../include/debug.h"
-#include "../include/error.h"
+#include "../include/compiler.h"
 
 /* ------------------RETURN STATEMENT COUNT----------------- */
 
