@@ -35,7 +35,7 @@ TARGET = $(BIN_DIR)/compiler
 EXAMPLES_DIR = examples/simple_c_examples
 EXAMPLE = $(EXAMPLES_DIR)/example1.c
 
-.PHONY: all clean run clean-run
+.PHONY: all lex syntax semantic ir clean run clean-run
 
 # Default target
 all: $(TARGET)
