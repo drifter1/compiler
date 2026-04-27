@@ -24,6 +24,10 @@
 #define DEBUG 1
 #endif
 
+#ifndef STOP_ON_ERROR
+#define STOP_ON_ERROR 0
+#endif
+
 /* ----------------------DEBUG RELATED---------------------- */
 
 #if DEBUG
@@ -39,6 +43,16 @@ extern FILE *lexer_dump_file;
 
 #ifndef AST_JSON_DUMP_FILE_NAME
 #define AST_JSON_DUMP_FILE_NAME "ast.json"
+#endif
+
+#endif
+
+/* ----------------------ERROR RELATED---------------------- */
+
+#if !STOP_ON_ERROR
+
+#ifndef ALLOWED_ERRORS
+#define ALLOWED_ERRORS 5
 #endif
 
 #endif

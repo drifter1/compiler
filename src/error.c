@@ -6,6 +6,14 @@ extern const char *filename; // defined in compiler.c
 extern char *yytext; // defined in lex/yacc
 extern int yyleng;   // defined in lex/yacc
 
+#if !STOP_ON_ERROR
+
+/* -----------------------ERROR COUNT----------------------- */
+
+int error_count = 0;
+
+#endif
+
 /* ----------------ERROR REPORTING FUNCTIONS---------------- */
 
 void internal_error(const char *error) {
@@ -46,6 +54,11 @@ void lexical_analysis_error(const char *error, ...) {
 
     va_end(args);
 
+#if !STOP_ON_ERROR
+    if (++error_count <= ALLOWED_ERRORS)
+        return;
+#endif
+
     exit(EXIT_FAILURE);
 }
 
@@ -81,6 +94,11 @@ void syntax_analysis_error(int lineno, const char *error, ...) {
 
     va_end(args);
 
+#if !STOP_ON_ERROR
+    if (++error_count <= ALLOWED_ERRORS)
+        return;
+#endif
+
     exit(EXIT_FAILURE);
 }
 
@@ -88,7 +106,7 @@ void semantic_analysis_error(int lineno, const char *error, ...) {
     va_list args;
     va_start(args, error);
 
-    fprintf(stderr, BWHT "%s:%d: " BRED "error: " CRESET, filename, lineno);
+    fprintf(stderr, BWHT "%s:%d: " BMAG "warning: " CRESET, filename, lineno);
     vfprintf(stderr, error, args);
 
     char line[256];
@@ -115,6 +133,11 @@ void semantic_analysis_error(int lineno, const char *error, ...) {
     fprintf(stderr, " \n");
 
     va_end(args);
+
+#if !STOP_ON_ERROR
+    if (++error_count <= ALLOWED_ERRORS)
+        return;
+#endif
 
     exit(EXIT_FAILURE);
 }
