@@ -1,4 +1,6 @@
-#include "../include/compiler.h"
+#include "../include/semantics.h"
+#include "../include/debug.h"
+#include "../include/error.h"
 
 /* ------------------RETURN STATEMENT COUNT----------------- */
 
@@ -85,7 +87,7 @@ void semantic_analysis_list(list_node *list_head) {
 }
 
 void semantic_analysis_program(ast_node *node) {
-#if DEBUG
+#if SEM_DEBUG
     printf("Starting semantic analysis of program...\n");
 #endif
     semantic_analysis_list(node->as.program.declarations);
@@ -101,7 +103,7 @@ void semantic_analysis_declaration(ast_node *node) {
 }
 
 void semantic_analysis_constant(ast_node *node) {
-#if DEBUG
+#if SEM_DEBUG
     printf("Constant Node of data type \'%s\' used in line no. %d. No semantic "
            "analysis necessary!\n",
            data_type_to_string(node->as.constant.d_type), node->lineno);
@@ -151,7 +153,7 @@ void semantic_analysis_expresssion_binary(ast_node *node) {
             operator_type_to_string(node->as.expression_binary.op_type));
     } else {
         node->as.expression_binary.d_type = d_type;
-#if DEBUG
+#if SEM_DEBUG
         printf("Result data type of binary expression of operator type "
                "\'%s\' at line no. %d is \'%s\'\n",
                operator_type_to_string(node->as.expression_binary.op_type),
@@ -173,7 +175,7 @@ void semantic_analysis_expresssion_unary(ast_node *node) {
             operator_type_to_string(node->as.expression_unary.op_type));
     } else {
         node->as.expression_unary.d_type = d_type;
-#if DEBUG
+#if SEMANTIC_SEM_DEBUG
         printf("Result data type of unary expression of operator type \'%s\' "
                "at line no. %d is \'%s\'\n",
                operator_type_to_string(node->as.expression_unary.op_type),
@@ -185,7 +187,7 @@ void semantic_analysis_expresssion_unary(ast_node *node) {
 void semantic_analysis_variable_reference(ast_node *node) {
     symtab_entry *entry = node->as.variable_reference.entry;
 
-#if DEBUG
+#if SEM_DEBUG
     printf("Reference of variable \'%s\' at line no. %d is in scope \'%s\'\n",
            entry->id, node->lineno, entry->scope->id);
 #endif
@@ -194,7 +196,7 @@ void semantic_analysis_variable_reference(ast_node *node) {
 }
 
 void semantic_analysis_function_call(ast_node *node) {
-#if DEBUG
+#if SEM_DEBUG
     printf("Semantic analysis of function call node of function \'%s\' in line "
            "no. %d\n",
            node->as.function_call.entry->id, node->lineno);
@@ -227,7 +229,7 @@ void semantic_analysis_for_loop(ast_node *node) {
 }
 
 void semantic_analysis_assignment(ast_node *node) {
-#if DEBUG
+#if SEM_DEBUG
     printf("Semantic analysis of assignment node at line no. %d\n",
            node->lineno);
 #endif
@@ -239,7 +241,7 @@ void semantic_analysis_assignment(ast_node *node) {
         node->as.assignment.variable_reference->as.variable_reference.entry);
     data_type rhs_dtype = expression_data_type(node->as.assignment.expression);
 
-#if DEBUG
+#if SEM_DEBUG
     printf("LHS data type is \'%s\'\n", data_type_to_string(lhs_dtype));
     printf("RHS data type is \'%s\'\n", data_type_to_string(rhs_dtype));
 #endif
@@ -253,12 +255,12 @@ void semantic_analysis_assignment(ast_node *node) {
                                 data_type_to_string(lhs_dtype));
         break;
     case SAME_TYPE:
-#if DEBUG
+#if SEM_DEBUG
         printf("Types are the same!\n");
 #endif
         break;
     case COMPATIBLE:
-#if DEBUG
+#if SEM_DEBUG
         printf("Compatible Types!\n");
 #endif
     }
@@ -274,7 +276,7 @@ void semantic_analysis_while_loop(ast_node *node) {
 }
 
 void semantic_analysis_jump_statement(ast_node *node) {
-#if DEBUG
+#if SEM_DEBUG
     printf("Jump statement node of type \'%s\'\n",
            jump_type_to_string(node->as.jump_statement.j_type));
 #endif
@@ -286,14 +288,14 @@ void semantic_analysis_jump_statement(ast_node *node) {
             jump_type_to_string(node->as.jump_statement.j_type));
 
     } else {
-#if DEBUG
+#if SEM_DEBUG
         printf("Jump statement at line no. %d inside of loop!\n", node->lineno);
 #endif
     }
 }
 
 void semantic_analysis_print_statement(ast_node *node) {
-#if DEBUG
+#if SEM_DEBUG
     printf("Print statement node of type \'%s\'\n",
            print_type_to_string(node->as.print_statement.p_type));
 #endif
@@ -309,14 +311,14 @@ void semantic_analysis_print_statement(ast_node *node) {
             semantic_analysis_error(node->lineno, ERR_OUTPUT_TYPE,
                                     data_type_to_string(d_type));
         } else {
-#if DEBUG
+#if SEM_DEBUG
             printf("The data type of the output value is: \'%s\'\n",
                    data_type_to_string(d_type));
 #endif
         }
         break;
     case STRING:
-#if DEBUG
+#if SEM_DEBUG
         printf(
             "The output value is a STRING. No semantic analysis necessary!\n");
 #endif
@@ -326,7 +328,7 @@ void semantic_analysis_print_statement(ast_node *node) {
 void semantic_analysis_input_statement(ast_node *node) {
     semantic_analysis(node->as.input_statement.variable_reference);
 
-#if DEBUG
+#if SEM_DEBUG
     data_type d_type =
         get_data_type(node->as.input_statement.variable_reference->as
                           .variable_reference.entry);
@@ -370,7 +372,7 @@ void verify_no_redeclaration_of_names(list_node *names,
         head = head->next;
     }
 
-#if DEBUG
+#if SEM_DEBUG
     printf("No redeclaration of identifier \'%s\' at line no. %d\n", entry->id,
            declaration_lineno);
 #endif
@@ -381,7 +383,7 @@ void set_declaration_names_type(data_type d_type, list_node *names) {
     symtab_entry *entry;
     while (head != NULL) {
         entry = (symtab_entry *)head->data;
-#if DEBUG
+#if SEM_DEBUG
         printf("Set type of variable \'%s\' to \'%s\'\n", entry->id,
                data_type_to_string(d_type));
 #endif
@@ -442,7 +444,7 @@ void verify_declaration_names_init_value(list_node *names) {
 
         /* initialization type is UNDEF_TYPE -> there is no init value */
         if (init_type == UNDEF_TYPE) {
-#if DEBUG
+#if SEM_DEBUG
             printf("Declaration of variable \'%s\' of type \'%s\' has no "
                    "initialization value\n",
                    entry->id, data_type_to_string(var_type));
@@ -457,14 +459,14 @@ void verify_declaration_names_init_value(list_node *names) {
                                         data_type_to_string(init_type));
                 break;
             case SAME_TYPE:
-#if DEBUG
+#if SEM_DEBUG
                 printf("Declaration of variable \'%s\' of type \'%s\' has "
                        "initialization value of same type\n",
                        entry->id, data_type_to_string(var_type));
 #endif
                 break;
             case COMPATIBLE:
-#if DEBUG
+#if SEM_DEBUG
                 printf("Declaration of variable \'%s\' of type \'%s\' has "
                        "initialization value of compatible type \'%s\'\n",
                        entry->id, data_type_to_string(var_type),
@@ -487,7 +489,7 @@ void verify_no_redeclaration_of_function_name(symtab_entry *entry,
         semantic_analysis_error(declaration_lineno, ERR_REDECLARED_FUNC,
                                 entry->id);
     } else {
-#if DEBUG
+#if SEM_DEBUG
         printf("No redeclaration of identifier \'%s\' at line no. %d\n",
                entry->id, declaration_lineno);
 #endif
@@ -511,7 +513,7 @@ void verify_return_statement_last(list_node *statements) {
     if (ret_type == VOID_TYPE) {
         /* check kind of last statement node */
         if (statement->kind == RETURN_STATEMENT) {
-#if DEBUG
+#if SEM_DEBUG
             printf("Optional return statement was found at the end of function "
                    "\'%s\' of return type \'%s\'\n",
                    entry->id, data_type_to_string(ret_type));
@@ -522,7 +524,7 @@ void verify_return_statement_last(list_node *statements) {
     else {
         /* check kind of last statement node */
         if (statement->kind == RETURN_STATEMENT) {
-#if DEBUG
+#if SEM_DEBUG
             printf("Return statement was located at the of function \'%s\' of "
                    "type \'%s\' as required!\n",
                    entry->id, data_type_to_string(ret_type));
@@ -547,7 +549,7 @@ void verify_variable_declaration_before_use(symtab_entry *entry,
     if (use_lineno == first_lineno) {
         semantic_analysis_error(use_lineno, ERR_UNDECLARED_VAR, entry->id);
     } else {
-#if DEBUG
+#if SEM_DEBUG
         printf("Variable \'%s\' declared at line no. %d is correctly used in "
                "line no. %d\n",
                entry->id, first_lineno, use_lineno);
@@ -560,7 +562,7 @@ void verify_function_call_argument_count(list_node *parameters,
     int argument_count = list_length(arguments);
     int parameter_count = list_length(parameters);
 
-#if DEBUG
+#if SEM_DEBUG
     printf("Argument count is %d\n", argument_count);
     printf("Parameter count is %d\n", argument_count);
 #endif
@@ -569,7 +571,7 @@ void verify_function_call_argument_count(list_node *parameters,
         semantic_analysis_error(lineno, ERR_FUNC_ARG_NUM_MISMATCH,
                                 argument_count, parameter_count);
     } else {
-#if DEBUG
+#if SEM_DEBUG
         printf("Function call arguments are equal to the parameters required "
                "by the function!\n");
 #endif
@@ -599,14 +601,14 @@ void verify_function_call_argument_types(list_node *parameters,
                                     data_type_to_string(par_dtype));
             break;
         case SAME_TYPE:
-#if DEBUG
+#if SEM_DEBUG
             printf("Argument for parameter \'%s\' of type "
                    "\'%s\' is of same type!\n",
                    parameter->id, data_type_to_string(par_dtype));
 #endif
             break;
         case COMPATIBLE:
-#if DEBUG
+#if SEM_DEBUG
             printf("Argument of type \'%s\' for parameter \'%s\' of type "
                    "\'%s\' is of compatible type!\n",
                    data_type_to_string(arg_dtype), parameter->id,
@@ -625,7 +627,7 @@ void set_return_statement_ret_type(ast_node *node) {
     if (expression != NULL) {
         data_type ret_type = expression_data_type(expression);
         node->as.return_statement.ret_type = ret_type;
-#if DEBUG
+#if SEM_DEBUG
         printf("Set return type of return statement in line no. %d to "
                "\'%s\'\n",
                node->lineno, data_type_to_string(ret_type));
@@ -639,7 +641,7 @@ void verify_return_statement_ret_type(ast_node *node) {
     data_type func_ret_type =
         lookup_symtab_entry(cur_scope->id)->as.function.ret_type;
 
-#if DEBUG
+#if SEM_DEBUG
     printf("Return statement data type is \'%s\'\n",
            data_type_to_string(ret_type));
     printf("Function return type is \'%s\'\n",
@@ -650,7 +652,7 @@ void verify_return_statement_ret_type(ast_node *node) {
     if (func_ret_type == VOID_TYPE) {
         /* return statement has no return value -> correct */
         if (ret_type == VOID_TYPE) {
-#if DEBUG
+#if SEM_DEBUG
             printf("Return statement correctly returns no value!\n");
 #endif
         }
@@ -677,13 +679,13 @@ void verify_return_statement_ret_type(ast_node *node) {
                                         data_type_to_string(func_ret_type));
                 break;
             case SAME_TYPE:
-#if DEBUG
+#if SEM_DEBUG
                 printf("Return statement of same type as function return "
                        "value\n");
 #endif
                 break;
             case COMPATIBLE:
-#if DEBUG
+#if SEM_DEBUG
                 printf("Return statement has value of compatible type to "
                        "function return value!\n");
 #endif

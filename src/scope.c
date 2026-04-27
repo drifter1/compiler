@@ -1,4 +1,6 @@
-#include "../include/compiler.h"
+#include "../include/scope.h"
+#include "../include/debug.h"
+#include <stdlib.h>
 
 /* ----------------------CURRENT SCOPE--------------------- */
 
@@ -10,7 +12,7 @@ void init_scope() { cur_scope = new_global_scope(); }
 
 void hide_current_scope() {
 
-#if DEBUG
+#if SCOPE_DEBUG
     printf("Hiding scope \'%s\'\n", cur_scope->id);
 #endif
 
@@ -33,7 +35,7 @@ scope *new_local_scope(const char *id) { return new_scope((LOCAL), id); }
 
 void enter_local_scope(const char *id) {
 
-#if DEBUG
+#if SCOPE_DEBUG
     printf("Entering scope \'%s\'\n", id);
 #endif
 

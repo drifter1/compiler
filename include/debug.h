@@ -17,6 +17,18 @@
 #define AST_DEBUG 1
 #endif
 
+#ifndef SCOPE_DEBUG
+#define SCOPE_DEBUG 1
+#endif
+
+#ifndef CONTEXT_DEBUG
+#define CONTEXT_DEBUG 1
+#endif
+
+#ifndef SEM_DEBUG
+#define SEM_DEBUG 1
+#endif
+
 /* -------------LEXICAL ANALYSIS DEBUG SETTINGS------------- */
 
 #if LEX_DEBUG
