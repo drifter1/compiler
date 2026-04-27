@@ -1,18 +1,18 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
-#include "../include/ansi_colors.h"
-#include "../include/ast.h"
-#include "../include/context.h"
-#include "../include/error.h"
-#include "../include/ir.h"
-#include "../include/json.h"
-#include "../include/list.h"
-#include "../include/scope.h"
-#include "../include/semantics.h"
-#include "../include/symtab.h"
-#include "../include/tac.h"
-#include "../include/types.h"
+#include "ansi_colors.h"
+#include "ast.h"
+#include "context.h"
+#include "error.h"
+#include "ir.h"
+#include "json.h"
+#include "list.h"
+#include "scope.h"
+#include "semantics.h"
+#include "symtab.h"
+#include "tac.h"
+#include "types.h"
 
 /* --------------------COMPILER SETTINGS-------------------- */
 
@@ -31,6 +31,7 @@
 /* ----------------------DEBUG RELATED---------------------- */
 
 #if DEBUG
+
 extern FILE *lexer_dump_file;
 
 #ifndef LEXER_DUMP_FILE_NAME
