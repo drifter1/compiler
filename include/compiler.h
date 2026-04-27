@@ -28,6 +28,19 @@
 #define STOP_ON_ERROR 0
 #endif
 
+/* Available options for compiler stage selection
+ * 0 - do nothing
+ * 1 - only lexical analysis
+ * 2 - lexical + syntax
+ * 3 - lexical + syntax + semantic
+ * 4 - lexical + syntax + semantic + IR
+ * 5 - full pipeline
+ */
+
+#ifndef COMPILER_STAGE
+#define COMPILER_STAGE 5
+#endif
+
 /* ----------------------DEBUG RELATED---------------------- */
 
 #if DEBUG
@@ -44,6 +57,32 @@
 #define ALLOWED_ERRORS 5
 #endif
 
+#endif
+
+/* -----------------COMPILER STAGES RELATED----------------- */
+
+#if COMPILER_STAGE >= 1
+#define ENABLE_LEX 1
+#else
+#define ENABLE_LEX 0
+#endif
+
+#if COMPILER_STAGE >= 2
+#define ENABLE_SYNTAX 1
+#else
+#define ENABLE_SYNTAX 0
+#endif
+
+#if COMPILER_STAGE >= 3
+#define ENABLE_SEMANTIC 1
+#else
+#define ENABLE_SEMANTIC 0
+#endif
+
+#if COMPILER_STAGE >= 4
+#define ENABLE_IR 1
+#else
+#define ENABLE_IR 0
 #endif
 
 /* ----------------FLEX / BISON REQUIREMENTS---------------- */
