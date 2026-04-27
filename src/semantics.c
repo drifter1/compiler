@@ -175,7 +175,7 @@ void semantic_analysis_expresssion_unary(ast_node *node) {
             operator_type_to_string(node->as.expression_unary.op_type));
     } else {
         node->as.expression_unary.d_type = d_type;
-#if SEMANTIC_SEM_DEBUG
+#if SEM_DEBUG
         printf("Result data type of unary expression of operator type \'%s\' "
                "at line no. %d is \'%s\'\n",
                operator_type_to_string(node->as.expression_unary.op_type),
