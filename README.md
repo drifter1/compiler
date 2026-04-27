@@ -87,6 +87,9 @@ To build the compiler simply type `make` in this directory.
 
 By default, the executable will be located in the subdirectory *bin* and called *compiler*.
 
+>[!NOTE]
+> `make` targets the default `make` target which is `all` and has the same effect as `make all`.
+
 
 ## Running the included examples
 
@@ -114,6 +117,48 @@ To clean the build files and binary executable, you just have to type `make clea
 ## Cleaning up the run files
 
 To clean the debugging files when using the compiler in `DEBUG` mode (the default setting), simply type `make clean-run` after `make run`.
+
+
+# Advanced Usage
+
+## Compiler Stage Selection
+
+Rather than using the `make` or `make all` commands, the compiler can also be built using other targets that target a specific compilation stage. These are:
+
+- `make lex`: perform only lexical analysis
+- `make syntax`: perform up to syntax analysis
+- `make semantic`: perform up to semantic analysis
+- `make ir`: perform up to intermediate code generation
+
+>[!NOTE]
+> Since machine code generation is not yet implemented `make`, `make all` and `make ir` have the same effect.
+
+## Debugging Options
+
+Debugging is active by default.
+
+It can be deactivated by setting the *include/compiler.h* flag `DEBUG` to `0`, or by providing the `-DDEBUG=0` flag to `gcc`.
+
+When debugging is enabled, the header file includes the *include/debug.h* header, which contains all debugging options.
+
+The main options are for disabling lexical analysis, symbol table analysis, abstract syntax tree analysis, scope analysis, context analysis and semantic analysis debugging, respectively.
+
+Further options are available for lexical, symbol table and abstract syntax tree generation:
+
+- By default, lexical analysis debugging disables comment and token output, whilst keeping the generation of the dump file enabled.
+
+- By default, symbol table debugging prints a message on insertion and enables dump file generation.
+
+- Abstract syntax tree debugging prints a message on node creation and enables JSON dump file generation by default.
+
+
+## Error Handling
+
+The compiler's default behavior is to not stop on the first encountered error.
+
+This behavior can be changed by setting the *include/compiler.h* flag `STOP_ON_ERROR` to `1`.
+
+Default settings permit up to `5` non-internal errors before terminating the compilation procedure. The `ALLOWED_ERRORS` flag can be changed to any desired value.
 
 
 # Articles
